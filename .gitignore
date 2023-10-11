@@ -1,0 +1,8 @@
+/output/
+/dist/
+/build/
+/qgate_perf.egg-info/
+**/__pycache__/
+/venv/
+
+/.idea/
