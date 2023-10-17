@@ -34,7 +34,7 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
 
     if run_setup.is_init:
         prepare_model(cluster)
-        return
+        return None
 
     try:
         session = cluster.connect()
@@ -46,7 +46,7 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
         insert_statement = session.prepare(f"INSERT INTO jist.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
         batch = BatchStatement(consistency_level=ConsistencyLevel.ONE)
 
-        while (True):
+        while True:
             batch.clear()
 
             # generate synthetic data (only 1 mil. values for insert or update)
@@ -122,4 +122,4 @@ def perf_test(scylla: bool = False):
 
 if __name__ == '__main__':
     # prepare_model()
-    perf_test(True)
+    perf_test(False)
