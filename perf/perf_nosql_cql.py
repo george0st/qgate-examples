@@ -1,3 +1,5 @@
+import datetime
+
 from cassandra import ConsistencyLevel
 from cassandra.cluster import Cluster
 from cassandra.cluster import ExecutionProfile
@@ -101,24 +103,25 @@ def perf_test(scylla: bool = False):
         generator = ParallelExecutor(prf_cql,
                                      label="Cassandra",
                                      detail_output=True,
-                                     output_file="../output/prf_cassandara.txt",
+                                     output_file=f"../output/prf_cassandara-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
         setting={"ip":   "10.19.135.161",
                  "port": 9042}
 
-    setup = RunSetup(duration_second=50, start_delay=10, parameters=setting)
+    setup = RunSetup(duration_second=10, start_delay=0, parameters=setting)
     generator.run_bulk_executor(bulk_list=[[200, 10]],
                                 # executor_list=[[1, 2, '2x threads'],
                                 #                [2, 4, '2x threads']],
-                                executor_list=[[32, 2, '2x threads'],
-#                                                [48, 5, '2x threads']],
-                                                [32, 4, '2x threads']],
+                                executor_list=[[8, 2, '2x threads'],
+                                            [16, 2, '2x threads'],
+                                            [32, 2, '2x threads']],
                                 # executor_list=[[1, 2, '2x threads'],
                                 #                [4, 2, '2x threads'],
                                 #                [8, 2, '2x threads'],
                                 #                [16, 2, '2x threads'],
                                 #                [32, 2, '2x threads']],
                                 run_setup=setup)
+    generator.create_graph_perf(f"..\output")
 
 if __name__ == '__main__':
     # prepare_model()
