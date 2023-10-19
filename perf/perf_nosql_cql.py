@@ -1,3 +1,5 @@
+import datetime
+
 from cassandra import ConsistencyLevel
 from cassandra.cluster import Cluster
 from cassandra.cluster import ExecutionProfile
@@ -34,7 +36,7 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
 
     if run_setup.is_init:
         prepare_model(cluster)
-        return
+        return None
 
     try:
         session = cluster.connect()
@@ -46,7 +48,7 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
         insert_statement = session.prepare(f"INSERT INTO jist.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
         batch = BatchStatement(consistency_level=ConsistencyLevel.ONE)
 
-        while (True):
+        while True:
             batch.clear()
 
             # generate synthetic data (only 1 mil. values for insert or update)
@@ -101,25 +103,26 @@ def perf_test(scylla: bool = False):
         generator = ParallelExecutor(prf_cql,
                                      label="Cassandra",
                                      detail_output=True,
-                                     output_file="../output/prf_cassandara.txt",
+                                     output_file=f"../output/prf_cassandara-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
         setting={"ip":   "10.19.135.161",
                  "port": 9042}
 
-    setup = RunSetup(duration_second=50, start_delay=10, parameters=setting)
+    setup = RunSetup(duration_second=10, start_delay=0, parameters=setting)
     generator.run_bulk_executor(bulk_list=[[200, 10]],
                                 # executor_list=[[1, 2, '2x threads'],
                                 #                [2, 4, '2x threads']],
-                                executor_list=[[32, 2, '2x threads'],
-#                                                [48, 5, '2x threads']],
-                                                [32, 4, '2x threads']],
+                                executor_list=[[8, 2, '2x threads'],
+                                            [16, 2, '2x threads'],
+                                            [32, 2, '2x threads']],
                                 # executor_list=[[1, 2, '2x threads'],
                                 #                [4, 2, '2x threads'],
                                 #                [8, 2, '2x threads'],
                                 #                [16, 2, '2x threads'],
                                 #                [32, 2, '2x threads']],
                                 run_setup=setup)
+    generator.create_graph_perf(f"..\output")
 
 if __name__ == '__main__':
     # prepare_model()
-    perf_test(True)
+    perf_test(False)
