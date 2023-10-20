@@ -1,2 +1,2 @@
-qgate-perf>=0.4.2
+qgate-perf>=0.4.4
 cassandra-driver==3.28.0
