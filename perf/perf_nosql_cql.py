@@ -35,6 +35,7 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
                       connect_timeout=30)
 
     if run_setup.is_init:
+        # create NoSQL schema
         prepare_model(cluster)
         return None
 
@@ -89,40 +90,35 @@ def prepare_model(cluster):
         if cluster:
             cluster.shutdown()
 
-def perf_test(scylla: bool = False):
+def perf_test(scylla: bool = False, ip="localhost", port=9042, bulk_list=None, executor_list=None):
 
     if scylla:
         generator = ParallelExecutor(prf_cql,
                                      label="Scylla",
                                      detail_output=True,
-                                     output_file="../output/prf_scylla.txt",
+                                     output_file=f"../output/prf_scylla-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
-        setting={"ip":   "localhost",
-                 "port": 9042}
     else:
         generator = ParallelExecutor(prf_cql,
                                      label="Cassandra",
                                      detail_output=True,
                                      output_file=f"../output/prf_cassandara-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
-        setting={"ip":   "10.19.135.161",
-                 "port": 9042}
 
-    setup = RunSetup(duration_second=10, start_delay=0, parameters=setting)
-    generator.run_bulk_executor(bulk_list=[[200, 10]],
-                                # executor_list=[[1, 2, '2x threads'],
-                                #                [2, 4, '2x threads']],
-                                executor_list=[[8, 2, '2x threads'],
-                                            [16, 2, '2x threads'],
-                                            [32, 2, '2x threads']],
-                                # executor_list=[[1, 2, '2x threads'],
-                                #                [4, 2, '2x threads'],
-                                #                [8, 2, '2x threads'],
-                                #                [16, 2, '2x threads'],
-                                #                [32, 2, '2x threads']],
-                                run_setup=setup)
+    setup = RunSetup(duration_second=10, start_delay=0, parameters={"ip": ip,"port": port})
+    generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf(f"..\output")
 
 if __name__ == '__main__':
-    # prepare_model()
-    perf_test(False)
+
+    # size of data builks
+    bulks = [[200, 10]]
+    # list of executors
+    executors = [[8, 2, '2x threads'],
+                     [16, 2, '2x threads'],
+                     [32, 2, '2x threads']]
+
+    # ScyllaDB performnace tests
+#    perf_test(scylla=True, ip="localhost", port=9042, bulk_list=bulks, executor_list=executors)
+    # Cassandra performance tests
+    perf_test(scylla=False, ip="10.19.135.161", port=9042, bulk_list=bulks, executor_list=executors)
