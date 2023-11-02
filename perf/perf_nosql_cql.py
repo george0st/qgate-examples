@@ -1,4 +1,8 @@
-import datetime
+from enum import Enum
+import datetime, time
+from re import findall
+from subprocess import Popen, PIPE
+import numpy
 
 from cassandra import ConsistencyLevel
 from cassandra.cluster import Cluster
@@ -9,23 +13,42 @@ from cassandra.query import BatchStatement
 from qgate_perf.parallel_executor import ParallelExecutor
 from qgate_perf.parallel_probe import ParallelProbe
 from qgate_perf.run_setup import RunSetup
-import numpy
+from cassandra.auth import PlainTextAuthProvider
+from cassandra.cluster import Cluster
+
+class CQLType(Enum):
+    ScyllaDB = 1
+    Cassandra = 2
+    AstraDB = 3
+
+def read_file(file) -> str:
+    with open(file) as f:
+        return f.readline()
 
 def prf_cql(run_setup: RunSetup) -> ParallelProbe:
-
-    generator = numpy.random.default_rng()
+    generator = numpy.random.default_rng()  #seed=int(time.time())
     columns, items="", ""
 
-    # INIT - contain executor synchonization, if needed
-    probe=ParallelProbe(run_setup)
-
     # connect
-    cluster = Cluster(contact_points=[run_setup.param('ip')],
-                      port=run_setup.param('port'),
-                      execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
-                      control_connection_timeout=30,
-                      idle_heartbeat_interval=30,
-                      connect_timeout=30)
+    if run_setup['cql']!=CQLType.AstraDB:
+        cluster = Cluster(contact_points=[run_setup.param('ip')],
+                          port=run_setup.param('port'),
+                          execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
+                          control_connection_timeout=30,
+                          idle_heartbeat_interval=30,
+                          connect_timeout=30)
+    else:
+        cloud_config = {
+            "secure_connect_bundle" : "c:/Python/secure-connect-astrajist.zip",
+            'use_default_tempdir': True
+        }
+        authProvider = PlainTextAuthProvider(username="vvrXyPxUmMWnZrEELltYUrMf", password=read_file("c:/Python/client-secret.txt"))
+        cluster = Cluster(cloud = cloud_config,
+                          auth_provider = authProvider,
+                          execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
+                          control_connection_timeout=30,
+                          idle_heartbeat_interval=30,
+                          connect_timeout=30)
 
     if run_setup.is_init:
         # create NoSQL schema
@@ -35,12 +58,19 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
     try:
         session = cluster.connect()
 
+        # INIT - contain executor synchonization, if needed
+        probe = ParallelProbe(run_setup)
+
         # prepare insert statement for batch
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
             items+="?,"
         insert_statement = session.prepare(f"INSERT INTO jist.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
-        batch = BatchStatement(consistency_level=ConsistencyLevel.ONE)
+        if run_setup['cql']==CQLType.AstraDB:
+            # not support CL.ONE see error "Provided value ONE is not allowed for Write Consistency Level (disallowed values are: [ANY, ONE, LOCAL_ONE]"
+            batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
+        else:
+            batch = BatchStatement(consistency_level=ConsistencyLevel.ONE)
 
         while True:
             batch.clear()
@@ -54,7 +84,9 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
 
             # START - probe, only for this specific code part
             probe.start()
+
             session.execute(batch)
+
             # STOP - probe
             if probe.stop():
                 break
@@ -70,11 +102,10 @@ def prepare_model(cluster, run_setup: RunSetup):
         session = cluster.connect()
         columns=""
 
-        # Create new key space if not exist (similarity with new DW in MS SQL or new schema in Oracle)
-        session.execute("CREATE KEYSPACE IF NOT EXISTS jist WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};")
-
-        # use different replication strategy
-        # 'class':'NetworkTopologyStrategy'
+        if run_setup["cql"]!=CQLType.AstraDB:
+            # Create new key space if not exist (similarity with new DW in MS SQL or new schema in Oracle)
+            # use different replication strategy 'class':'NetworkTopologyStrategy'
+            session.execute("CREATE KEYSPACE IF NOT EXISTS jist WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};")
 
         # use LTW atomic command with IF
         session.execute("DROP TABLE IF EXISTS jist.t02")
@@ -83,44 +114,56 @@ def prepare_model(cluster, run_setup: RunSetup):
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i} int,"
 
-        session.execute(f"CREATE TABLE IF NOT EXISTS jist.t02 ({columns[:-1]}, PRIMARY KEY (fn0))")
-
-        # complex primary key (partition key 'fn0', 'fn1' and cluster key 'fn2'
-        # PRIMARY KEY ((fn0, fn1), (fn2))
+        # complex primary key (partition key 'fn0' and cluster key 'fn1')
+        session.execute(f"CREATE TABLE IF NOT EXISTS jist.t02 ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
 
     finally:
         if cluster:
             cluster.shutdown()
 
-def perf_test(scylla: bool = False, ip="localhost", port=9042, bulk_list=None, executor_list=None):
+def perf_test(cql: CQLType, ip="localhost", port=9042, duration=5, bulk_list=None, executor_list=None):
 
-    if scylla:
+    if cql==CQLType.ScyllaDB:
         generator = ParallelExecutor(prf_cql,
                                      label="Scylla",
                                      detail_output=True,
                                      output_file=f"../output/prf_scylla-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
-    else:
+    elif cql==CQLType.Cassandra:
         generator = ParallelExecutor(prf_cql,
                                      label="Cassandra",
                                      detail_output=True,
                                      output_file=f"../output/prf_cassandara-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
+    elif cql==CQLType.AstraDB:
+        generator = ParallelExecutor(prf_cql,
+                                     label="AstraDB",
+                                     detail_output=True,
+                                     output_file=f"../output/prf_astradb-{datetime.date.today()}.txt",
+                                     init_each_bulk=True)
 
-    setup = RunSetup(duration_second=10, start_delay=0, parameters={"ip": ip,"port": port})
+    setup = RunSetup(duration_second=duration, start_delay=0, parameters={"ip": ip, "port": port, "cql": cql})
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf(f"..\output")
 
 if __name__ == '__main__':
 
-    # size of data builks
-    bulks = [[200, 5]]
+    # size of data bulks
+    bulks = [[200, 10]]
+
     # list of executors
-    executors = [[4, 2, '2x threads'],
-                 [8, 2, '2x threads'],
-                 [16, 2, '2x threads']]
+    executors = [[2, 2, '2x threads'],
+                 [4, 2, '2x threads'],
+                 [8, 2, '2x threads']]
+
+    # performance test duration
+    duration_seconds=5
 
     # ScyllaDB performnace tests
-#    perf_test(scylla=True, ip="localhost", port=9042, bulk_list=bulks, executor_list=executors)
+    perf_test(CQLType.ScyllaDB, ip="localhost", port=9042, duration=duration_seconds, bulk_list=bulks, executor_list=executors)
+
     # Cassandra performance tests
-    perf_test(scylla=False, ip="10.19.135.161", port=9042, bulk_list=bulks, executor_list=executors)
+    #perf_test(CQLType.Cassandra, ip="10.19.135.161", port=9042, duration=duration_seconds, bulk_list=bulks, executor_list=executors)
+
+    # AstraDB performance tests
+    #perf_test(CQLType.AstraDB, ip="", port=9042, bulk_list=bulks, duration=duration_seconds, executor_list=executors)
