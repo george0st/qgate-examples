@@ -11,13 +11,6 @@ from qgate_perf.parallel_probe import ParallelProbe
 from qgate_perf.run_setup import RunSetup
 import numpy
 
-#
-# class CqlTest:
-#
-#     def __init__(self):
-#         pass
-
-
 def prf_cql(run_setup: RunSetup) -> ParallelProbe:
 
     generator = numpy.random.default_rng()
@@ -36,7 +29,7 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
 
     if run_setup.is_init:
         # create NoSQL schema
-        prepare_model(cluster)
+        prepare_model(cluster, run_setup)
         return None
 
     try:
@@ -71,20 +64,29 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
 
     return probe
 
-def prepare_model(cluster):
+def prepare_model(cluster, run_setup: RunSetup):
 
     try:
         session = cluster.connect()
+        columns=""
 
+        # Create new key space if not exist (similarity with new DW in MS SQL or new schema in Oracle)
         session.execute("CREATE KEYSPACE IF NOT EXISTS jist WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};")
+
+        # use different replication strategy
+        # 'class':'NetworkTopologyStrategy'
+
+        # use LTW atomic command with IF
         session.execute("DROP TABLE IF EXISTS jist.t02")
 
-        session.execute("CREATE TABLE IF NOT EXISTS jist.t02 (fn0 int PRIMARY KEY, fn1 int, fn2 int, fn3 int"
-                        ", fn4 int, fn5 int, fn6 int, fn7 int, fn8 int, fn9 int)")
+        # prepare insert statement for batch
+        for i in range(0, run_setup.bulk_col):
+            columns+=f"fn{i} int,"
 
-        # one insert for basic tests (if everything is ready)
-        session.execute(f"INSERT INTO jist.t02 (fn0, fn1, fn2, fn3, fn4, fn5, fn6, fn7, fn8, fn9) "
-                        f"VALUES(0,0,0,0,0,0,0,0,0,0)")
+        session.execute(f"CREATE TABLE IF NOT EXISTS jist.t02 ({columns[:-1]}, PRIMARY KEY (fn0))")
+
+        # complex primary key (partition key 'fn0', 'fn1' and cluster key 'fn2'
+        # PRIMARY KEY ((fn0, fn1), (fn2))
 
     finally:
         if cluster:
@@ -112,11 +114,11 @@ def perf_test(scylla: bool = False, ip="localhost", port=9042, bulk_list=None, e
 if __name__ == '__main__':
 
     # size of data builks
-    bulks = [[200, 10]]
+    bulks = [[200, 5]]
     # list of executors
-    executors = [[8, 2, '2x threads'],
-                     [16, 2, '2x threads'],
-                     [32, 2, '2x threads']]
+    executors = [[4, 2, '2x threads'],
+                 [8, 2, '2x threads'],
+                 [16, 2, '2x threads']]
 
     # ScyllaDB performnace tests
 #    perf_test(scylla=True, ip="localhost", port=9042, bulk_list=bulks, executor_list=executors)
