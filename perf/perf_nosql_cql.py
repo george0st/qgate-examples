@@ -31,8 +31,8 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
 
     # connect
     if run_setup['cql']!=CQLType.AstraDB:
-        cluster = Cluster(contact_points=[run_setup.param('ip')],
-                          port=run_setup.param('port'),
+        cluster = Cluster(contact_points=[run_setup['ip']],
+                          port=run_setup['port'],
                           execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
                           control_connection_timeout=30,
                           idle_heartbeat_interval=30,
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     # size of data bulks
     bulks = [[200, 10]]
 
-    # list of executors
+    # list of executors (for application to all bulks)
     executors = [[2, 2, '2x threads'],
                  [4, 2, '2x threads'],
                  [8, 2, '2x threads']]
@@ -169,16 +169,16 @@ if __name__ == '__main__':
     #           bulk_list=bulks,
     #           executor_list=executors)
 
-    # Cassandra performance tests
-    # Note: change 'ip' and 'port' based on your needs
+    # # Cassandra performance tests
+    # # Note: change 'ip' and 'port' based on your needs
     # perf_test(CQLType.Cassandra,
     #           {"ip": "10.19.135.161", "port": 9042},
     #           duration=duration_seconds,
     #           bulk_list=bulks,
     #           executor_list=executors)
 
-    # AstraDB performance tests
-    # Note: change 'secure_connect_bundle', 'username', 'password' based on your needs
+    # # AstraDB performance tests
+    # # Note: change 'secure_connect_bundle', 'username', 'password' based on your needs
     # perf_test(CQLType.AstraDB,
     #           {"secure_connect_bundle": "c:/Python/secure-connect-astrajist.zip",
     #            "username": "vvrXyPxUmMWnZrEELltYUrMf",
