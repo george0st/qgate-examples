@@ -104,8 +104,8 @@ def prepare_model(cluster, run_setup: RunSetup):
         columns=""
 
         if run_setup["cql"]!=CQLType.AstraDB:
-            # Create new key space if not exist (similarity with new DW in MS SQL or new schema in Oracle)
-            # use different replication strategy 'class':'NetworkTopologyStrategy'
+            # Create new key space if not exist
+            # use different replication strategy 'class':'NetworkTopologyStrategy' for production HA mode
             session.execute("CREATE KEYSPACE IF NOT EXISTS jist WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};")
 
         # use LTW atomic command with IF
@@ -171,11 +171,11 @@ if __name__ == '__main__':
 
     # # Cassandra performance tests
     # # Note: change 'ip' and 'port' based on your needs
-    # perf_test(CQLType.Cassandra,
-    #           {"ip": "10.19.135.161", "port": 9042},
-    #           duration=duration_seconds,
-    #           bulk_list=bulks,
-    #           executor_list=executors)
+    perf_test(CQLType.Cassandra,
+              {"ip": "10.19.135.161", "port": 9042},
+              duration=duration_seconds,
+              bulk_list=bulks,
+              executor_list=executors)
 
     # # AstraDB performance tests
     # # Note: change 'secure_connect_bundle', 'username', 'password' based on your needs
