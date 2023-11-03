@@ -31,8 +31,8 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
 
     # connect
     if run_setup['cql']!=CQLType.AstraDB:
-        cluster = Cluster(contact_points=[run_setup.param('ip')],
-                          port=run_setup.param('port'),
+        cluster = Cluster(contact_points=[run_setup['ip']],
+                          port=run_setup.['port'],
                           execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
                           control_connection_timeout=30,
                           idle_heartbeat_interval=30,
