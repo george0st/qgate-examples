@@ -153,7 +153,7 @@ if __name__ == '__main__':
     # size of data bulks
     bulks = [[200, 10]]
 
-    # list of executors
+    # list of executors (for application to all bulks)
     executors = [[2, 2, '2x threads'],
                  [4, 2, '2x threads'],
                  [8, 2, '2x threads']]
@@ -169,16 +169,16 @@ if __name__ == '__main__':
     #           bulk_list=bulks,
     #           executor_list=executors)
 
-    # Cassandra performance tests
-    # Note: change 'ip' and 'port' based on your needs
+    # # Cassandra performance tests
+    # # Note: change 'ip' and 'port' based on your needs
     # perf_test(CQLType.Cassandra,
     #           {"ip": "10.19.135.161", "port": 9042},
     #           duration=duration_seconds,
     #           bulk_list=bulks,
     #           executor_list=executors)
 
-    # AstraDB performance tests
-    # Note: change 'secure_connect_bundle', 'username', 'password' based on your needs
+    # # AstraDB performance tests
+    # # Note: change 'secure_connect_bundle', 'username', 'password' based on your needs
     # perf_test(CQLType.AstraDB,
     #           {"secure_connect_bundle": "c:/Python/secure-connect-astrajist.zip",
     #            "username": "vvrXyPxUmMWnZrEELltYUrMf",
