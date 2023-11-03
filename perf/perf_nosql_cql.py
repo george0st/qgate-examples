@@ -39,10 +39,11 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
                           connect_timeout=30)
     else:
         cloud_config = {
-            "secure_connect_bundle" : "c:/Python/secure-connect-astrajist.zip",
+            "secure_connect_bundle" : run_setup["secure_connect_bundle"],
             'use_default_tempdir': True
         }
-        authProvider = PlainTextAuthProvider(username="vvrXyPxUmMWnZrEELltYUrMf", password=read_file("c:/Python/client-secret.txt"))
+        authProvider = PlainTextAuthProvider(username=run_setup["username"],
+                                             password=read_file(run_setup["password"]))
         cluster = Cluster(cloud = cloud_config,
                           auth_provider = authProvider,
                           execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
@@ -121,7 +122,7 @@ def prepare_model(cluster, run_setup: RunSetup):
         if cluster:
             cluster.shutdown()
 
-def perf_test(cql: CQLType, ip="localhost", port=9042, duration=5, bulk_list=None, executor_list=None):
+def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, executor_list=None):
 
     if cql==CQLType.ScyllaDB:
         generator = ParallelExecutor(prf_cql,
@@ -142,7 +143,8 @@ def perf_test(cql: CQLType, ip="localhost", port=9042, duration=5, bulk_list=Non
                                      output_file=f"../output/prf_astradb-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
 
-    setup = RunSetup(duration_second=duration, start_delay=0, parameters={"ip": ip, "port": port, "cql": cql})
+    parameters["cql"]=cql
+    setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf(f"..\output")
 
@@ -159,11 +161,28 @@ if __name__ == '__main__':
     # performance test duration
     duration_seconds=5
 
-    # ScyllaDB performnace tests
-    perf_test(CQLType.ScyllaDB, ip="localhost", port=9042, duration=duration_seconds, bulk_list=bulks, executor_list=executors)
+    # # ScyllaDB performnace tests
+    # # Note: change 'ip' and 'port' based on your needs
+    # perf_test(CQLType.ScyllaDB,
+    #           {"ip": "localhost", "port": 9042},
+    #           duration=duration_seconds,
+    #           bulk_list=bulks,
+    #           executor_list=executors)
 
     # Cassandra performance tests
-    #perf_test(CQLType.Cassandra, ip="10.19.135.161", port=9042, duration=duration_seconds, bulk_list=bulks, executor_list=executors)
+    # Note: change 'ip' and 'port' based on your needs
+    # perf_test(CQLType.Cassandra,
+    #           {"ip": "10.19.135.161", "port": 9042},
+    #           duration=duration_seconds,
+    #           bulk_list=bulks,
+    #           executor_list=executors)
 
     # AstraDB performance tests
-    #perf_test(CQLType.AstraDB, ip="", port=9042, bulk_list=bulks, duration=duration_seconds, executor_list=executors)
+    # Note: change 'secure_connect_bundle', 'username', 'password' based on your needs
+    # perf_test(CQLType.AstraDB,
+    #           {"secure_connect_bundle": "c:/Python/secure-connect-astrajist.zip",
+    #            "username": "vvrXyPxUmMWnZrEELltYUrMf",
+    #            "password": "c:/Python/client-secret.txt"},
+    #           bulk_list=bulks,
+    #           duration=duration_seconds,
+    #           executor_list=executors)
