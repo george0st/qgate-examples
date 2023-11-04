@@ -28,24 +28,30 @@ def read_file(file) -> str:
 def prf_cql(run_setup: RunSetup) -> ParallelProbe:
     generator = numpy.random.default_rng()  #seed=int(time.time())
     columns, items="", ""
+    authProvider=None
 
-    # connect
-    if run_setup['cql']!=CQLType.AstraDB:
-        cluster = Cluster(contact_points=[run_setup['ip']],
-                          port=run_setup['port'],
+    # connection setting
+    if run_setup['username']:
+        authProvider = PlainTextAuthProvider(username=run_setup["username"],
+                                             password=read_file(run_setup["password"]))
+
+    if run_setup["secure_connect_bundle"]:
+        # connection with 'secure_connect_bundle' to the cloud
+        cloud_config = {
+            "secure_connect_bundle" : run_setup["secure_connect_bundle"],
+            'use_default_tempdir': True
+        }
+        cluster = Cluster(cloud = cloud_config,
+                          auth_provider=authProvider,
                           execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
                           control_connection_timeout=30,
                           idle_heartbeat_interval=30,
                           connect_timeout=30)
     else:
-        cloud_config = {
-            "secure_connect_bundle" : run_setup["secure_connect_bundle"],
-            'use_default_tempdir': True
-        }
-        authProvider = PlainTextAuthProvider(username=run_setup["username"],
-                                             password=read_file(run_setup["password"]))
-        cluster = Cluster(cloud = cloud_config,
-                          auth_provider = authProvider,
+        # connection with 'ip' and 'port'
+        cluster = Cluster(contact_points=run_setup['ip'],
+                          port=run_setup['port'],
+                          auth_provider=authProvider,
                           execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
                           control_connection_timeout=30,
                           idle_heartbeat_interval=30,
@@ -161,24 +167,28 @@ if __name__ == '__main__':
     # performance test duration
     duration_seconds=5
 
-    # # ScyllaDB performnace tests
-    # # Note: change 'ip' and 'port' based on your needs
+    # ScyllaDB performnace tests
+    # Note:
+    #   - please, change 'ip' and 'port' based on your needs
     # perf_test(CQLType.ScyllaDB,
-    #           {"ip": "localhost", "port": 9042},
+    #           {"ip": ["localhost"], "port": 9042},
     #           duration=duration_seconds,
     #           bulk_list=bulks,
     #           executor_list=executors)
 
-    # # Cassandra performance tests
-    # # Note: change 'ip' and 'port' based on your needs
-    perf_test(CQLType.Cassandra,
-              {"ip": "10.19.135.161", "port": 9042},
-              duration=duration_seconds,
-              bulk_list=bulks,
-              executor_list=executors)
+    # Cassandra performance tests
+    # Note:
+    #   - please, change 'ip' and 'port' based on your needs
+    # perf_test(CQLType.Cassandra,
+    #           {"ip": ["10.19.135.161"], "port": 9042},
+    #           duration=duration_seconds,
+    #           bulk_list=bulks,
+    #           executor_list=executors)
 
-    # # AstraDB performance tests
-    # # Note: change 'secure_connect_bundle', 'username', 'password' based on your needs
+    # AstraDB performance tests
+    # Note:
+    #   - please, change 'secure_connect_bundle', 'username', 'password' based on your needs
+    #   - typicaly you have to switch off VPN
     # perf_test(CQLType.AstraDB,
     #           {"secure_connect_bundle": "c:/Python/secure-connect-astrajist.zip",
     #            "username": "vvrXyPxUmMWnZrEELltYUrMf",
