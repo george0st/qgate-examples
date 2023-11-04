@@ -1,11 +1,8 @@
 from enum import Enum
-import datetime, time
-from re import findall
-from subprocess import Popen, PIPE
+import datetime
 import numpy
 
 from cassandra import ConsistencyLevel
-from cassandra.cluster import Cluster
 from cassandra.cluster import ExecutionProfile
 from cassandra.cluster import EXEC_PROFILE_DEFAULT
 from cassandra.query import BatchStatement
