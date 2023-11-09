@@ -162,7 +162,7 @@ if __name__ == '__main__':
                  [16, 2, '2x threads']]
 
     # performance test duration
-    duration_seconds=120
+    duration_seconds=5
 
     # ScyllaDB performnace tests
     # Note:
@@ -186,10 +186,10 @@ if __name__ == '__main__':
     # Note:
     #   - please, change 'secure_connect_bundle', 'username', 'password' based on your needs
     #   - typicaly you have to switch off VPN
-    perf_test(CQLType.AstraDB,
-              {"secure_connect_bundle": "c:/Python/secure-connect-astrajist.zip",
-               "username": "UpBqQJwTWGUUKdZQTcZaoglA",
-               "password": "c:/Python/client-secret.txt"},
-              bulk_list=bulks,
-              duration=duration_seconds,
-              executor_list=executors)
+    # perf_test(CQLType.AstraDB,
+    #           {"secure_connect_bundle": "c:/Python/secure-connect-astrajist.zip",
+    #            "username": "UpBqQJwTWGUUKdZQTcZaoglA",
+    #            "password": "c:/Python/client-secret.txt"},
+    #           bulk_list=bulks,
+    #           duration=duration_seconds,
+    #           executor_list=executors)
