@@ -1,11 +1,8 @@
 from enum import Enum
-import datetime, time
-from re import findall
-from subprocess import Popen, PIPE
+import datetime
 import numpy
 
 from cassandra import ConsistencyLevel
-from cassandra.cluster import Cluster
 from cassandra.cluster import ExecutionProfile
 from cassandra.cluster import EXEC_PROFILE_DEFAULT
 from cassandra.query import BatchStatement
@@ -162,7 +159,7 @@ if __name__ == '__main__':
     # list of executors (for application to all bulks)
     executors = [[2, 2, '2x threads'],
                  [4, 2, '2x threads'],
-                 [8, 2, '2x threads']]
+                 [16, 2, '2x threads']]
 
     # performance test duration
     duration_seconds=5
@@ -191,7 +188,7 @@ if __name__ == '__main__':
     #   - typicaly you have to switch off VPN
     # perf_test(CQLType.AstraDB,
     #           {"secure_connect_bundle": "c:/Python/secure-connect-astrajist.zip",
-    #            "username": "vvrXyPxUmMWnZrEELltYUrMf",
+    #            "username": "UpBqQJwTWGUUKdZQTcZaoglA",
     #            "password": "c:/Python/client-secret.txt"},
     #           bulk_list=bulks,
     #           duration=duration_seconds,
