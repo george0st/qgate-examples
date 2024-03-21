@@ -170,35 +170,45 @@ if __name__ == '__main__':
     #load_dotenv("perf_nosql_cql.env")
 
     if config['COSMOSDB'].lower() == "on":
+        param = {"ip": [config["COSMOSDB_IP"]], "port": config["COSMOSDB_PORT"]}
+        if config['COSMOSDB_USERNAME']:
+            param['username'] = config['COSMOSDB_USERNAME']
+            param['password'] = config['COSMOSDB_PASSWORD']
         perf_test(CQLType.CosmosDB,
-                  {
-                      "ip": [config["COSMOSDB_IP"]],
-                      "port": config["COSMOSDB_PORT"],
-                      "username": config["COSMOSDB_USERNAME"],
-                      "password": config["COSMOSDB_PASSWORD"]},
+                  param,
                   bulk_list=bulks,
                   duration=duration_seconds,
                   executor_list=executors)
 
     if config['SCYLLADB'].lower() == "on":
+        param = {"ip": [config["SCYLLADB_IP"]], "port": config["SCYLLADB_PORT"]}
+        if config['SCYLLADB_USERNAME']:
+            param['username'] = config['SCYLLADB_USERNAME']
+            param['password'] = config['SCYLLADB_PASSWORD']
         perf_test(CQLType.ScyllaDB,
-                  {"ip": [config["SCYLLADB_IP"]], "port": config["SCYLLADB_PORT"]},
+                  param,
                   duration=duration_seconds,
                   bulk_list=bulks,
                   executor_list=executors)
 
     if config['CASSANDRA'].lower() == "on":
+        param = {"ip": [config["CASSANDRA_IP"]], "port": config["CASSANDRA_PORT"]}
+        if config['CASSANDRA_USERNAME']:
+            param['username'] = config['CASSANDRA_USERNAME']
+            param['password'] = config['CASSANDRA_PASSWORD']
         perf_test(CQLType.Cassandra,
-                  {"ip": [config["CASSANDRA_IP"]], "port": config["CASSANDRA_PORT"]},
+                  param,
                   duration=duration_seconds,
                   bulk_list=bulks,
                   executor_list=executors)
 
     if config['ASTRADB'].lower() == "on":
+        param = {"secure_connect_bundle": config["ASTRADB_SECURE_CONNECT_BUNDLE"]}
+        if config['ASTRADB_USERNAME']:
+            param['username'] = config['ASTRADB_USERNAME']
+            param['password'] = config['ASTRADB_PASSWORD']
         perf_test(CQLType.AstraDB,
-                  {"secure_connect_bundle": config["ASTRADB_SECURE_CONNECT_BUNDLE"],
-                   "username": config["ASTRADB_USERNAME"],
-                   "password": config["ASTRADB_PASSWORD"]},
+                  param,
                   bulk_list=bulks,
                   duration=duration_seconds,
                   executor_list=executors)
