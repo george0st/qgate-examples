@@ -167,26 +167,39 @@ if __name__ == '__main__':
 
     config = dotenv_values("perf_nosql_cql.py")
 
-    if config['COSMOS'].lower()=="on":
-        pass
+    if config['COSMOSDB'].lower()=="on":
+        perf_test(CQLType.CosmosDB,
+                  {
+                      "ip": [config["COSMOSDB_IP"]],
+                      "port": config["COSMOSDB_PORT"],
+                      "username": config["COSMOSDB_USERNAME"],
+                      "password": config["COSMOSDB_PASSWORD"]},
+                  bulk_list=bulks,
+                  duration=duration_seconds,
+                  executor_list=executors)
 
-    if config['SCYLLA'].lower()=="on":
+    if config['SCYLLADB'].lower()=="on":
         perf_test(CQLType.ScyllaDB,
-                  {"ip": [config["IP"]], "port": config["PORT"]},
+                  {"ip": [config["SCYLLADB_IP"]], "port": config["SCYLLADB_PORT"]},
                   duration=duration_seconds,
                   bulk_list=bulks,
                   executor_list=executors)
 
     if config['CASSANDRA'].lower()=="on":
         perf_test(CQLType.Cassandra,
-                  {"ip": [config["IP"]], "port": config["PORT"]},
+                  {"ip": [config["CASSANDRA_IP"]], "port": config["CASSANDRA_PORT"]},
                   duration=duration_seconds,
                   bulk_list=bulks,
                   executor_list=executors)
 
-    if config['ASTRA'].lower()=="on":
-        pass
-
+    if config['ASTRADB'].lower()=="on":
+        perf_test(CQLType.AstraDB,
+                  {"secure_connect_bundle": config["ASTRADB_SECURE_CONNECT_BUNDLE"],
+                   "username": config["ASTRADB_USERNAME"],
+                   "password": config["ASTRADB_PASSWORD"]},
+                  bulk_list=bulks,
+                  duration=duration_seconds,
+                  executor_list=executors)
 
     # CosmosDB performance tests
     perf_test(CQLType.CosmosDB,
