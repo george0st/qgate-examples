@@ -63,7 +63,7 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
     try:
         session = cluster.connect()
 
-        # INIT - contain executor synchonization, if needed
+        # INIT - contain executor synchronization, if needed
         probe = ParallelProbe(run_setup)
 
         # prepare insert statement for batch
