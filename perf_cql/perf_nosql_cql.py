@@ -196,9 +196,9 @@ if __name__ == '__main__':
     #   - please, change 'secure_connect_bundle', 'username', 'password' based on your needs
     #   - typicaly you have to switch off VPN
     # perf_test(CQLType.AstraDB,
-    #           {"secure_connect_bundle": "c:/Python/secure-connect-astrajist.zip",
+    #           {"secure_connect_bundle": "./secrets/secure-connect-astrajist.zip",
     #            "username": "UpBqQJwTWGUUKdZQTcZaoglA",
-    #            "password": "c:/Python/client-secret.txt"},
+    #            "password": "./secrets/client-secret.txt"},
     #           bulk_list=bulks,
     #           duration=duration_seconds,
     #           executor_list=executors)
