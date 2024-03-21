@@ -171,10 +171,18 @@ if __name__ == '__main__':
         pass
 
     if config['SCYLLA'].lower()=="on":
-        pass
+        perf_test(CQLType.ScyllaDB,
+                  {"ip": [config["IP"]], "port": config["PORT"]},
+                  duration=duration_seconds,
+                  bulk_list=bulks,
+                  executor_list=executors)
 
     if config['CASSANDRA'].lower()=="on":
-        pass
+        perf_test(CQLType.Cassandra,
+                  {"ip": [config["IP"]], "port": config["PORT"]},
+                  duration=duration_seconds,
+                  bulk_list=bulks,
+                  executor_list=executors)
 
     if config['ASTRA'].lower()=="on":
         pass
