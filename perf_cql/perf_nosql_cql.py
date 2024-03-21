@@ -146,6 +146,13 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
                                      detail_output=True,
                                      output_file=f"../output/prf_astradb-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
+    elif cql==CQLType.CosmosDB:
+        generator = ParallelExecutor(prf_cql,
+                                     label="CosmosDB",
+                                     detail_output=True,
+                                     output_file=f"../output/prf_cosmosdb-{datetime.date.today()}.txt",
+                                     init_each_bulk=True)
+
 
     parameters["cql"]=cql
     setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
