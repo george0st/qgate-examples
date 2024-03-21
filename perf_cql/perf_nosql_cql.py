@@ -13,6 +13,9 @@ from qgate_perf.run_setup import RunSetup
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster
 
+from dotenv import load_dotenv, dotenv_values
+
+
 class CQLType(Enum):
     ScyllaDB = 1
     Cassandra = 2
@@ -162,7 +165,43 @@ if __name__ == '__main__':
     # performance test duration
     duration_seconds=5
 
-    # CosmosDB performnace tests
+    config = dotenv_values("perf_nosql_cql.py")
+
+    if config['COSMOSDB'].lower()=="on":
+        perf_test(CQLType.CosmosDB,
+                  {
+                      "ip": [config["COSMOSDB_IP"]],
+                      "port": config["COSMOSDB_PORT"],
+                      "username": config["COSMOSDB_USERNAME"],
+                      "password": config["COSMOSDB_PASSWORD"]},
+                  bulk_list=bulks,
+                  duration=duration_seconds,
+                  executor_list=executors)
+
+    if config['SCYLLADB'].lower()=="on":
+        perf_test(CQLType.ScyllaDB,
+                  {"ip": [config["SCYLLADB_IP"]], "port": config["SCYLLADB_PORT"]},
+                  duration=duration_seconds,
+                  bulk_list=bulks,
+                  executor_list=executors)
+
+    if config['CASSANDRA'].lower()=="on":
+        perf_test(CQLType.Cassandra,
+                  {"ip": [config["CASSANDRA_IP"]], "port": config["CASSANDRA_PORT"]},
+                  duration=duration_seconds,
+                  bulk_list=bulks,
+                  executor_list=executors)
+
+    if config['ASTRADB'].lower()=="on":
+        perf_test(CQLType.AstraDB,
+                  {"secure_connect_bundle": config["ASTRADB_SECURE_CONNECT_BUNDLE"],
+                   "username": config["ASTRADB_USERNAME"],
+                   "password": config["ASTRADB_PASSWORD"]},
+                  bulk_list=bulks,
+                  duration=duration_seconds,
+                  executor_list=executors)
+
+    # CosmosDB performance tests
     perf_test(CQLType.CosmosDB,
               {
                   "ip": ["jist-cos02.cassandra.cosmos.azure.com"],
@@ -173,7 +212,7 @@ if __name__ == '__main__':
               duration=duration_seconds,
               executor_list=executors)
 
-    # ScyllaDB performnace tests
+    # ScyllaDB performance tests
     # Note:
     #   - please, change 'ip' and 'port' based on your needs
     # perf_test(CQLType.ScyllaDB,
