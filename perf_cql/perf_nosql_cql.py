@@ -13,6 +13,9 @@ from qgate_perf.run_setup import RunSetup
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster
 
+from dotenv import load_dotenv, dotenv_values
+
+
 class CQLType(Enum):
     ScyllaDB = 1
     Cassandra = 2
@@ -161,6 +164,21 @@ if __name__ == '__main__':
 
     # performance test duration
     duration_seconds=5
+
+    config = dotenv_values("perf_nosql_cql.py")
+
+    if config['COSMOS'].lower()=="on":
+        pass
+
+    if config['SCYLLA'].lower()=="on":
+        pass
+
+    if config['CASSANDRA'].lower()=="on":
+        pass
+
+    if config['ASTRA'].lower()=="on":
+        pass
+
 
     # CosmosDB performance tests
     perf_test(CQLType.CosmosDB,
