@@ -202,15 +202,15 @@ if __name__ == '__main__':
                   executor_list=executors)
 
     # CosmosDB performance tests
-    perf_test(CQLType.CosmosDB,
-              {
-                  "ip": ["jist-cos02.cassandra.cosmos.azure.com"],
-                  "port": 10350,
-                  "username": "jist-cos02",
-                  "password": "./secrets/cosmos-secret.txt"},
-              bulk_list=bulks,
-              duration=duration_seconds,
-              executor_list=executors)
+    # perf_test(CQLType.CosmosDB,
+    #           {
+    #               "ip": ["jist-cos02.cassandra.cosmos.azure.com"],
+    #               "port": 10350,
+    #               "username": "jist-cos02",
+    #               "password": "./secrets/cosmos-secret.txt"},
+    #           bulk_list=bulks,
+    #           duration=duration_seconds,
+    #           executor_list=executors)
 
     # ScyllaDB performance tests
     # Note:
@@ -237,7 +237,7 @@ if __name__ == '__main__':
     # perf_test(CQLType.AstraDB,
     #           {"secure_connect_bundle": "./secrets/secure-connect-astrajist.zip",
     #            "username": "UpBqQJwTWGUUKdZQTcZaoglA",
-    #            "password": "./secrets/client-secret.txt"},
+    #            "password": "./secrets/astra-client-secret.txt"},
     #           bulk_list=bulks,
     #           duration=duration_seconds,
     #           executor_list=executors)
