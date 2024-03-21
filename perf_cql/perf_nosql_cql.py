@@ -128,31 +128,21 @@ def prepare_model(cluster, run_setup: RunSetup):
 
 def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, executor_list=None):
 
+    lbl=""
     if cql==CQLType.ScyllaDB:
-        generator = ParallelExecutor(prf_cql,
-                                     label="Scylla",
-                                     detail_output=True,
-                                     output_file=f"../output/prf_scylla-{datetime.date.today()}.txt",
-                                     init_each_bulk=True)
+        lbl="Scylla"
     elif cql==CQLType.Cassandra:
-        generator = ParallelExecutor(prf_cql,
-                                     label="Cassandra",
-                                     detail_output=True,
-                                     output_file=f"../output/prf_cassandara-{datetime.date.today()}.txt",
-                                     init_each_bulk=True)
+        lbl = "Cassandra"
     elif cql==CQLType.AstraDB:
-        generator = ParallelExecutor(prf_cql,
-                                     label="AstraDB",
-                                     detail_output=True,
-                                     output_file=f"../output/prf_astradb-{datetime.date.today()}.txt",
-                                     init_each_bulk=True)
+        lbl = "AstraDB"
     elif cql==CQLType.CosmosDB:
-        generator = ParallelExecutor(prf_cql,
-                                     label="CosmosDB",
-                                     detail_output=True,
-                                     output_file=f"../output/prf_cosmosdb-{datetime.date.today()}.txt",
-                                     init_each_bulk=True)
+        lbl = "CosmosDB"
 
+    generator = ParallelExecutor(prf_cql,
+                                 label=lbl,
+                                 detail_output=True,
+                                 output_file=f"../output/prf_{lbl.lower()}-{datetime.date.today()}.txt",
+                                 init_each_bulk=True)
 
     parameters["cql"]=cql
     setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
