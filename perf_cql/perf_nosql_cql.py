@@ -17,6 +17,7 @@ class CQLType(Enum):
     ScyllaDB = 1
     Cassandra = 2
     AstraDB = 3
+    CosmosDB = 4
 
 def read_file(file) -> str:
     with open(file) as f:
