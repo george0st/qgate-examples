@@ -165,9 +165,11 @@ if __name__ == '__main__':
     # performance test duration
     duration_seconds=5
 
-    config = dotenv_values("perf_nosql_cql.py")
+    #env_vars = dotenv.dotenv_values(env_file)
+    config = dotenv_values("perf_nosql_cql.env")
+    #load_dotenv("perf_nosql_cql.env")
 
-    if config['COSMOSDB'].lower()=="on":
+    if config['COSMOSDB'].lower() == "on":
         perf_test(CQLType.CosmosDB,
                   {
                       "ip": [config["COSMOSDB_IP"]],
@@ -178,21 +180,21 @@ if __name__ == '__main__':
                   duration=duration_seconds,
                   executor_list=executors)
 
-    if config['SCYLLADB'].lower()=="on":
+    if config['SCYLLADB'].lower() == "on":
         perf_test(CQLType.ScyllaDB,
                   {"ip": [config["SCYLLADB_IP"]], "port": config["SCYLLADB_PORT"]},
                   duration=duration_seconds,
                   bulk_list=bulks,
                   executor_list=executors)
 
-    if config['CASSANDRA'].lower()=="on":
+    if config['CASSANDRA'].lower() == "on":
         perf_test(CQLType.Cassandra,
                   {"ip": [config["CASSANDRA_IP"]], "port": config["CASSANDRA_PORT"]},
                   duration=duration_seconds,
                   bulk_list=bulks,
                   executor_list=executors)
 
-    if config['ASTRADB'].lower()=="on":
+    if config['ASTRADB'].lower() == "on":
         perf_test(CQLType.AstraDB,
                   {"secure_connect_bundle": config["ASTRADB_SECURE_CONNECT_BUNDLE"],
                    "username": config["ASTRADB_USERNAME"],
@@ -202,15 +204,15 @@ if __name__ == '__main__':
                   executor_list=executors)
 
     # CosmosDB performance tests
-    perf_test(CQLType.CosmosDB,
-              {
-                  "ip": ["jist-cos02.cassandra.cosmos.azure.com"],
-                  "port": 10350,
-                  "username": "jist-cos02",
-                  "password": "./secrets/cosmos-secret.txt"},
-              bulk_list=bulks,
-              duration=duration_seconds,
-              executor_list=executors)
+    # perf_test(CQLType.CosmosDB,
+    #           {
+    #               "ip": ["jist-cos02.cassandra.cosmos.azure.com"],
+    #               "port": 10350,
+    #               "username": "jist-cos02",
+    #               "password": "./secrets/cosmos-secret.txt"},
+    #           bulk_list=bulks,
+    #           duration=duration_seconds,
+    #           executor_list=executors)
 
     # ScyllaDB performance tests
     # Note:
@@ -237,7 +239,7 @@ if __name__ == '__main__':
     # perf_test(CQLType.AstraDB,
     #           {"secure_connect_bundle": "./secrets/secure-connect-astrajist.zip",
     #            "username": "UpBqQJwTWGUUKdZQTcZaoglA",
-    #            "password": "./secrets/client-secret.txt"},
+    #            "password": "./secrets/astra-client-secret.txt"},
     #           bulk_list=bulks,
     #           duration=duration_seconds,
     #           executor_list=executors)
