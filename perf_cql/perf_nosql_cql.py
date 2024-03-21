@@ -17,6 +17,7 @@ class CQLType(Enum):
     ScyllaDB = 1
     Cassandra = 2
     AstraDB = 3
+    CosmosDB = 4
 
 def read_file(file) -> str:
     with open(file) as f:
@@ -62,7 +63,7 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
     try:
         session = cluster.connect()
 
-        # INIT - contain executor synchonization, if needed
+        # INIT - contain executor synchronization, if needed
         probe = ParallelProbe(run_setup)
 
         # prepare insert statement for batch
@@ -127,24 +128,21 @@ def prepare_model(cluster, run_setup: RunSetup):
 
 def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, executor_list=None):
 
+    lbl=""
     if cql==CQLType.ScyllaDB:
-        generator = ParallelExecutor(prf_cql,
-                                     label="Scylla",
-                                     detail_output=True,
-                                     output_file=f"../output/prf_scylla-{datetime.date.today()}.txt",
-                                     init_each_bulk=True)
+        lbl="Scylla"
     elif cql==CQLType.Cassandra:
-        generator = ParallelExecutor(prf_cql,
-                                     label="Cassandra",
-                                     detail_output=True,
-                                     output_file=f"../output/prf_cassandara-{datetime.date.today()}.txt",
-                                     init_each_bulk=True)
+        lbl = "Cassandra"
     elif cql==CQLType.AstraDB:
-        generator = ParallelExecutor(prf_cql,
-                                     label="AstraDB",
-                                     detail_output=True,
-                                     output_file=f"../output/prf_astradb-{datetime.date.today()}.txt",
-                                     init_each_bulk=True)
+        lbl = "AstraDB"
+    elif cql==CQLType.CosmosDB:
+        lbl = "CosmosDB"
+
+    generator = ParallelExecutor(prf_cql,
+                                 label=lbl,
+                                 detail_output=True,
+                                 output_file=f"../output/prf_{lbl.lower()}-{datetime.date.today()}.txt",
+                                 init_each_bulk=True)
 
     parameters["cql"]=cql
     setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
@@ -163,6 +161,17 @@ if __name__ == '__main__':
 
     # performance test duration
     duration_seconds=5
+
+    # CosmosDB performnace tests
+    perf_test(CQLType.CosmosDB,
+              {
+                  "ip": ["jist-cos02.cassandra.cosmos.azure.com"],
+                  "port": 10350,
+                  "username": "jist-cos02",
+                  "password": "./secrets/cosmos-secret.txt"},
+              bulk_list=bulks,
+              duration=duration_seconds,
+              executor_list=executors)
 
     # ScyllaDB performnace tests
     # Note:
@@ -187,9 +196,9 @@ if __name__ == '__main__':
     #   - please, change 'secure_connect_bundle', 'username', 'password' based on your needs
     #   - typicaly you have to switch off VPN
     # perf_test(CQLType.AstraDB,
-    #           {"secure_connect_bundle": "c:/Python/secure-connect-astrajist.zip",
+    #           {"secure_connect_bundle": "./secrets/secure-connect-astrajist.zip",
     #            "username": "UpBqQJwTWGUUKdZQTcZaoglA",
-    #            "password": "c:/Python/client-secret.txt"},
+    #            "password": "./secrets/client-secret.txt"},
     #           bulk_list=bulks,
     #           duration=duration_seconds,
     #           executor_list=executors)
