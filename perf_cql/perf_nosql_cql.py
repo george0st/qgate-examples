@@ -162,7 +162,7 @@ if __name__ == '__main__':
     # performance test duration
     duration_seconds=5
 
-    # CosmosDB performnace tests
+    # CosmosDB performance tests
     perf_test(CQLType.CosmosDB,
               {
                   "ip": ["jist-cos02.cassandra.cosmos.azure.com"],
@@ -173,7 +173,7 @@ if __name__ == '__main__':
               duration=duration_seconds,
               executor_list=executors)
 
-    # ScyllaDB performnace tests
+    # ScyllaDB performance tests
     # Note:
     #   - please, change 'ip' and 'port' based on your needs
     # perf_test(CQLType.ScyllaDB,
