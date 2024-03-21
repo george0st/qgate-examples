@@ -162,6 +162,17 @@ if __name__ == '__main__':
     # performance test duration
     duration_seconds=5
 
+    # CosmosDB performnace tests
+    perf_test(CQLType.CosmosDB,
+              {
+                  "ip": ["jist-cos02.cassandra.cosmos.azure.com"],
+                  "port": 10350,
+                  "username": "jist-cos02",
+                  "password": "./secrets/cosmos-secret.txt"},
+              bulk_list=bulks,
+              duration=duration_seconds,
+              executor_list=executors)
+
     # ScyllaDB performnace tests
     # Note:
     #   - please, change 'ip' and 'port' based on your needs
