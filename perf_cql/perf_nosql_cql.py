@@ -14,6 +14,7 @@ from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster
 
 from dotenv import load_dotenv, dotenv_values
+from ssl import PROTOCOL_TLSv1_2, SSLContext, CERT_NONE, CERT_REQUIRED, PROTOCOL_TLSv2
 
 
 class CQLType(Enum):
@@ -21,6 +22,7 @@ class CQLType(Enum):
     Cassandra = 2
     AstraDB = 3
     CosmosDB = 4
+
 
 def read_file(file) -> str:
     with open(file) as f:
@@ -49,10 +51,11 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
                           idle_heartbeat_interval=30,
                           connect_timeout=30)
     else:
-        from ssl import PROTOCOL_TLSv1_2, SSLContext, CERT_NONE
-
-        ssl_context = SSLContext(PROTOCOL_TLSv1_2)
-        ssl_context.verify_mode = CERT_NONE
+        ssl_opts = {
+            'ca_certs': '../secrets/public-key.pem',
+            'ssl_version': PROTOCOL_TLSv2,
+            'cert_reqs': CERT_REQUIRED  # Certificates are required and validated
+        }
 
         # connection with 'ip' and 'port'
         cluster = Cluster(contact_points=run_setup['ip'],
@@ -62,7 +65,7 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
                           control_connection_timeout=30,
                           idle_heartbeat_interval=30,
                           connect_timeout=30,
-                          ssl_context=ssl_context)
+                          ssl_options=ssl_opts)
 
     if run_setup.is_init:
         # create NoSQL schema
@@ -79,7 +82,7 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
             items+="?,"
-        insert_statement = session.prepare(f"INSERT INTO jist.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
+        insert_statement = session.prepare(f"INSERT INTO jist2.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
         if run_setup['cql']==CQLType.AstraDB:
             # not support CL.ONE see error "Provided value ONE is not allowed for Write Consistency Level (disallowed values are: [ANY, ONE, LOCAL_ONE]"
             batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
@@ -119,17 +122,18 @@ def prepare_model(cluster, run_setup: RunSetup):
         if run_setup["cql"]!=CQLType.AstraDB:
             # Create new key space if not exist
             # use different replication strategy 'class':'NetworkTopologyStrategy' for production HA mode
-            session.execute("CREATE KEYSPACE IF NOT EXISTS jist WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};")
+#            session.execute("CREATE KEYSPACE IF NOT EXISTS jist WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};")
+            session.execute("CREATE KEYSPACE IF NOT EXISTS jist2 WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};")
 
         # use LTW atomic command with IF
-        session.execute("DROP TABLE IF EXISTS jist.t02")
+        session.execute("DROP TABLE IF EXISTS jist2.t02")
 
         # prepare insert statement for batch
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i} int,"
 
         # complex primary key (partition key 'fn0' and cluster key 'fn1')
-        session.execute(f"CREATE TABLE IF NOT EXISTS jist.t02 ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
+        session.execute(f"CREATE TABLE IF NOT EXISTS jist2.t02 ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
 
     finally:
         if cluster:
@@ -161,12 +165,14 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
 if __name__ == '__main__':
 
     # size of data bulks
-    bulks = [[200, 10]]
+    bulks = [[1, 10]]
 
     # list of executors (for application to all bulks)
-    executors = [[2, 2, '2x threads'],
-                 [4, 2, '2x threads'],
-                 [16, 2, '2x threads']]
+
+    # executors = [[2, 2, '2x threads'],
+    #              [4, 2, '2x threads'],
+    #              [16, 2, '2x threads']]
+    executors = [[1, 1, '1x threads']]
 
     # performance test duration
     duration_seconds=5
@@ -225,7 +231,7 @@ if __name__ == '__main__':
     #               "ip": ["jist-cos02.cassandra.cosmos.azure.com"],
     #               "port": 10350,
     #               "username": "jist-cos02",
-    #               "password": "./secrets/cosmos-secret.txt"},
+    #               "password": "./secrets/jist-cos03.txt"},
     #           bulk_list=bulks,
     #           duration=duration_seconds,
     #           executor_list=executors)
