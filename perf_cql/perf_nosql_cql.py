@@ -49,6 +49,11 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
                           idle_heartbeat_interval=30,
                           connect_timeout=30)
     else:
+        from ssl import PROTOCOL_TLSv1_2, SSLContext, CERT_NONE
+
+        ssl_context = SSLContext(PROTOCOL_TLSv1_2)
+        ssl_context.verify_mode = CERT_NONE
+
         # connection with 'ip' and 'port'
         cluster = Cluster(contact_points=run_setup['ip'],
                           port=run_setup['port'],
@@ -56,7 +61,8 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
                           execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
                           control_connection_timeout=30,
                           idle_heartbeat_interval=30,
-                          connect_timeout=30)
+                          connect_timeout=30,
+                          ssl_context=ssl_context)
 
     if run_setup.is_init:
         # create NoSQL schema
