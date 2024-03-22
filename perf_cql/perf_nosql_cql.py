@@ -14,7 +14,7 @@ from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster
 
 from dotenv import load_dotenv, dotenv_values
-from ssl import PROTOCOL_TLSv1_2, SSLContext, CERT_NONE, CERT_REQUIRED, PROTOCOL_TLSv2
+from ssl import PROTOCOL_TLSv1_2, PROTOCOL_TLSv1, SSLContext, CERT_NONE, CERT_REQUIRED
 
 
 class CQLType(Enum):
@@ -51,11 +51,14 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
                           idle_heartbeat_interval=30,
                           connect_timeout=30)
     else:
-        ssl_opts = {
-            'ca_certs': '../secrets/public-key.pem',
-            'ssl_version': PROTOCOL_TLSv2,
-            'cert_reqs': CERT_REQUIRED  # Certificates are required and validated
-        }
+        # ssl_opts = {
+        #     'ca_certs': 'C:\Python\qgate-examples\secrets\public-key.pem',
+        #     'ssl_version': PROTOCOL_TLSv1_2,
+        #     'cert_reqs': CERT_REQUIRED  # Certificates are required and validated
+        # }
+        #
+        # ssl_context = SSLContext(PROTOCOL_TLSv1_2)
+        # ssl_context.verify_mode = CERT_NONE
 
         # connection with 'ip' and 'port'
         cluster = Cluster(contact_points=run_setup['ip'],
@@ -64,8 +67,7 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
                           execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
                           control_connection_timeout=30,
                           idle_heartbeat_interval=30,
-                          connect_timeout=30,
-                          ssl_options=ssl_opts)
+                          connect_timeout=30)
 
     if run_setup.is_init:
         # create NoSQL schema
@@ -165,14 +167,14 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
 if __name__ == '__main__':
 
     # size of data bulks
-    bulks = [[1, 10]]
+    bulks = [[200, 10]]
 
     # list of executors (for application to all bulks)
 
-    # executors = [[2, 2, '2x threads'],
-    #              [4, 2, '2x threads'],
-    #              [16, 2, '2x threads']]
-    executors = [[1, 1, '1x threads']]
+    executors = [[2, 2, '2x threads'],
+                 [4, 2, '2x threads'],
+                 [16, 2, '2x threads']]
+#    executors = [[1, 1, '1x threads']]
 
     # performance test duration
     duration_seconds=5
@@ -194,7 +196,7 @@ if __name__ == '__main__':
 
     if config['SCYLLADB'].lower() == "on":
         param = {"ip": [config["SCYLLADB_IP"]], "port": config["SCYLLADB_PORT"]}
-        if config['SCYLLADB_USERNAME']:
+        if config.get('SCYLLADB_USERNAME',None):
             param['username'] = config['SCYLLADB_USERNAME']
             param['password'] = config['SCYLLADB_PASSWORD']
         perf_test(CQLType.ScyllaDB,
