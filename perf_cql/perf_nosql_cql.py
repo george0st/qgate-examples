@@ -185,7 +185,7 @@ if __name__ == '__main__':
 
     if config['COSMOSDB'].lower() == "on":
         param = {"ip": [config["COSMOSDB_IP"]], "port": config["COSMOSDB_PORT"]}
-        if config['COSMOSDB_USERNAME']:
+        if config.get('COSMOSDB_USERNAME', None):
             param['username'] = config['COSMOSDB_USERNAME']
             param['password'] = config['COSMOSDB_PASSWORD']
         perf_test(CQLType.CosmosDB,
@@ -207,7 +207,7 @@ if __name__ == '__main__':
 
     if config['CASSANDRA'].lower() == "on":
         param = {"ip": [config["CASSANDRA_IP"]], "port": config["CASSANDRA_PORT"]}
-        if config['CASSANDRA_USERNAME']:
+        if config.get('CASSANDRA_USERNAME', None):
             param['username'] = config['CASSANDRA_USERNAME']
             param['password'] = config['CASSANDRA_PASSWORD']
         perf_test(CQLType.Cassandra,
@@ -218,7 +218,7 @@ if __name__ == '__main__':
 
     if config['ASTRADB'].lower() == "on":
         param = {"secure_connect_bundle": config["ASTRADB_SECURE_CONNECT_BUNDLE"]}
-        if config['ASTRADB_USERNAME']:
+        if config.get('ASTRADB_USERNAME', None):
             param['username'] = config['ASTRADB_USERNAME']
             param['password'] = config['ASTRADB_PASSWORD']
         perf_test(CQLType.AstraDB,
