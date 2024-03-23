@@ -170,7 +170,6 @@ if __name__ == '__main__':
     bulks = [[200, 10]]
 
     # list of executors (for application to all bulks)
-
     executors = [[2, 2, '2x threads'],
                  [4, 2, '2x threads'],
                  [16, 2, '2x threads']]
