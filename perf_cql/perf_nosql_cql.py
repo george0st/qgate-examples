@@ -124,7 +124,8 @@ def prepare_model(cluster, run_setup: RunSetup):
         if run_setup["cql"]!=CQLType.AstraDB:
             # Create new key space if not exist
             # use different replication strategy 'class':'NetworkTopologyStrategy' for production HA mode
-            session.execute("CREATE KEYSPACE IF NOT EXISTS jist WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};")
+            run_setup['']
+            session.execute("CREATE KEYSPACE IF NOT EXISTS jist2 WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};")
 #            session.execute("CREATE KEYSPACE IF NOT EXISTS jist2 WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};")
 
         # use LTW atomic command with IF
@@ -179,12 +180,14 @@ if __name__ == '__main__':
     # performance test duration
     duration_seconds=5
 
-    #env_vars = dotenv.dotenv_values(env_file)
     config = dotenv_values("perf_nosql_cql.env")
-    #load_dotenv("perf_nosql_cql.env")
+
+    param={}
+    param['keyspace']=config["KEYSPACE"]
 
     if config['COSMOSDB'].lower() == "on":
-        param = {"ip": [config["COSMOSDB_IP"]], "port": config["COSMOSDB_PORT"]}
+        param["ip"]=[config["COSMOSDB_IP"]]
+        param["port"]=config["COSMOSDB_PORT"]
         if config.get('COSMOSDB_USERNAME', None):
             param['username'] = config['COSMOSDB_USERNAME']
             param['password'] = config['COSMOSDB_PASSWORD']
@@ -195,7 +198,8 @@ if __name__ == '__main__':
                   executor_list=executors)
 
     if config['SCYLLADB'].lower() == "on":
-        param = {"ip": [config["SCYLLADB_IP"]], "port": config["SCYLLADB_PORT"]}
+        param["ip"]=[config["SCYLLADB_IP"]]
+        param["port"]=config["SCYLLADB_PORT"]
         if config.get('SCYLLADB_USERNAME',None):
             param['username'] = config['SCYLLADB_USERNAME']
             param['password'] = config['SCYLLADB_PASSWORD']
@@ -206,7 +210,8 @@ if __name__ == '__main__':
                   executor_list=executors)
 
     if config['CASSANDRA'].lower() == "on":
-        param = {"ip": [config["CASSANDRA_IP"]], "port": config["CASSANDRA_PORT"]}
+        param["ip"]=[config["CASSANDRA_IP"]]
+        param["port"]=config["CASSANDRA_PORT"]
         if config.get('CASSANDRA_USERNAME', None):
             param['username'] = config['CASSANDRA_USERNAME']
             param['password'] = config['CASSANDRA_PASSWORD']
@@ -217,7 +222,7 @@ if __name__ == '__main__':
                   executor_list=executors)
 
     if config['ASTRADB'].lower() == "on":
-        param = {"secure_connect_bundle": config["ASTRADB_SECURE_CONNECT_BUNDLE"]}
+        param["secure_connect_bundle"]=config["ASTRADB_SECURE_CONNECT_BUNDLE"]
         if config.get('ASTRADB_USERNAME', None):
             param['username'] = config['ASTRADB_USERNAME']
             param['password'] = config['ASTRADB_PASSWORD']
