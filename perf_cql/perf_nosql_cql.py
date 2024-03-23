@@ -124,8 +124,8 @@ def prepare_model(cluster, run_setup: RunSetup):
         if run_setup["cql"]!=CQLType.AstraDB:
             # Create new key space if not exist
             # use different replication strategy 'class':'NetworkTopologyStrategy' for production HA mode
-#            session.execute("CREATE KEYSPACE IF NOT EXISTS jist WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};")
-            session.execute("CREATE KEYSPACE IF NOT EXISTS jist2 WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};")
+            session.execute("CREATE KEYSPACE IF NOT EXISTS jist WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};")
+#            session.execute("CREATE KEYSPACE IF NOT EXISTS jist2 WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};")
 
         # use LTW atomic command with IF
         session.execute("DROP TABLE IF EXISTS jist2.t02")
