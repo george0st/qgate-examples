@@ -5,6 +5,7 @@ import numpy
 from cassandra import ConsistencyLevel
 from cassandra.cluster import ExecutionProfile
 from cassandra.cluster import EXEC_PROFILE_DEFAULT
+from cassandra.policies import DCAwareRoundRobinPolicy
 from cassandra.query import BatchStatement
 
 from qgate_perf.parallel_executor import ParallelExecutor
@@ -164,6 +165,11 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf(f"..\output")
 
+def param_reset(config):
+    param={}
+    param['keyspace']=config["KEYSPACE"]
+    return param
+
 if __name__ == '__main__':
 
     # size of data bulks
@@ -180,9 +186,7 @@ if __name__ == '__main__':
 
     config = dotenv_values("perf_nosql_cql.env")
 
-    param={}
-    param['keyspace']=config["KEYSPACE"]
-
+    param=param_reset(config)
     if config['COSMOSDB'].lower() == "on":
         param["ip"]=[config["COSMOSDB_IP"]]
         param["port"]=config["COSMOSDB_PORT"]
@@ -195,6 +199,7 @@ if __name__ == '__main__':
                   duration=duration_seconds,
                   executor_list=executors)
 
+    param=param_reset(config)
     if config['SCYLLADB'].lower() == "on":
         param["ip"]=[config["SCYLLADB_IP"]]
         param["port"]=config["SCYLLADB_PORT"]
@@ -207,6 +212,7 @@ if __name__ == '__main__':
                   bulk_list=bulks,
                   executor_list=executors)
 
+    param=param_reset(config)
     if config['CASSANDRA'].lower() == "on":
         param["ip"]=[config["CASSANDRA_IP"]]
         param["port"]=config["CASSANDRA_PORT"]
@@ -219,6 +225,7 @@ if __name__ == '__main__':
                   bulk_list=bulks,
                   executor_list=executors)
 
+    param=param_reset(config)
     if config['ASTRADB'].lower() == "on":
         param["secure_connect_bundle"]=config["ASTRADB_SECURE_CONNECT_BUNDLE"]
         if config.get('ASTRADB_USERNAME', None):
