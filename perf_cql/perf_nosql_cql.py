@@ -84,7 +84,7 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
             items+="?,"
-        insert_statement = session.prepare(f"INSERT INTO jist2.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
+        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
         if run_setup['cql']==CQLType.AstraDB:
             # not support CL.ONE see error "Provided value ONE is not allowed for Write Consistency Level (disallowed values are: [ANY, ONE, LOCAL_ONE]"
             batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
@@ -124,19 +124,18 @@ def prepare_model(cluster, run_setup: RunSetup):
         if run_setup["cql"]!=CQLType.AstraDB:
             # Create new key space if not exist
             # use different replication strategy 'class':'NetworkTopologyStrategy' for production HA mode
-            run_setup['']
-            session.execute("CREATE KEYSPACE IF NOT EXISTS jist2 WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};")
-#            session.execute("CREATE KEYSPACE IF NOT EXISTS jist2 WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};")
+            #            session.execute("CREATE KEYSPACE IF NOT EXISTS jist2 WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};")
+            session.execute(f"CREATE KEYSPACE IF NOT EXISTS {run_setup['keyspace']} WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};")
 
         # use LTW atomic command with IF
-        session.execute("DROP TABLE IF EXISTS jist2.t02")
+        session.execute(f"DROP TABLE IF EXISTS {run_setup['keyspace']}.t02")
 
         # prepare insert statement for batch
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i} int,"
 
         # complex primary key (partition key 'fn0' and cluster key 'fn1')
-        session.execute(f"CREATE TABLE IF NOT EXISTS jist2.t02 ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
+        session.execute(f"CREATE TABLE IF NOT EXISTS {run_setup['keyspace']}.t02 ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
 
     finally:
         if cluster:
