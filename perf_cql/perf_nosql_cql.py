@@ -169,10 +169,32 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf(f"..\output")
 
-def param_reset(config):
+def get_config(config, adapter):
     param={}
     param['keyspace']=config["KEYSPACE"]
-    return param
+
+    if config[adapter].lower() == "on":
+        # connection setting
+        if config.get(f"{adapter}_IP", None):
+            param["ip"]=[config[f"{adapter}_IP"]]
+        if config.get(f"{adapter}_PORT", None):
+            param["port"]=config[f"{adapter}_PORT"]
+        if config.get(f"{adapter}_SECURE_CONNECT_BUNDLE", None):
+            param["secure_connect_bundle"]=config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
+
+        # login setting
+        if config.get(f"{adapter}_USERNAME", None):
+            param['username'] = config[f"{adapter}_USERNAME"]
+            param['password'] = config[f"{adapter}_PASSWORD"]
+
+        # replication setting
+        if config.get(f"{adapter}_REPLICATION_CLASS", None):
+            param['replication_class'] = config[f"{adapter}_REPLICATION_CLASS"]
+            param['replication_factor'] = config[f"{adapter}_REPLICATION_FACTOR"]
+
+        return param
+    else:
+        return None
 
 if __name__ == '__main__':
 
@@ -194,54 +216,59 @@ if __name__ == '__main__':
     #     config['REPLICATION_FACTOR
 
 
-    param=param_reset(config)
-    if config['COSMOSDB'].lower() == "on":
-        param["ip"]=[config["COSMOSDB_IP"]]
-        param["port"]=config["COSMOSDB_PORT"]
-        if config.get('COSMOSDB_USERNAME', None):
-            param['username'] = config['COSMOSDB_USERNAME']
-            param['password'] = config['COSMOSDB_PASSWORD']
-        if config.get('COSMOSDB_REPLICATION_CLASS', None):
-            param['replication_class'] = config['COSMOSDB_REPLICATION_CLASS']
-            param['replication_factor'] = config['COSMOSDB_REPLICATION_FACTOR']
+    param=get_config(config, 'COSMOSDB')
+    if param:
+    # if config['COSMOSDB'].lower() == "on":
+    #     param["ip"]=[config["COSMOSDB_IP"]]
+    #     param["port"]=config["COSMOSDB_PORT"]
+    #     if config.get('COSMOSDB_USERNAME', None):
+    #         param['username'] = config['COSMOSDB_USERNAME']
+    #         param['password'] = config['COSMOSDB_PASSWORD']
+    #     if config.get('COSMOSDB_REPLICATION_CLASS', None):
+    #         param['replication_class'] = config['COSMOSDB_REPLICATION_CLASS']
+    #         param['replication_factor'] = config['COSMOSDB_REPLICATION_FACTOR']
         perf_test(CQLType.CosmosDB,
                   param,
                   bulk_list=bulks,
                   duration=duration_seconds,
                   executor_list=executors)
 
-    param=param_reset(config)
-    if config['SCYLLADB'].lower() == "on":
-        param["ip"]=[config["SCYLLADB_IP"]]
-        param["port"]=config["SCYLLADB_PORT"]
-        if config.get('SCYLLADB_USERNAME',None):
-            param['username'] = config['SCYLLADB_USERNAME']
-            param['password'] = config['SCYLLADB_PASSWORD']
+    param=get_config(config, 'SCYLLADB')
+    if param:
+    # if config['SCYLLADB'].lower() == "on":
+    #     param["ip"]=[config["SCYLLADB_IP"]]
+    #     param["port"]=config["SCYLLADB_PORT"]
+    #     if config.get('SCYLLADB_USERNAME',None):
+    #         param['username'] = config['SCYLLADB_USERNAME']
+    #         param['password'] = config['SCYLLADB_PASSWORD']
         perf_test(CQLType.ScyllaDB,
                   param,
                   duration=duration_seconds,
                   bulk_list=bulks,
                   executor_list=executors)
 
-    param=param_reset(config)
-    if config['CASSANDRA'].lower() == "on":
-        param["ip"]=[config["CASSANDRA_IP"]]
-        param["port"]=config["CASSANDRA_PORT"]
-        if config.get('CASSANDRA_USERNAME', None):
-            param['username'] = config['CASSANDRA_USERNAME']
-            param['password'] = config['CASSANDRA_PASSWORD']
+    param=get_config(config, 'CASSANDRA')
+    if param:
+    # if config['CASSANDRA'].lower() == "on":
+    #     param["ip"]=[config["CASSANDRA_IP"]]
+    #     param["port"]=config["CASSANDRA_PORT"]
+    #     if config.get('CASSANDRA_USERNAME', None):
+    #         param['username'] = config['CASSANDRA_USERNAME']
+    #         param['password'] = config['CASSANDRA_PASSWORD']
         perf_test(CQLType.Cassandra,
                   param,
                   duration=duration_seconds,
                   bulk_list=bulks,
                   executor_list=executors)
 
-    param=param_reset(config)
-    if config['ASTRADB'].lower() == "on":
-        param["secure_connect_bundle"]=config["ASTRADB_SECURE_CONNECT_BUNDLE"]
-        if config.get('ASTRADB_USERNAME', None):
-            param['username'] = config['ASTRADB_USERNAME']
-            param['password'] = config['ASTRADB_PASSWORD']
+    param=get_config(config, 'ASTRADB')
+    if param:
+    # if config['ASTRADB'].lower() == "on":
+    #
+    #     param["secure_connect_bundle"]=config["ASTRADB_SECURE_CONNECT_BUNDLE"]
+    #     if config.get('ASTRADB_USERNAME', None):
+    #         param['username'] = config['ASTRADB_USERNAME']
+    #         param['password'] = config['ASTRADB_PASSWORD']
         perf_test(CQLType.AstraDB,
                   param,
                   bulk_list=bulks,
