@@ -199,13 +199,11 @@ if __name__ == '__main__':
     executors = [[2, 2, '2x threads'],
                  [4, 2, '2x threads'],
                  [16, 2, '2x threads']]
-#    executors = [[1, 1, '1x threads']]
 
     # performance test duration
     duration_seconds=5
 
     config = dotenv_values("perf_nosql_cql.env")
-
     param=get_config(config, 'COSMOSDB')
     if param:
         perf_test(CQLType.CosmosDB,
