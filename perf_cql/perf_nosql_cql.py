@@ -130,7 +130,10 @@ def prepare_model(cluster, run_setup: RunSetup):
             # Create key space
             # use different replication strategy 'class':'NetworkTopologyStrategy' for production HA mode
             #            session.execute("CREATE KEYSPACE IF NOT EXISTS jist2 WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};")
-            session.execute(f"CREATE KEYSPACE IF NOT EXISTS {run_setup['keyspace']}" + " WITH replication = {" + "'class':'SimpleStrategy', 'replication_factor' : 1" + "};")
+            session.execute(f"CREATE KEYSPACE IF NOT EXISTS {run_setup['keyspace']}" +
+                            " WITH replication = {" +
+                            f"'class':'{run_setup['replication_class']}', 'replication_factor' : {run_setup['replication_factor']}" +
+                            "};")
 
         # use LTW atomic command with IF
         session.execute(f"DROP TABLE IF EXISTS {run_setup['keyspace']}.t02")
