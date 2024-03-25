@@ -127,7 +127,7 @@ def prepare_model(cluster, run_setup: RunSetup):
             # Drop key space
             session.execut(f"DROP KEYSPACE IF EXISTS {run_setup['keyspace']}")
 
-            # Create new key space
+            # Create key space
             # use different replication strategy 'class':'NetworkTopologyStrategy' for production HA mode
             #            session.execute("CREATE KEYSPACE IF NOT EXISTS jist2 WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};")
             session.execute(f"CREATE KEYSPACE IF NOT EXISTS {run_setup['keyspace']}" + " WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};")
@@ -190,6 +190,10 @@ if __name__ == '__main__':
 
     config = dotenv_values("perf_nosql_cql.env")
 
+    # if config['REPLICATION_CLASS'].lower() == "on":
+    #     config['REPLICATION_FACTOR
+
+
     param=param_reset(config)
     if config['COSMOSDB'].lower() == "on":
         param["ip"]=[config["COSMOSDB_IP"]]
@@ -197,6 +201,9 @@ if __name__ == '__main__':
         if config.get('COSMOSDB_USERNAME', None):
             param['username'] = config['COSMOSDB_USERNAME']
             param['password'] = config['COSMOSDB_PASSWORD']
+        if config.get('COSMOSDB_REPLICATION_CLASS', None):
+            param['replication_class'] = config['COSMOSDB_REPLICATION_CLASS']
+            param['replication_factor'] = config['COSMOSDB_REPLICATION_FACTOR']
         perf_test(CQLType.CosmosDB,
                   param,
                   bulk_list=bulks,
