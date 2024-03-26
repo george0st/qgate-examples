@@ -177,14 +177,14 @@ def get_config(config, adapter):
             param["secure_connect_bundle"]=config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
 
         # login setting
-        if config.get(f"{adapter}_USERNAME", None):
-            param['username'] = config[f"{adapter}_USERNAME"]
-            param['password'] = config[f"{adapter}_PASSWORD"]
+        if config.get(f"{adapter}_USERNAME", None) or config.get(f"{adapter}_PASSWORD", None):
+            param['username'] = config.get(f"{adapter}_USERNAME", None)
+            param['password'] = config.get(f"{adapter}_PASSWORD", None)
 
         # replication setting
-        if config.get(f"{adapter}_REPLICATION_CLASS", None):
-            param['replication_class'] = config[f"{adapter}_REPLICATION_CLASS"]
-            param['replication_factor'] = config[f"{adapter}_REPLICATION_FACTOR"]
+        if config.get(f"{adapter}_REPLICATION_CLASS", None) or config.get(f"{adapter}_REPLICATION_FACTOR", None):
+            param['replication_class'] = config.get(f"{adapter}_REPLICATION_CLASS", None)
+            param['replication_factor'] = config.get(f"{adapter}_REPLICATION_FACTOR", None)
 
         return param
     else:
