@@ -124,7 +124,7 @@ def prepare_model(cluster, run_setup: RunSetup):
 
         if run_setup["cql"]!=CQLType.AstraDB:
 
-            if int(run_setup['replication_factor']) > 0:
+            if run_setup['replication_factor']:
                 # Drop key space
                 session.execute(f"DROP KEYSPACE IF EXISTS {run_setup['keyspace']}")
 
