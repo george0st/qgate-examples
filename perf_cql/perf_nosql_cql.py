@@ -197,10 +197,8 @@ if __name__ == '__main__':
     bulks = [[200, 10]]
 
     # list of executors (for application to all bulks)
-    executors = [[2, 2, '2x threads'],
-                 [4, 2, '2x threads'],
-                 [16, 2, '2x threads']]
-
+    executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
+                 [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
     # performance test duration
     duration_seconds=5
 
