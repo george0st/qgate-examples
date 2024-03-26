@@ -154,9 +154,9 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
 
     lbl=str(cql).split('.')[1]
     generator = ParallelExecutor(prf_cql,
-                                 label=lbl,
+                                 label=f"{lbl}-write",
                                  detail_output=True,
-                                 output_file=f"../output/prf_{lbl.lower()}-{datetime.date.today()}.txt",
+                                 output_file=f"../output/prf_{lbl.lower()}-write-{datetime.date.today()}.txt",
                                  init_each_bulk=True)
 
     parameters["cql"]=cql
