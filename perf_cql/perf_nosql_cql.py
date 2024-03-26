@@ -124,16 +124,17 @@ def prepare_model(cluster, run_setup: RunSetup):
 
         if run_setup["cql"]!=CQLType.AstraDB:
 
-            # Drop key space
-            session.execute(f"DROP KEYSPACE IF EXISTS {run_setup['keyspace']}")
+            if run_setup['replication_factor']:
+                # Drop key space
+                session.execute(f"DROP KEYSPACE IF EXISTS {run_setup['keyspace']}")
 
-            # Create key space
-            # use different replication strategy 'class':'NetworkTopologyStrategy' for production HA mode
-            #            session.execute("CREATE KEYSPACE IF NOT EXISTS jist2 WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};")
-            session.execute(f"CREATE KEYSPACE IF NOT EXISTS {run_setup['keyspace']}" +
-                            " WITH replication = {" +
-                            f"'class':'{run_setup['replication_class']}', 'replication_factor' : {run_setup['replication_factor']}" +
-                            "};")
+                # Create key space
+                # use different replication strategy 'class':'NetworkTopologyStrategy' for production HA mode
+                #            session.execute("CREATE KEYSPACE IF NOT EXISTS jist2 WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};")
+                session.execute(f"CREATE KEYSPACE IF NOT EXISTS {run_setup['keyspace']}" +
+                                " WITH replication = {" +
+                                f"'class':'{run_setup['replication_class']}', 'replication_factor' : {run_setup['replication_factor']}" +
+                                "};")
 
         # use LTW atomic command with IF
         session.execute(f"DROP TABLE IF EXISTS {run_setup['keyspace']}.t02")
@@ -177,14 +178,14 @@ def get_config(config, adapter):
             param["secure_connect_bundle"]=config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
 
         # login setting
-        if config.get(f"{adapter}_USERNAME", None):
-            param['username'] = config[f"{adapter}_USERNAME"]
-            param['password'] = config[f"{adapter}_PASSWORD"]
+        if config.get(f"{adapter}_USERNAME", None) or config.get(f"{adapter}_PASSWORD", None):
+            param['username'] = config.get(f"{adapter}_USERNAME", None)
+            param['password'] = config.get(f"{adapter}_PASSWORD", None)
 
         # replication setting
-        if config.get(f"{adapter}_REPLICATION_CLASS", None):
-            param['replication_class'] = config[f"{adapter}_REPLICATION_CLASS"]
-            param['replication_factor'] = config[f"{adapter}_REPLICATION_FACTOR"]
+        if config.get(f"{adapter}_REPLICATION_CLASS", None) or config.get(f"{adapter}_REPLICATION_FACTOR", None):
+            param['replication_class'] = config.get(f"{adapter}_REPLICATION_CLASS", None)
+            param['replication_factor'] = config.get(f"{adapter}_REPLICATION_FACTOR", None)
 
         return param
     else:
