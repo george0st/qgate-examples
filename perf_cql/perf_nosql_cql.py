@@ -100,11 +100,6 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
             columns+=f"fn{i},"
             items+="?,"
         insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
-        # if run_setup['cql']==CQLType.AstraDB:
-        #     # not support CL.ONE see error "Provided value ONE is not allowed for Write Consistency Level (disallowed values are: [ANY, ONE, LOCAL_ONE]"
-        #     batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
-        # else:
-        #     batch = BatchStatement(consistency_level=ConsistencyLevel.ONE)
         batch = BatchStatement(consistency_level=ConsistencyHelper.name_to_value[run_setup['consistency_level']])
 
         while True:
