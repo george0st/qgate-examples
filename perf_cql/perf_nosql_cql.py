@@ -24,6 +24,20 @@ class CQLType(Enum):
     AstraDB = 3
     CosmosDB = 4
 
+class ConsistencyHelper:
+    name_to_value = {
+    'ANY': ConsistencyLevel.ANY,
+    'ONE': ConsistencyLevel.ONE,
+    'TWO': ConsistencyLevel.TWO,
+    'THREE': ConsistencyLevel.THREE,
+    'QUORUM': ConsistencyLevel.QUORUM,
+    'ALL': ConsistencyLevel.ALL,
+    'LOCAL_QUORUM': ConsistencyLevel.LOCAL_QUORUM,
+    'EACH_QUORUM': ConsistencyLevel.EACH_QUORUM,
+    'SERIAL': ConsistencyLevel.SERIAL,
+    'LOCAL_SERIAL': ConsistencyLevel.LOCAL_SERIAL,
+    'LOCAL_ONE': ConsistencyLevel.LOCAL_ONE
+    }
 
 def read_file(file) -> str:
     with open(file) as f:
@@ -86,11 +100,12 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
             columns+=f"fn{i},"
             items+="?,"
         insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
-        if run_setup['cql']==CQLType.AstraDB:
-            # not support CL.ONE see error "Provided value ONE is not allowed for Write Consistency Level (disallowed values are: [ANY, ONE, LOCAL_ONE]"
-            batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
-        else:
-            batch = BatchStatement(consistency_level=ConsistencyLevel.ONE)
+        # if run_setup['cql']==CQLType.AstraDB:
+        #     # not support CL.ONE see error "Provided value ONE is not allowed for Write Consistency Level (disallowed values are: [ANY, ONE, LOCAL_ONE]"
+        #     batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
+        # else:
+        #     batch = BatchStatement(consistency_level=ConsistencyLevel.ONE)
+        batch = BatchStatement(consistency_level=ConsistencyHelper.name_to_value[run_setup['consistency_level']])
 
         while True:
             batch.clear()
@@ -186,6 +201,9 @@ def get_config(config, adapter):
         if config.get(f"{adapter}_REPLICATION_CLASS", None) or config.get(f"{adapter}_REPLICATION_FACTOR", None):
             param['replication_class'] = config.get(f"{adapter}_REPLICATION_CLASS", None)
             param['replication_factor'] = config.get(f"{adapter}_REPLICATION_FACTOR", None)
+
+        # consistency level
+        param['consistency_level'] = config.get(f"{adapter}_CONSISTENCY_LEVEL", "ddd")
 
         return param
     else:
