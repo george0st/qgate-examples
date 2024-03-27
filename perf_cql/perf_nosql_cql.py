@@ -24,6 +24,20 @@ class CQLType(Enum):
     AstraDB = 3
     CosmosDB = 4
 
+class ConsistencyHelper:
+    name_to_value = {
+    'ANY': ConsistencyLevel.ANY,
+    'ONE': ConsistencyLevel.ONE,
+    'TWO': ConsistencyLevel.TWO,
+    'THREE': ConsistencyLevel.THREE,
+    'QUORUM': ConsistencyLevel.QUORUM,
+    'ALL': ConsistencyLevel.ALL,
+    'LOCAL_QUORUM': ConsistencyLevel.LOCAL_QUORUM,
+    'EACH_QUORUM': ConsistencyLevel.EACH_QUORUM,
+    'SERIAL': ConsistencyLevel.SERIAL,
+    'LOCAL_SERIAL': ConsistencyLevel.LOCAL_SERIAL,
+    'LOCAL_ONE': ConsistencyLevel.LOCAL_ONE
+    }
 
 def read_file(file) -> str:
     with open(file) as f:
@@ -86,11 +100,7 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
             columns+=f"fn{i},"
             items+="?,"
         insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
-        if run_setup['cql']==CQLType.AstraDB:
-            # not support CL.ONE see error "Provided value ONE is not allowed for Write Consistency Level (disallowed values are: [ANY, ONE, LOCAL_ONE]"
-            batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
-        else:
-            batch = BatchStatement(consistency_level=ConsistencyLevel.ONE)
+        batch = BatchStatement(consistency_level=ConsistencyHelper.name_to_value[run_setup['consistency_level']])
 
         while True:
             batch.clear()
@@ -154,9 +164,9 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
 
     lbl=str(cql).split('.')[1]
     generator = ParallelExecutor(prf_cql,
-                                 label=lbl,
+                                 label=f"{lbl}-write",
                                  detail_output=True,
-                                 output_file=f"../output/prf_{lbl.lower()}-{datetime.date.today()}.txt",
+                                 output_file=f"../output/prf_{lbl.lower()}-write-{datetime.date.today()}.txt",
                                  init_each_bulk=True)
 
     parameters["cql"]=cql
@@ -187,6 +197,9 @@ def get_config(config, adapter):
             param['replication_class'] = config.get(f"{adapter}_REPLICATION_CLASS", None)
             param['replication_factor'] = config.get(f"{adapter}_REPLICATION_FACTOR", None)
 
+        # consistency level
+        param['consistency_level'] = config.get(f"{adapter}_CONSISTENCY_LEVEL", "ddd")
+
         return param
     else:
         return None
@@ -197,10 +210,9 @@ if __name__ == '__main__':
     bulks = [[200, 10]]
 
     # list of executors (for application to all bulks)
-    executors = [[2, 2, '2x threads'],
-                 [4, 2, '2x threads'],
-                 [16, 2, '2x threads']]
-
+    executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
+                 [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
+    
     # performance test duration
     duration_seconds=5
 
