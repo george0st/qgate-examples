@@ -204,7 +204,7 @@ def get_config(config, adapter):
     else:
         return None
 
-def exec_environment(config):
+def exec_config(config):
     param = get_config(config, 'COSMOSDB')
     if param:
         perf_test(CQLType.CosmosDB,
@@ -243,8 +243,8 @@ if __name__ == '__main__':
     bulks = [[200, 10]]
 
     # list of executors (for application to all bulks)
-    executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
-                 [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
+    # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
+    #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
 
     executors = [[2, 1, '1x threads'], [2, 2, '2x threads']]
 
@@ -256,39 +256,6 @@ if __name__ == '__main__':
     if param:
         envs=config["MULTIPLE_ENV"].split(",")
         for env in envs:
-            exec_environment(dotenv_values(env.strip()))
+            exec_config(dotenv_values(env.strip()))
     else:
-        exec_environment(config)
-
-    # param = get_config(config, 'COSMOSDB')
-    # if param:
-    #     perf_test(CQLType.CosmosDB,
-    #               param,
-    #               bulk_list=bulks,
-    #               duration=duration_seconds,
-    #               executor_list=executors)
-    #
-    # param=get_config(config, 'SCYLLADB')
-    # if param:
-    #     perf_test(CQLType.ScyllaDB,
-    #               param,
-    #               duration=duration_seconds,
-    #               bulk_list=bulks,
-    #               executor_list=executors)
-    #
-    # param=get_config(config, 'CASSANDRA')
-    # if param:
-    #     perf_test(CQLType.Cassandra,
-    #               param,
-    #               duration=duration_seconds,
-    #               bulk_list=bulks,
-    #               executor_list=executors)
-    #
-    # param=get_config(config, 'ASTRADB')
-    # if param:
-    #     perf_test(CQLType.AstraDB,
-    #               param,
-    #               bulk_list=bulks,
-    #               duration=duration_seconds,
-    #               executor_list=executors)
-
+        exec_config(config)
