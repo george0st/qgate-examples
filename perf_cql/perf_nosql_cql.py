@@ -216,7 +216,7 @@ if __name__ == '__main__':
     # performance test duration
     duration_seconds=5
 
-    config = dotenv_values("perf_nosql_cql.env")
+    config = dotenv_values("config/perf_nosql_cql.env")
     param=get_config(config, 'COSMOSDB')
     if param:
         perf_test(CQLType.CosmosDB,
