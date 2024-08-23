@@ -172,20 +172,20 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
     parameters["cql"]=cql
     setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
-    generator.create_graph_perf(f"..\output")
+    generator.create_graph_perf("../output")
 
 def get_config(config, adapter):
     param={}
-    param['keyspace']=config["KEYSPACE"]
+    param['keyspace'] = config["KEYSPACE"]
 
     if config[adapter].lower() == "on":
         # connection setting
         if config.get(f"{adapter}_IP", None):
-            param["ip"]=[config[f"{adapter}_IP"]]
+            param["ip"] = config[f"{adapter}_IP"].split(",")
         if config.get(f"{adapter}_PORT", None):
-            param["port"]=config[f"{adapter}_PORT"]
+            param["port"] = config[f"{adapter}_PORT"]
         if config.get(f"{adapter}_SECURE_CONNECT_BUNDLE", None):
-            param["secure_connect_bundle"]=config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
+            param["secure_connect_bundle"] = config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
 
         # login setting
         if config.get(f"{adapter}_USERNAME", None) or config.get(f"{adapter}_PASSWORD", None):
@@ -204,20 +204,8 @@ def get_config(config, adapter):
     else:
         return None
 
-if __name__ == '__main__':
-
-    # size of data bulks
-    bulks = [[200, 10]]
-
-    # list of executors (for application to all bulks)
-    executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
-                 [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
-    
-    # performance test duration
-    duration_seconds=5
-
-    config = dotenv_values("perf_nosql_cql.env")
-    param=get_config(config, 'COSMOSDB')
+def exec_config(config):
+    param = get_config(config, 'COSMOSDB')
     if param:
         perf_test(CQLType.CosmosDB,
                   param,
@@ -249,3 +237,25 @@ if __name__ == '__main__':
                   duration=duration_seconds,
                   executor_list=executors)
 
+if __name__ == '__main__':
+
+    # size of data bulks
+    bulks = [[200, 10]]
+
+    # list of executors (for application to all bulks)
+    # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
+    #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
+
+    executors = [[2, 1, '1x threads'], [2, 2, '2x threads']]
+
+    # performance test duration
+    duration_seconds=5
+
+    config = dotenv_values("config/perf_nosql_cql.env")
+    param=config.get('MULTIPLE_ENV', None)
+    if param:
+        envs=config["MULTIPLE_ENV"].split(",")
+        for env in envs:
+            exec_config(dotenv_values(env.strip()))
+    else:
+        exec_config(config)
