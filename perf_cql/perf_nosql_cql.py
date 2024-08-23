@@ -172,7 +172,7 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
     parameters["cql"]=cql
     setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
-    generator.create_graph_perf(f"..\output")
+    generator.create_graph_perf("../output")
 
 def get_config(config, adapter):
     param={}
