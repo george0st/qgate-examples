@@ -249,8 +249,11 @@ if __name__ == '__main__':
     # list of executors (for application to all bulks)
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
     #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
+    #
+    executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'], [16, 1, '1x threads'],
+                 [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads'], [16, 2, '2x threads']]
 
-    executors = [[2, 1, '1x threads'], [2, 2, '2x threads']]
+    #executors = [[2, 1, '1x threads'], [4, 1, '1x threads']]
 
     # performance test duration
     duration_seconds=5
@@ -258,8 +261,10 @@ if __name__ == '__main__':
     config = dotenv_values("config/perf_nosql_cql.env")
     param=config.get('MULTIPLE_ENV', None)
     if param:
+        # multiple configurations
         envs=config["MULTIPLE_ENV"].split(",")
         for env in envs:
             exec_config(dotenv_values(env.strip()))
     else:
+        # single configuration
         exec_config(config)
