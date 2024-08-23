@@ -176,7 +176,7 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
 
 def get_config(config, adapter):
     param={}
-    param['keyspace']=config["KEYSPACE"]
+    param['keyspace'] = config["KEYSPACE"]
 
     if config[adapter].lower() == "on":
         # connection setting
