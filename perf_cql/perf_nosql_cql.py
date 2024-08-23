@@ -181,11 +181,11 @@ def get_config(config, adapter):
     if config[adapter].lower() == "on":
         # connection setting
         if config.get(f"{adapter}_IP", None):
-            param["ip"]=[config[f"{adapter}_IP"]]
+            param["ip"] = config[f"{adapter}_IP"].split(",")
         if config.get(f"{adapter}_PORT", None):
-            param["port"]=config[f"{adapter}_PORT"]
+            param["port"] = config[f"{adapter}_PORT"]
         if config.get(f"{adapter}_SECURE_CONNECT_BUNDLE", None):
-            param["secure_connect_bundle"]=config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
+            param["secure_connect_bundle"] = config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
 
         # login setting
         if config.get(f"{adapter}_USERNAME", None) or config.get(f"{adapter}_PASSWORD", None):
