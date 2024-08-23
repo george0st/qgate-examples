@@ -170,7 +170,7 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
                                  output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
                                  init_each_bulk=True)
 
-    parameters["cql"]=cql
+    parameters["cql"] = cql
     setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf("../output")
