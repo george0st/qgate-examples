@@ -162,11 +162,12 @@ def prepare_model(cluster, run_setup: RunSetup):
 
 def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, executor_list=None):
 
-    lbl=str(cql).split('.')[1]
+    lbl = str(cql).split('.')[1]
+    lbl_suffix = f"-{parameters['label']}" if parameters.get('label', None) else ""
     generator = ParallelExecutor(prf_cql,
-                                 label=f"{lbl}-write",
+                                 label=f"{lbl}-write{lbl_suffix}",
                                  detail_output=True,
-                                 output_file=f"../output/prf_{lbl.lower()}-write-{datetime.date.today()}.txt",
+                                 output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
                                  init_each_bulk=True)
 
     parameters["cql"]=cql
@@ -199,6 +200,9 @@ def get_config(config, adapter):
 
         # consistency level
         param['consistency_level'] = config.get(f"{adapter}_CONSISTENCY_LEVEL", "ddd")
+
+        # label
+        param['label'] = config.get(f"{adapter}_LABEL", None)
 
         return param
     else:
