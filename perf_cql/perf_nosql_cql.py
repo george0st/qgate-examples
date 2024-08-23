@@ -204,20 +204,8 @@ def get_config(config, adapter):
     else:
         return None
 
-if __name__ == '__main__':
-
-    # size of data bulks
-    bulks = [[200, 10]]
-
-    # list of executors (for application to all bulks)
-    executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
-                 [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
-    
-    # performance test duration
-    duration_seconds=5
-
-    config = dotenv_values("config/perf_nosql_cql.env")
-    param=get_config(config, 'COSMOSDB')
+def exec_environment(config):
+    param = get_config(config, 'COSMOSDB')
     if param:
         perf_test(CQLType.CosmosDB,
                   param,
@@ -248,4 +236,56 @@ if __name__ == '__main__':
                   bulk_list=bulks,
                   duration=duration_seconds,
                   executor_list=executors)
+
+if __name__ == '__main__':
+
+    # size of data bulks
+    bulks = [[200, 10]]
+
+    # list of executors (for application to all bulks)
+    executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
+                 [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
+    
+    # performance test duration
+    duration_seconds=5
+
+    config = dotenv_values("config/perf_nosql_cql.env")
+    param=config.get('MULTIPLE_ENV', None)
+    if param:
+        for env in config["MULTIPLE_ENV"].split(","):
+            exec_environment(dotenv_values(env))
+    else:
+        exec_environment(config)
+
+    # param = get_config(config, 'COSMOSDB')
+    # if param:
+    #     perf_test(CQLType.CosmosDB,
+    #               param,
+    #               bulk_list=bulks,
+    #               duration=duration_seconds,
+    #               executor_list=executors)
+    #
+    # param=get_config(config, 'SCYLLADB')
+    # if param:
+    #     perf_test(CQLType.ScyllaDB,
+    #               param,
+    #               duration=duration_seconds,
+    #               bulk_list=bulks,
+    #               executor_list=executors)
+    #
+    # param=get_config(config, 'CASSANDRA')
+    # if param:
+    #     perf_test(CQLType.Cassandra,
+    #               param,
+    #               duration=duration_seconds,
+    #               bulk_list=bulks,
+    #               executor_list=executors)
+    #
+    # param=get_config(config, 'ASTRADB')
+    # if param:
+    #     perf_test(CQLType.AstraDB,
+    #               param,
+    #               bulk_list=bulks,
+    #               duration=duration_seconds,
+    #               executor_list=executors)
 
