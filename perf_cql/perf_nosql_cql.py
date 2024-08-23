@@ -162,14 +162,15 @@ def prepare_model(cluster, run_setup: RunSetup):
 
 def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, executor_list=None):
 
-    lbl=str(cql).split('.')[1]
+    lbl = str(cql).split('.')[1]
+    lbl_suffix = f"-{parameters['label']}" if parameters.get('label', None) else ""
     generator = ParallelExecutor(prf_cql,
-                                 label=f"{lbl}-write",
+                                 label=f"{lbl}-write{lbl_suffix}",
                                  detail_output=True,
-                                 output_file=f"../output/prf_{lbl.lower()}-write-{datetime.date.today()}.txt",
+                                 output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
                                  init_each_bulk=True)
 
-    parameters["cql"]=cql
+    parameters["cql"] = cql
     setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf("../output")
@@ -199,6 +200,9 @@ def get_config(config, adapter):
 
         # consistency level
         param['consistency_level'] = config.get(f"{adapter}_CONSISTENCY_LEVEL", "ddd")
+
+        # label
+        param['label'] = config.get(f"{adapter}_LABEL", None)
 
         return param
     else:
@@ -245,8 +249,11 @@ if __name__ == '__main__':
     # list of executors (for application to all bulks)
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
     #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
+    #
+    executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'], [16, 1, '1x threads'],
+                 [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads'], [16, 2, '2x threads']]
 
-    executors = [[2, 1, '1x threads'], [2, 2, '2x threads']]
+    #executors = [[2, 1, '1x threads'], [4, 1, '1x threads']]
 
     # performance test duration
     duration_seconds=5
@@ -254,8 +261,10 @@ if __name__ == '__main__':
     config = dotenv_values("config/perf_nosql_cql.env")
     param=config.get('MULTIPLE_ENV', None)
     if param:
+        # multiple configurations
         envs=config["MULTIPLE_ENV"].split(",")
         for env in envs:
             exec_config(dotenv_values(env.strip()))
     else:
+        # single configuration
         exec_config(config)
