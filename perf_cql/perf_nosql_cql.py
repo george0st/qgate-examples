@@ -33,10 +33,10 @@ class ConsistencyHelper:
     'QUORUM': ConsistencyLevel.QUORUM,
     'ALL': ConsistencyLevel.ALL,
     'LOCAL_QUORUM': ConsistencyLevel.LOCAL_QUORUM,
+    'LOCAL_ONE': ConsistencyLevel.LOCAL_ONE,
+    'LOCAL_SERIAL': ConsistencyLevel.LOCAL_SERIAL,
     'EACH_QUORUM': ConsistencyLevel.EACH_QUORUM,
     'SERIAL': ConsistencyLevel.SERIAL,
-    'LOCAL_SERIAL': ConsistencyLevel.LOCAL_SERIAL,
-    'LOCAL_ONE': ConsistencyLevel.LOCAL_ONE
     }
 
 def read_file(file) -> str:
