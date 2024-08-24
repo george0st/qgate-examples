@@ -33,19 +33,18 @@ class ConsistencyHelper:
     'QUORUM': ConsistencyLevel.QUORUM,
     'ALL': ConsistencyLevel.ALL,
     'LOCAL_QUORUM': ConsistencyLevel.LOCAL_QUORUM,
+    'LOCAL_ONE': ConsistencyLevel.LOCAL_ONE,
+    'LOCAL_SERIAL': ConsistencyLevel.LOCAL_SERIAL,
     'EACH_QUORUM': ConsistencyLevel.EACH_QUORUM,
     'SERIAL': ConsistencyLevel.SERIAL,
-    'LOCAL_SERIAL': ConsistencyLevel.LOCAL_SERIAL,
-    'LOCAL_ONE': ConsistencyLevel.LOCAL_ONE
     }
 
 def read_file(file) -> str:
     with open(file) as f:
         return f.readline()
 
-def prf_cql(run_setup: RunSetup) -> ParallelProbe:
-    generator = numpy.random.default_rng()  #seed=int(time.time())
-    columns, items="", ""
+def create_cluster(run_setup: RunSetup):
+    """Create cluster for connection"""
     authProvider=None
 
     # connection setting
@@ -83,6 +82,53 @@ def prf_cql(run_setup: RunSetup) -> ParallelProbe:
                           control_connection_timeout=30,
                           idle_heartbeat_interval=30,
                           connect_timeout=30)
+    return cluster
+
+def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
+    pass
+
+def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
+    generator = numpy.random.default_rng()  #seed=int(time.time())
+    columns, items="", ""
+
+    cluster = create_cluster(run_setup)
+    # authProvider=None
+    #
+    # # connection setting
+    # if run_setup['username']:
+    #     authProvider = PlainTextAuthProvider(username=run_setup["username"],
+    #                                          password=read_file(run_setup["password"]))
+    #
+    # if run_setup["secure_connect_bundle"]:
+    #     # connection with 'secure_connect_bundle' to the cloud
+    #     cloud_config = {
+    #         "secure_connect_bundle" : run_setup["secure_connect_bundle"],
+    #         'use_default_tempdir': True
+    #     }
+    #     cluster = Cluster(cloud = cloud_config,
+    #                       auth_provider=authProvider,
+    #                       execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
+    #                       control_connection_timeout=30,
+    #                       idle_heartbeat_interval=30,
+    #                       connect_timeout=30)
+    # else:
+    #     # ssl_opts = {
+    #     #     'ca_certs': 'C:\Python\qgate-examples\secrets\public-key.pem',
+    #     #     'ssl_version': PROTOCOL_TLSv1_2,
+    #     #     'cert_reqs': CERT_REQUIRED  # Certificates are required and validated
+    #     # }
+    #     #
+    #     # ssl_context = SSLContext(PROTOCOL_TLSv1_2)
+    #     # ssl_context.verify_mode = CERT_NONE
+    #
+    #     # connection with 'ip' and 'port'
+    #     cluster = Cluster(contact_points=run_setup['ip'],
+    #                       port=run_setup['port'],
+    #                       auth_provider=authProvider,
+    #                       execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
+    #                       control_connection_timeout=30,
+    #                       idle_heartbeat_interval=30,
+    #                       connect_timeout=30)
 
     if run_setup.is_init:
         # create NoSQL schema
@@ -164,7 +210,7 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
 
     lbl = str(cql).split('.')[1]
     lbl_suffix = f"-{parameters['label']}" if parameters.get('label', None) else ""
-    generator = ParallelExecutor(prf_cql,
+    generator = ParallelExecutor(prf_cql_write,
                                  label=f"{lbl}-write{lbl_suffix}",
                                  detail_output=True,
                                  output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
