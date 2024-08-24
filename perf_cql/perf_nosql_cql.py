@@ -1,5 +1,5 @@
 from enum import Enum
-import datetime
+import datetime, time
 import numpy
 
 from cassandra import ConsistencyLevel
@@ -84,9 +84,20 @@ def create_cluster(run_setup: RunSetup):
                           connect_timeout=30)
     return cluster
 
+def init_rng_generator():
+    # now
+    now = time.time()
+    now_ms = (now - int(now)) * 1000000000
+
+    # random value, based on CPU
+    ns_start = time.perf_counter_ns()
+    time.sleep(0.01)
+    ns_stop = time.perf_counter_ns()
+
+    return numpy.random.default_rng([int(now), int(now_ms), ns_stop - ns_start, ns_stop])
+
 def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
-    generator = numpy.random.default_rng()
-    #seed=int(time.time())
+    generator = init_rng_generator()
     columns, items="", ""
 
     cluster = create_cluster(run_setup)
@@ -128,7 +139,7 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
     return probe
 
 def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
-    generator = numpy.random.default_rng()  #seed=int(time.time())
+    generator = init_rng_generator()
     columns, items="", ""
 
     cluster = create_cluster(run_setup)
