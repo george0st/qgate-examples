@@ -85,7 +85,47 @@ def create_cluster(run_setup: RunSetup):
     return cluster
 
 def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
-    pass
+    generator = numpy.random.default_rng()
+    #seed=int(time.time())
+    columns, items="", ""
+
+    cluster = create_cluster(run_setup)
+    try:
+        session = cluster.connect()
+
+        # INIT - contain executor synchronization, if needed
+        probe = ParallelProbe(run_setup)
+
+        # prepare insert statement for batch
+        for i in range(0, run_setup.bulk_col):
+            columns+=f"fn{i},"
+            items+="?,"
+        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
+        batch = BatchStatement(consistency_level=ConsistencyHelper.name_to_value[run_setup['consistency_level']])
+
+        while True:
+            batch.clear()
+
+            # generate synthetic data (only 1 mil. values for insert or update)
+            synthetic_data = generator.integers(999999, size=(run_setup.bulk_row, run_setup.bulk_col))
+
+            # prepare data
+            for row in synthetic_data:
+                batch.add(insert_statement, row)
+
+            # START - probe, only for this specific code part
+            probe.start()
+
+            session.execute(batch)
+
+            # STOP - probe
+            if probe.stop():
+                break
+    finally:
+        if cluster:
+            cluster.shutdown()
+
+    return probe
 
 def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
     generator = numpy.random.default_rng()  #seed=int(time.time())
@@ -131,7 +171,7 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
     #                       connect_timeout=30)
 
     if run_setup.is_init:
-        # create NoSQL schema
+        # create NoSQL schema for write perf tests
         prepare_model(cluster, run_setup)
         return None
 
