@@ -86,7 +86,7 @@ def create_cluster(run_setup: RunSetup):
 
 def init_rng_generator():
     """Init generator of random values"""
-    
+
     # now
     now = time.time()
     now_ms = (now - int(now)) * 1000000000
@@ -145,43 +145,6 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
     columns, items="", ""
 
     cluster = create_cluster(run_setup)
-    # authProvider=None
-    #
-    # # connection setting
-    # if run_setup['username']:
-    #     authProvider = PlainTextAuthProvider(username=run_setup["username"],
-    #                                          password=read_file(run_setup["password"]))
-    #
-    # if run_setup["secure_connect_bundle"]:
-    #     # connection with 'secure_connect_bundle' to the cloud
-    #     cloud_config = {
-    #         "secure_connect_bundle" : run_setup["secure_connect_bundle"],
-    #         'use_default_tempdir': True
-    #     }
-    #     cluster = Cluster(cloud = cloud_config,
-    #                       auth_provider=authProvider,
-    #                       execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
-    #                       control_connection_timeout=30,
-    #                       idle_heartbeat_interval=30,
-    #                       connect_timeout=30)
-    # else:
-    #     # ssl_opts = {
-    #     #     'ca_certs': 'C:\Python\qgate-examples\secrets\public-key.pem',
-    #     #     'ssl_version': PROTOCOL_TLSv1_2,
-    #     #     'cert_reqs': CERT_REQUIRED  # Certificates are required and validated
-    #     # }
-    #     #
-    #     # ssl_context = SSLContext(PROTOCOL_TLSv1_2)
-    #     # ssl_context.verify_mode = CERT_NONE
-    #
-    #     # connection with 'ip' and 'port'
-    #     cluster = Cluster(contact_points=run_setup['ip'],
-    #                       port=run_setup['port'],
-    #                       auth_provider=authProvider,
-    #                       execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
-    #                       control_connection_timeout=30,
-    #                       idle_heartbeat_interval=30,
-    #                       connect_timeout=30)
 
     if run_setup.is_init:
         # create NoSQL schema for write perf tests
