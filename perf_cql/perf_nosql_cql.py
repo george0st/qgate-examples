@@ -43,7 +43,7 @@ def read_file(file) -> str:
     with open(file) as f:
         return f.readline()
 
-def prf_cql(run_setup: RunSetup) -> ParallelProbe:
+def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
     generator = numpy.random.default_rng()  #seed=int(time.time())
     columns, items="", ""
     authProvider=None
@@ -164,7 +164,7 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
 
     lbl = str(cql).split('.')[1]
     lbl_suffix = f"-{parameters['label']}" if parameters.get('label', None) else ""
-    generator = ParallelExecutor(prf_cql,
+    generator = ParallelExecutor(prf_cql_write,
                                  label=f"{lbl}-write{lbl_suffix}",
                                  detail_output=True,
                                  output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
