@@ -85,6 +85,8 @@ def create_cluster(run_setup: RunSetup):
     return cluster
 
 def init_rng_generator():
+    """Init generator of random values"""
+    
     # now
     now = time.time()
     now_ms = (now - int(now)) * 1000000000
