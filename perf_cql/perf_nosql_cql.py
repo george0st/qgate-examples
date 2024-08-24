@@ -1,5 +1,5 @@
 from enum import Enum
-import datetime
+import datetime, time
 import numpy
 
 from cassandra import ConsistencyLevel
@@ -84,54 +84,70 @@ def create_cluster(run_setup: RunSetup):
                           connect_timeout=30)
     return cluster
 
-def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
-    pass
+def init_rng_generator():
+    """Init generator of random values"""
 
-def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
-    generator = numpy.random.default_rng()  #seed=int(time.time())
+    # now
+    now = time.time()
+    now_ms = (now - int(now)) * 1000000000
+
+    # random value, based on CPU
+    ns_start = time.perf_counter_ns()
+    time.sleep(0.01)
+    ns_stop = time.perf_counter_ns()
+
+    return numpy.random.default_rng([int(now), int(now_ms), ns_stop - ns_start, ns_stop])
+
+def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
+    generator = init_rng_generator()
     columns, items="", ""
 
     cluster = create_cluster(run_setup)
-    # authProvider=None
-    #
-    # # connection setting
-    # if run_setup['username']:
-    #     authProvider = PlainTextAuthProvider(username=run_setup["username"],
-    #                                          password=read_file(run_setup["password"]))
-    #
-    # if run_setup["secure_connect_bundle"]:
-    #     # connection with 'secure_connect_bundle' to the cloud
-    #     cloud_config = {
-    #         "secure_connect_bundle" : run_setup["secure_connect_bundle"],
-    #         'use_default_tempdir': True
-    #     }
-    #     cluster = Cluster(cloud = cloud_config,
-    #                       auth_provider=authProvider,
-    #                       execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
-    #                       control_connection_timeout=30,
-    #                       idle_heartbeat_interval=30,
-    #                       connect_timeout=30)
-    # else:
-    #     # ssl_opts = {
-    #     #     'ca_certs': 'C:\Python\qgate-examples\secrets\public-key.pem',
-    #     #     'ssl_version': PROTOCOL_TLSv1_2,
-    #     #     'cert_reqs': CERT_REQUIRED  # Certificates are required and validated
-    #     # }
-    #     #
-    #     # ssl_context = SSLContext(PROTOCOL_TLSv1_2)
-    #     # ssl_context.verify_mode = CERT_NONE
-    #
-    #     # connection with 'ip' and 'port'
-    #     cluster = Cluster(contact_points=run_setup['ip'],
-    #                       port=run_setup['port'],
-    #                       auth_provider=authProvider,
-    #                       execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
-    #                       control_connection_timeout=30,
-    #                       idle_heartbeat_interval=30,
-    #                       connect_timeout=30)
+    try:
+        session = cluster.connect()
+
+        # INIT - contain executor synchronization, if needed
+        probe = ParallelProbe(run_setup)
+
+        # prepare insert statement for batch
+        for i in range(0, run_setup.bulk_col):
+            columns+=f"fn{i},"
+            items+="?,"
+        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
+        batch = BatchStatement(consistency_level=ConsistencyHelper.name_to_value[run_setup['consistency_level']])
+
+        while True:
+            batch.clear()
+
+            # generate synthetic data (only 1 mil. values for insert or update)
+            synthetic_data = generator.integers(999999, size=(run_setup.bulk_row, run_setup.bulk_col))
+
+            # prepare data
+            for row in synthetic_data:
+                batch.add(insert_statement, row)
+
+            # START - probe, only for this specific code part
+            probe.start()
+
+            session.execute(batch)
+
+            # STOP - probe
+            if probe.stop():
+                break
+    finally:
+        if cluster:
+            cluster.shutdown()
+
+    return probe
+
+def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
+    generator = init_rng_generator()
+    columns, items="", ""
+
+    cluster = create_cluster(run_setup)
 
     if run_setup.is_init:
-        # create NoSQL schema
+        # create NoSQL schema for write perf tests
         prepare_model(cluster, run_setup)
         return None
 
