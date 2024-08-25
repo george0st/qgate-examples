@@ -112,22 +112,21 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
         # INIT - contain executor synchronization, if needed
         probe = ParallelProbe(run_setup)
 
-        # prepare insert statement for batch
+        # prepare select statement for batch
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
-            items+="?,"
-        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]})")
+        select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0=? and fn1=?")
         batch = BatchStatement(consistency_level=ConsistencyHelper.name_to_value[run_setup['consistency_level']])
 
         while True:
             batch.clear()
 
-            # generate synthetic data (only 1 mil. values for insert or update)
+            # generate synthetic data (only 1 mil. values for select)
             synthetic_data = generator.integers(999999, size=(run_setup.bulk_row, run_setup.bulk_col))
 
             # prepare data
             for row in synthetic_data:
-                batch.add(insert_statement, row)
+                batch.add(select_statement, row)
 
             # START - probe, only for this specific code part
             probe.start()
