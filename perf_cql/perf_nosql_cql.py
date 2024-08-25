@@ -270,7 +270,7 @@ def get_config(config, adapter):
     else:
         return None
 
-def exec_config(config):
+def exec_config(config, bulks, duration_seconds, executors):
     param = get_config(config, 'COSMOSDB')
     if param:
         perf_test(CQLType.CosmosDB,
@@ -305,7 +305,7 @@ def exec_config(config):
 
 if __name__ == '__main__':
 
-    # size of data bulks
+    # size of data bulks 
     bulks = [[200, 10]]
 
     # list of executors (for application to all bulks)
@@ -326,7 +326,7 @@ if __name__ == '__main__':
         # multiple configurations
         envs=config["MULTIPLE_ENV"].split(",")
         for env in envs:
-            exec_config(dotenv_values(env.strip()))
+            exec_config(dotenv_values(env.strip()), bulks, duration_seconds, executors)
     else:
         # single configuration
-        exec_config(config)
+        exec_config(config, bulks, duration_seconds, executors)
