@@ -120,8 +120,8 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
 
         while True:
 
-            # generate synthetic data (only 1 mil. values for select)
-            #  NOTE: I wll generate only values for two columns (as primary keys)
+            # generate synthetic data
+            #  NOTE: It will generate only values for two columns (as primary keys)
             synthetic_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, 2))
 
             # START - probe, only for this specific code part
@@ -167,7 +167,7 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
         while True:
             batch.clear()
 
-            # generate synthetic data (only 1 mil. values for insert or update)
+            # generate synthetic data
             synthetic_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, run_setup.bulk_col))
 
             # prepare data
