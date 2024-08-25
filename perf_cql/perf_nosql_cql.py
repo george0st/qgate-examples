@@ -8,7 +8,7 @@ from cassandra import ConsistencyLevel
 from cassandra.cluster import ExecutionProfile
 from cassandra.cluster import EXEC_PROFILE_DEFAULT
 from cassandra.policies import DCAwareRoundRobinPolicy
-from cassandra.query import BatchStatement
+from cassandra.query import BatchStatement, BoundStatement
 
 from qgate_perf.parallel_executor import ParallelExecutor
 from qgate_perf.parallel_probe import ParallelProbe
@@ -119,8 +119,8 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
         select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0=? and fn1=?")
-        consistency_level = ConsistencyHelper.name_to_value[run_setup['consistency_level']]
-        select_statement.consistency_level = consistency_level
+        bound = cassandra.query.BoundStatement(select_statement,
+                                               consistency_level = ConsistencyHelper.name_to_value[run_setup['consistency_level']])
 
         while True:
 
@@ -133,9 +133,8 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
 
             # prepare data
             for row in synthetic_data:
-                select_bound = select_statement.bind(row)
-                select_bound.consistency_level = consistency_level
-                session.execute(select_bound)
+                bound.bind(row)
+                session.execute(bound)
 
             # STOP - probe
             if probe.stop():
