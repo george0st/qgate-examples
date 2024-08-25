@@ -18,6 +18,9 @@ from dotenv import load_dotenv, dotenv_values
 from ssl import PROTOCOL_TLSv1_2, PROTOCOL_TLSv1, SSLContext, CERT_NONE, CERT_REQUIRED
 
 
+class Setting:
+    TABLE_NAME = "t02"
+
 class CQLType(Enum):
     ScyllaDB = 1
     Cassandra = 2
@@ -113,7 +116,7 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
             items+="?,"
-        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
+        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]})")
         batch = BatchStatement(consistency_level=ConsistencyHelper.name_to_value[run_setup['consistency_level']])
 
         while True:
@@ -161,7 +164,7 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
             items+="?,"
-        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
+        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]})")
         batch = BatchStatement(consistency_level=ConsistencyHelper.name_to_value[run_setup['consistency_level']])
 
         while True:
@@ -209,14 +212,14 @@ def prepare_model(cluster, run_setup: RunSetup):
                                 "};")
 
         # use LTW atomic command with IF
-        session.execute(f"DROP TABLE IF EXISTS {run_setup['keyspace']}.t02")
+        session.execute(f"DROP TABLE IF EXISTS {run_setup['keyspace']}.{Setting.TABLE_NAME}")
 
         # prepare insert statement for batch
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i} int,"
 
         # complex primary key (partition key 'fn0' and cluster key 'fn1')
-        session.execute(f"CREATE TABLE IF NOT EXISTS {run_setup['keyspace']}.t02 ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
+        session.execute(f"CREATE TABLE IF NOT EXISTS {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
 
     finally:
         if cluster:
