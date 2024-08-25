@@ -305,7 +305,7 @@ def exec_config(config, bulks, duration_seconds, executors):
 
 if __name__ == '__main__':
 
-    # size of data bulks 
+    # size of data bulks, requested format [[rows, columns], ...]
     bulks = [[200, 10]]
 
     # list of executors (for application to all bulks)
