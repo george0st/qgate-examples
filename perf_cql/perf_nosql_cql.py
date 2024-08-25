@@ -18,6 +18,10 @@ from dotenv import load_dotenv, dotenv_values
 from ssl import PROTOCOL_TLSv1_2, PROTOCOL_TLSv1, SSLContext, CERT_NONE, CERT_REQUIRED
 
 
+class Setting:
+    TABLE_NAME = "t02"
+    MAX_GNR_VALUE = 999999
+
 class CQLType(Enum):
     ScyllaDB = 1
     Cassandra = 2
@@ -109,27 +113,23 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
         # INIT - contain executor synchronization, if needed
         probe = ParallelProbe(run_setup)
 
-        # prepare insert statement for batch
+        # prepare select statement for batch
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
-            items+="?,"
-        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
-        batch = BatchStatement(consistency_level=ConsistencyHelper.name_to_value[run_setup['consistency_level']])
+        select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0=? and fn1=?")
 
         while True:
-            batch.clear()
 
-            # generate synthetic data (only 1 mil. values for insert or update)
-            synthetic_data = generator.integers(999999, size=(run_setup.bulk_row, run_setup.bulk_col))
-
-            # prepare data
-            for row in synthetic_data:
-                batch.add(insert_statement, row)
+            # generate synthetic data
+            #  NOTE: It will generate only values for two columns (as primary keys)
+            synthetic_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, 2))
 
             # START - probe, only for this specific code part
             probe.start()
 
-            session.execute(batch)
+            # prepare data
+            for row in synthetic_data:
+                session.execute(select_statement.bind(row))
 
             # STOP - probe
             if probe.stop():
@@ -161,14 +161,14 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
             items+="?,"
-        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.t02 ({columns[:-1]}) VALUES ({items[:-1]})")
+        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]})")
         batch = BatchStatement(consistency_level=ConsistencyHelper.name_to_value[run_setup['consistency_level']])
 
         while True:
             batch.clear()
 
-            # generate synthetic data (only 1 mil. values for insert or update)
-            synthetic_data = generator.integers(999999, size=(run_setup.bulk_row, run_setup.bulk_col))
+            # generate synthetic data
+            synthetic_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, run_setup.bulk_col))
 
             # prepare data
             for row in synthetic_data:
@@ -209,14 +209,14 @@ def prepare_model(cluster, run_setup: RunSetup):
                                 "};")
 
         # use LTW atomic command with IF
-        session.execute(f"DROP TABLE IF EXISTS {run_setup['keyspace']}.t02")
+        session.execute(f"DROP TABLE IF EXISTS {run_setup['keyspace']}.{Setting.TABLE_NAME}")
 
         # prepare insert statement for batch
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i} int,"
 
         # complex primary key (partition key 'fn0' and cluster key 'fn1')
-        session.execute(f"CREATE TABLE IF NOT EXISTS {run_setup['keyspace']}.t02 ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
+        session.execute(f"CREATE TABLE IF NOT EXISTS {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
 
     finally:
         if cluster:
@@ -270,7 +270,7 @@ def get_config(config, adapter):
     else:
         return None
 
-def exec_config(config):
+def exec_config(config, bulks, duration_seconds, executors):
     param = get_config(config, 'COSMOSDB')
     if param:
         perf_test(CQLType.CosmosDB,
@@ -305,7 +305,7 @@ def exec_config(config):
 
 if __name__ == '__main__':
 
-    # size of data bulks
+    # size of data bulks, requested format [[rows, columns], ...]
     bulks = [[200, 10]]
 
     # list of executors (for application to all bulks)
@@ -326,7 +326,7 @@ if __name__ == '__main__':
         # multiple configurations
         envs=config["MULTIPLE_ENV"].split(",")
         for env in envs:
-            exec_config(dotenv_values(env.strip()))
+            exec_config(dotenv_values(env.strip()), bulks, duration_seconds, executors)
     else:
         # single configuration
-        exec_config(config)
+        exec_config(config, bulks, duration_seconds, executors)
