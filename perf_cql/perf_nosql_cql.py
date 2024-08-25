@@ -20,6 +20,7 @@ from ssl import PROTOCOL_TLSv1_2, PROTOCOL_TLSv1, SSLContext, CERT_NONE, CERT_RE
 
 class Setting:
     TABLE_NAME = "t02"
+    MAX_GNR_VALUE = 999999
 
 class CQLType(Enum):
     ScyllaDB = 1
@@ -121,7 +122,7 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
 
             # generate synthetic data (only 1 mil. values for select)
             #  NOTE: I wll generate only values for two columns (as primary keys)
-            synthetic_data = generator.integers(999999, size=(run_setup.bulk_row, 2))
+            synthetic_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, 2))
 
             # START - probe, only for this specific code part
             probe.start()
@@ -167,7 +168,7 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
             batch.clear()
 
             # generate synthetic data (only 1 mil. values for insert or update)
-            synthetic_data = generator.integers(999999, size=(run_setup.bulk_row, run_setup.bulk_col))
+            synthetic_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, run_setup.bulk_col))
 
             # prepare data
             for row in synthetic_data:
