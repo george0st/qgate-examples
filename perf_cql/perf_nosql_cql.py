@@ -116,22 +116,19 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
         select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0=? and fn1=?")
-        batch = BatchStatement(consistency_level=ConsistencyHelper.name_to_value[run_setup['consistency_level']])
 
         while True:
-            batch.clear()
 
             # generate synthetic data (only 1 mil. values for select)
-            synthetic_data = generator.integers(999999, size=(run_setup.bulk_row, run_setup.bulk_col))
-
-            # prepare data
-            for row in synthetic_data:
-                batch.add(select_statement, row)
+            #  NOTE: I wll generate only values for two columns (as primary keys)
+            synthetic_data = generator.integers(999999, size=(run_setup.bulk_row, 2))
 
             # START - probe, only for this specific code part
             probe.start()
 
-            session.execute(batch)
+            # prepare data
+            for row in synthetic_data:
+                session.execute(select_statement.bind(row))
 
             # STOP - probe
             if probe.stop():
