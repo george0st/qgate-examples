@@ -1,12 +1,14 @@
 from enum import Enum
 import datetime, time
+
+import cassandra.query
 import numpy
 
 from cassandra import ConsistencyLevel
 from cassandra.cluster import ExecutionProfile
 from cassandra.cluster import EXEC_PROFILE_DEFAULT
 from cassandra.policies import DCAwareRoundRobinPolicy
-from cassandra.query import BatchStatement
+from cassandra.query import BatchStatement, BoundStatement
 
 from qgate_perf.parallel_executor import ParallelExecutor
 from qgate_perf.parallel_probe import ParallelProbe
@@ -117,11 +119,13 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
         select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0=? and fn1=?")
+        bound = cassandra.query.BoundStatement(select_statement,
+                                               consistency_level = ConsistencyHelper.name_to_value[run_setup['consistency_level']])
 
         while True:
 
             # generate synthetic data
-            #  NOTE: It will generate only values for two columns (as primary keys)
+            #  NOTE: It will generate only values for two columns (as primary keys), not for all columns
             synthetic_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, 2))
 
             # START - probe, only for this specific code part
@@ -129,7 +133,8 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
 
             # prepare data
             for row in synthetic_data:
-                session.execute(select_statement.bind(row))
+                bound.bind(row)
+                session.execute(bound)
 
             # STOP - probe
             if probe.stop():
@@ -201,8 +206,6 @@ def prepare_model(cluster, run_setup: RunSetup):
                 session.execute(f"DROP KEYSPACE IF EXISTS {run_setup['keyspace']}")
 
                 # Create key space
-                # use different replication strategy 'class':'NetworkTopologyStrategy' for production HA mode
-                #            session.execute("CREATE KEYSPACE IF NOT EXISTS jist2 WITH replication = {'class':'NetworkTopologyStrategy', 'replication_factor' : 3};")
                 session.execute(f"CREATE KEYSPACE IF NOT EXISTS {run_setup['keyspace']}" +
                                 " WITH replication = {" +
                                 f"'class':'{run_setup['replication_class']}', 'replication_factor' : {run_setup['replication_factor']}" +
