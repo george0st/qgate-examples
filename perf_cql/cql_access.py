@@ -4,6 +4,11 @@ from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster
 from cassandra.cluster import ExecutionProfile
 from cassandra.cluster import EXEC_PROFILE_DEFAULT
+#from cassandra.policies import DCAwareRoundRobinPolicy
+# from cassandra.auth import PlainTextAuthProvider
+# from cassandra.cluster import Cluster
+# from ssl import PROTOCOL_TLSv1_2, PROTOCOL_TLSv1, SSLContext, CERT_NONE, CERT_REQUIRED
+
 
 from cql_config import CQLType
 
