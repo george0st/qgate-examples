@@ -19,16 +19,12 @@ from cassandra.cluster import Cluster
 from dotenv import load_dotenv, dotenv_values
 from ssl import PROTOCOL_TLSv1_2, PROTOCOL_TLSv1, SSLContext, CERT_NONE, CERT_REQUIRED
 
+from cql_type import CQLType
+
 
 class Setting:
     TABLE_NAME = "t02"
     MAX_GNR_VALUE = 999999
-
-class CQLType(Enum):
-    ScyllaDB = 1
-    Cassandra = 2
-    AstraDB = 3
-    CosmosDB = 4
 
 class ConsistencyHelper:
     name_to_value = {
@@ -252,6 +248,8 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
 
 
     parameters["cql"] = cql
+
+    # run tests & generate graphs
     setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf("../output", suppress_error = True)
