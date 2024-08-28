@@ -229,11 +229,27 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
 
     lbl = str(cql).split('.')[1]
     lbl_suffix = f"-{parameters['label']}" if parameters.get('label', None) else ""
-    generator = ParallelExecutor(prf_cql_write,
-                                 label=f"{lbl}-write{lbl_suffix}",
-                                 detail_output=True,
-                                 output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
-                                 init_each_bulk=True)
+
+    if parameters['test_type']=='W':    # WRITE perf test
+        generator = ParallelExecutor(prf_cql_write,
+                                     label=f"{lbl}-write{lbl_suffix}",
+                                     detail_output=True,
+                                     output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
+                                     init_each_bulk=True)
+    elif parameters['test_type']=='R':    # READ perf test
+        generator = ParallelExecutor(prf_cql_read(),
+                                     label=f"{lbl}-read{lbl_suffix}",
+                                     detail_output=True,
+                                     output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
+                                     init_each_bulk=True)
+    # TODO: Add read & write
+    # elif parameters['test_type']=='RW' or parameters['test_type']=='WR':    # READ & WRITE perf test
+    #     generator = ParallelExecutor(prf_cql_read(),
+    #                                  label=f"{lbl}-read{lbl_suffix}",
+    #                                  detail_output=True,
+    #                                  output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
+    #                                  init_each_bulk=True)
+
 
     parameters["cql"] = cql
     setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
@@ -242,7 +258,10 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
 
 def get_config(config, adapter):
     param={}
-    param['keyspace'] = config["KEYSPACE"]
+
+    # shared params for all providers
+    param['keyspace'] = config.get("KEYSPACE", "tst")
+    param['test_type'] = config.get("TEST_TYPE", "W")
 
     if config[adapter].lower() == "on":
         # connection setting
