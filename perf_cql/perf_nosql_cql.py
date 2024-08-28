@@ -109,7 +109,10 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
     cluster = create_cluster(run_setup)
 
     try:
-        session = cluster.connect()
+        cql = CQLAccess(run_setup)
+        cql.open()
+        #        session = cluster.connect()
+        # session = cql.cluster.connect()
 
         # INIT - contain executor synchronization, if needed
         probe = ParallelProbe(run_setup)
@@ -117,7 +120,7 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
         # prepare select statement for batch
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
-        select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0=? and fn1=?")
+        select_statement = cql.session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0=? and fn1=?")
         bound = cassandra.query.BoundStatement(select_statement, consistency_level=run_setup['consistency_level'])
 
         while True:
@@ -132,14 +135,14 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
             # prepare data
             for row in synthetic_data:
                 bound.bind(row)
-                session.execute(bound)
+                cql.session.execute(bound)
 
             # STOP - probe
             if probe.stop():
                 break
     finally:
-        if cluster:
-            cluster.shutdown()
+        if cql:
+            cql.close()
 
     return probe
 
@@ -319,7 +322,7 @@ if __name__ == '__main__':
     #executors = [[2, 1, '1x threads'], [4, 1, '1x threads']]
 
     # performance test duration
-    duration_seconds=5
+    duration_seconds=300
 
     config = dotenv_values("config/perf_nosql_cql.env")
     param=config.get('MULTIPLE_ENV', None)
