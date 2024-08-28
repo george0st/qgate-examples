@@ -1,5 +1,5 @@
-qgate-perf>=0.4.5
-qgate-graph>=1.4.4
+qgate-perf==0.4.7
+qgate-graph==1.4.6
 cassandra-driver==3.29.1
 
 # https://github.com/theskumar/python-dotenv
