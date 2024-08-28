@@ -20,6 +20,7 @@ from dotenv import load_dotenv, dotenv_values
 from ssl import PROTOCOL_TLSv1_2, PROTOCOL_TLSv1, SSLContext, CERT_NONE, CERT_REQUIRED
 
 from cql_type import CQLType
+from cql_config import CQLConfig
 
 
 class Setting:
@@ -115,8 +116,7 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
         select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0=? and fn1=?")
-        bound = cassandra.query.BoundStatement(select_statement,
-                                               consistency_level = ConsistencyHelper.name_to_value[run_setup['consistency_level']])
+        bound = cassandra.query.BoundStatement(select_statement, consistency_level=run_setup['consistency_level'])
 
         while True:
 
@@ -163,7 +163,7 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
             columns+=f"fn{i},"
             items+="?,"
         insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]})")
-        batch = BatchStatement(consistency_level=ConsistencyHelper.name_to_value[run_setup['consistency_level']])
+        batch = BatchStatement(consistency_level=run_setup['consistency_level'])
 
         while True:
             batch.clear()
@@ -291,7 +291,8 @@ def get_config(config, adapter):
         return None
 
 def exec_config(config, bulks, duration_seconds, executors):
-    param = get_config(config, 'COSMOSDB')
+
+    param = CQLConfig(config, 'COSMOSDB').get_params()
     if param:
         perf_test(CQLType.CosmosDB,
                   param,
@@ -299,7 +300,7 @@ def exec_config(config, bulks, duration_seconds, executors):
                   duration=duration_seconds,
                   executor_list=executors)
 
-    param=get_config(config, 'SCYLLADB')
+    param = CQLConfig(config, 'SCYLLADB').get_params()
     if param:
         perf_test(CQLType.ScyllaDB,
                   param,
@@ -307,7 +308,7 @@ def exec_config(config, bulks, duration_seconds, executors):
                   bulk_list=bulks,
                   executor_list=executors)
 
-    param=get_config(config, 'CASSANDRA')
+    param = CQLConfig(config, 'CASSANDRA').get_params()
     if param:
         perf_test(CQLType.Cassandra,
                   param,
@@ -315,7 +316,7 @@ def exec_config(config, bulks, duration_seconds, executors):
                   bulk_list=bulks,
                   executor_list=executors)
 
-    param=get_config(config, 'ASTRADB')
+    param = CQLConfig(config, 'ASTRADB').get_params()
     if param:
         perf_test(CQLType.AstraDB,
                   param,
