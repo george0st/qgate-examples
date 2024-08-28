@@ -254,41 +254,41 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf("../output", suppress_error = True)
 
-def get_config(config, adapter):
-    param={}
-
-    # shared params for all providers
-    param['keyspace'] = config.get("KEYSPACE", "tst")
-    param['test_type'] = config.get("TEST_TYPE", "W")
-
-    if config[adapter].lower() == "on":
-        # connection setting
-        if config.get(f"{adapter}_IP", None):
-            param["ip"] = config[f"{adapter}_IP"].split(",")
-        if config.get(f"{adapter}_PORT", None):
-            param["port"] = config[f"{adapter}_PORT"]
-        if config.get(f"{adapter}_SECURE_CONNECT_BUNDLE", None):
-            param["secure_connect_bundle"] = config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
-
-        # login setting
-        if config.get(f"{adapter}_USERNAME", None) or config.get(f"{adapter}_PASSWORD", None):
-            param['username'] = config.get(f"{adapter}_USERNAME", None)
-            param['password'] = config.get(f"{adapter}_PASSWORD", None)
-
-        # replication setting
-        if config.get(f"{adapter}_REPLICATION_CLASS", None) or config.get(f"{adapter}_REPLICATION_FACTOR", None):
-            param['replication_class'] = config.get(f"{adapter}_REPLICATION_CLASS", None)
-            param['replication_factor'] = config.get(f"{adapter}_REPLICATION_FACTOR", None)
-
-        # consistency level
-        param['consistency_level'] = config.get(f"{adapter}_CONSISTENCY_LEVEL", "ddd")
-
-        # label
-        param['label'] = config.get(f"{adapter}_LABEL", None)
-
-        return param
-    else:
-        return None
+# def get_config(config, adapter):
+#     param={}
+#
+#     # shared params for all providers
+#     param['keyspace'] = config.get("KEYSPACE", "tst")
+#     param['test_type'] = config.get("TEST_TYPE", "W")
+#
+#     if config[adapter].lower() == "on":
+#         # connection setting
+#         if config.get(f"{adapter}_IP", None):
+#             param["ip"] = config[f"{adapter}_IP"].split(",")
+#         if config.get(f"{adapter}_PORT", None):
+#             param["port"] = config[f"{adapter}_PORT"]
+#         if config.get(f"{adapter}_SECURE_CONNECT_BUNDLE", None):
+#             param["secure_connect_bundle"] = config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
+#
+#         # login setting
+#         if config.get(f"{adapter}_USERNAME", None) or config.get(f"{adapter}_PASSWORD", None):
+#             param['username'] = config.get(f"{adapter}_USERNAME", None)
+#             param['password'] = config.get(f"{adapter}_PASSWORD", None)
+#
+#         # replication setting
+#         if config.get(f"{adapter}_REPLICATION_CLASS", None) or config.get(f"{adapter}_REPLICATION_FACTOR", None):
+#             param['replication_class'] = config.get(f"{adapter}_REPLICATION_CLASS", None)
+#             param['replication_factor'] = config.get(f"{adapter}_REPLICATION_FACTOR", None)
+#
+#         # consistency level
+#         param['consistency_level'] = config.get(f"{adapter}_CONSISTENCY_LEVEL", "ddd")
+#
+#         # label
+#         param['label'] = config.get(f"{adapter}_LABEL", None)
+#
+#         return param
+#     else:
+#         return None
 
 def exec_config(config, bulks, duration_seconds, executors):
 
