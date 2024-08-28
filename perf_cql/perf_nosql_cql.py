@@ -21,26 +21,27 @@ from ssl import PROTOCOL_TLSv1_2, PROTOCOL_TLSv1, SSLContext, CERT_NONE, CERT_RE
 
 from cql_type import CQLType
 from cql_config import CQLConfig
+from cql_access import CQLAccess
 
 
 class Setting:
     TABLE_NAME = "t02"
     MAX_GNR_VALUE = 999999
 
-class ConsistencyHelper:
-    name_to_value = {
-    'ANY': ConsistencyLevel.ANY,
-    'ONE': ConsistencyLevel.ONE,
-    'TWO': ConsistencyLevel.TWO,
-    'THREE': ConsistencyLevel.THREE,
-    'QUORUM': ConsistencyLevel.QUORUM,
-    'ALL': ConsistencyLevel.ALL,
-    'LOCAL_QUORUM': ConsistencyLevel.LOCAL_QUORUM,
-    'LOCAL_ONE': ConsistencyLevel.LOCAL_ONE,
-    'LOCAL_SERIAL': ConsistencyLevel.LOCAL_SERIAL,
-    'EACH_QUORUM': ConsistencyLevel.EACH_QUORUM,
-    'SERIAL': ConsistencyLevel.SERIAL,
-    }
+# class ConsistencyHelper:
+#     name_to_value = {
+#     'ANY': ConsistencyLevel.ANY,
+#     'ONE': ConsistencyLevel.ONE,
+#     'TWO': ConsistencyLevel.TWO,
+#     'THREE': ConsistencyLevel.THREE,
+#     'QUORUM': ConsistencyLevel.QUORUM,
+#     'ALL': ConsistencyLevel.ALL,
+#     'LOCAL_QUORUM': ConsistencyLevel.LOCAL_QUORUM,
+#     'LOCAL_ONE': ConsistencyLevel.LOCAL_ONE,
+#     'LOCAL_SERIAL': ConsistencyLevel.LOCAL_SERIAL,
+#     'EACH_QUORUM': ConsistencyLevel.EACH_QUORUM,
+#     'SERIAL': ConsistencyLevel.SERIAL,
+#     }
 
 def read_file(file) -> str:
     with open(file) as f:
@@ -106,6 +107,7 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
     columns, items="", ""
 
     cluster = create_cluster(run_setup)
+
     try:
         session = cluster.connect()
 
@@ -143,17 +145,29 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
 
 def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
     generator = init_rng_generator()
-    columns, items="", ""
+    columns, items = "", ""
 
-    cluster = create_cluster(run_setup)
+#    cluster = create_cluster(run_setup)
+#    cql = CQLAccess(run_setup)
 
     if run_setup.is_init:
         # create NoSQL schema for write perf tests
-        prepare_model(cluster, run_setup)
+        try:
+            cql = CQLAccess(run_setup)
+            cql.open()
+            cql.create_model()
+        finally:
+            if cql:
+                cql.close()
+#        prepare_model(cluster, run_setup)
         return None
 
     try:
-        session = cluster.connect()
+
+        cql = CQLAccess(run_setup)
+        cql.open()
+#        session = cluster.connect()
+        #session = cql.cluster.connect()
 
         # INIT - contain executor synchronization, if needed
         probe = ParallelProbe(run_setup)
@@ -162,7 +176,7 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
             items+="?,"
-        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]})")
+        insert_statement = cql.session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]})")
         batch = BatchStatement(consistency_level=run_setup['consistency_level'])
 
         while True:
@@ -178,14 +192,16 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
             # START - probe, only for this specific code part
             probe.start()
 
-            session.execute(batch)
+            cql.session.execute(batch)
 
             # STOP - probe
             if probe.stop():
                 break
     finally:
-        if cluster:
-            cluster.shutdown()
+        if cql:
+            cql.close()
+        # if cluster:
+        #     cluster.shutdown()
 
     return probe
 
@@ -253,42 +269,6 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
     setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf("../output", suppress_error = True)
-
-# def get_config(config, adapter):
-#     param={}
-#
-#     # shared params for all providers
-#     param['keyspace'] = config.get("KEYSPACE", "tst")
-#     param['test_type'] = config.get("TEST_TYPE", "W")
-#
-#     if config[adapter].lower() == "on":
-#         # connection setting
-#         if config.get(f"{adapter}_IP", None):
-#             param["ip"] = config[f"{adapter}_IP"].split(",")
-#         if config.get(f"{adapter}_PORT", None):
-#             param["port"] = config[f"{adapter}_PORT"]
-#         if config.get(f"{adapter}_SECURE_CONNECT_BUNDLE", None):
-#             param["secure_connect_bundle"] = config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
-#
-#         # login setting
-#         if config.get(f"{adapter}_USERNAME", None) or config.get(f"{adapter}_PASSWORD", None):
-#             param['username'] = config.get(f"{adapter}_USERNAME", None)
-#             param['password'] = config.get(f"{adapter}_PASSWORD", None)
-#
-#         # replication setting
-#         if config.get(f"{adapter}_REPLICATION_CLASS", None) or config.get(f"{adapter}_REPLICATION_FACTOR", None):
-#             param['replication_class'] = config.get(f"{adapter}_REPLICATION_CLASS", None)
-#             param['replication_factor'] = config.get(f"{adapter}_REPLICATION_FACTOR", None)
-#
-#         # consistency level
-#         param['consistency_level'] = config.get(f"{adapter}_CONSISTENCY_LEVEL", "ddd")
-#
-#         # label
-#         param['label'] = config.get(f"{adapter}_LABEL", None)
-#
-#         return param
-#     else:
-#         return None
 
 def exec_config(config, bulks, duration_seconds, executors):
 
