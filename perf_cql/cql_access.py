@@ -5,12 +5,12 @@ from cassandra.cluster import Cluster
 from cassandra.cluster import ExecutionProfile
 from cassandra.cluster import EXEC_PROFILE_DEFAULT
 
-from cql_type import CQLType
+from cql_config import CQLType
+
 
 class Setting:
     TABLE_NAME = "t02"
     MAX_GNR_VALUE = 999999
-
 
 class CQLAccess:
 
