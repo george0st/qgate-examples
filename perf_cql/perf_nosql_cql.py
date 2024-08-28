@@ -1,6 +1,4 @@
-from enum import Enum
 import datetime, time
-
 import cassandra.query
 import numpy
 from cassandra.query import BatchStatement, BoundStatement
