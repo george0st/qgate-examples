@@ -148,18 +148,7 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
 
     # run tests & generate graphs
     setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
-    # generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
-
-    import matplotlib
-
-    import matplotlib
-    matplotlib.use('Agg')
-    # import matplotlib.pyplot as plt
-    #
-    # matplotlib.use('TkAgg', force=True)
-    # from matplotlib import pyplot as plt
-    # print("Switched to:", matplotlib.get_backend())
-
+    generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf("../output", suppress_error = True)
 
 def exec_config(config, bulks, duration_seconds, executors):
@@ -212,7 +201,7 @@ if __name__ == '__main__':
     #executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
 
     # performance test duration
-    duration_seconds=60
+    duration_seconds=5
 
     config = dotenv_values("config/perf_nosql_cql.env")
     param=config.get('MULTIPLE_ENV', None)
