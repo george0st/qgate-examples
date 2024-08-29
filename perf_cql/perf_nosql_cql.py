@@ -32,10 +32,10 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
         cql = CQLAccess(run_setup)
         cql.open()
 
-        # INIT - contain executor synchronization, if needed
+        # INIT - contains executor synchronization, if needed
         probe = ParallelProbe(run_setup)
 
-        # prepare select statement for batch
+        # prepare select statement
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
         select_statement = cql.session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0=? and fn1=?")
@@ -69,7 +69,7 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
     columns, items = "", ""
 
     if run_setup.is_init:
-        # create NoSQL schema for write perf tests
+        # create schema for write data
         try:
             cql = CQLAccess(run_setup)
             cql.open()
@@ -84,7 +84,7 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
         cql = CQLAccess(run_setup)
         cql.open()
 
-        # INIT - contain executor synchronization, if needed
+        # INIT - contains executor synchronization, if needed
         probe = ParallelProbe(run_setup)
 
         # prepare insert statement for batch
@@ -194,8 +194,8 @@ if __name__ == '__main__':
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
     #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
     #
-    executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'], [16, 1, '1x threads'],
-                 [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads'], [16, 2, '2x threads']]
+    executors = [[4, 1, '1x threads'], [8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
+                 [4, 2, '2x threads'], [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads']]
 
     #executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
 
