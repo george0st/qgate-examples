@@ -205,16 +205,17 @@ if __name__ == '__main__':
     duration_seconds=5
 
     config = dotenv_values("config/cass.env")
-    param=config.get('MULTIPLE_ENV', None)
-    if param:
+    multiple_env = config.get('MULTIPLE_ENV', None)
+    if multiple_env:
         # multiple configurations
-        envs=[env.strip() for env in config["MULTIPLE_ENV"].split(",")]
+        multiple_env_delay = config.get('MULTIPLE_ENV_DELAY', 0)
+        envs=[env.strip() for env in multiple_env.split(",")]
         env_count=0
         for env in envs:
             env_count+=1
             print(Fore.BLUE + f"Environment switch '{env_count}:{env}' ..." + Style.RESET_ALL)
             if env_count>1:
-                time.sleep(int(config.get('MULTIPLE_ENV_DELAY', 0)))
+                time.sleep(int(multiple_env_delay))
             exec_config(dotenv_values(env), bulks, duration_seconds, executors)
 
     else:
