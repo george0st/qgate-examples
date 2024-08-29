@@ -36,7 +36,7 @@ class CQLConfig:
         param['keyspace'] = self._config.get("KEYSPACE", "tst")
         param['test_type'] = self._config.get("TEST_TYPE", "W")
 
-        if self._config[self._adapter].lower() == "on":
+        if self._config.get(self._adapter,"off").lower() == "on":
             # connection setting
             if self._config.get(f"{self._adapter}_IP", None):
                 param["ip"] = self._config[f"{self._adapter}_IP"].split(",")
