@@ -203,7 +203,7 @@ if __name__ == '__main__':
     # performance test duration
     duration_seconds=5
 
-    config = dotenv_values("config/perf_nosql_cql.env")
+    config = dotenv_values("config/cass.env")
     param=config.get('MULTIPLE_ENV', None)
     if param:
         # multiple configurations
