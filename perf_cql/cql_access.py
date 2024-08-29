@@ -1,9 +1,12 @@
+import cassandra.policies
 from qgate_perf.run_setup import RunSetup
 
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster
 from cassandra.cluster import ExecutionProfile
 from cassandra.cluster import EXEC_PROFILE_DEFAULT
+from cassandra import ProtocolVersion
+from cassandra.policies import DCAwareRoundRobinPolicy, RoundRobinPolicy, DefaultLoadBalancingPolicy
 #from cassandra.policies import DCAwareRoundRobinPolicy
 # from cassandra.auth import PlainTextAuthProvider
 # from cassandra.cluster import Cluster
@@ -47,30 +50,28 @@ class CQLAccess:
                 "secure_connect_bundle": self._run_setup["secure_connect_bundle"],
                 'use_default_tempdir': True
             }
-            self._cluster = Cluster(cloud=cloud_config,
-                              auth_provider=authProvider,
-                              execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
-                              control_connection_timeout=30,
-                              idle_heartbeat_interval=30,
-                              connect_timeout=30)
-        else:
-            # ssl_opts = {
-            #     'ca_certs': 'C:\Python\qgate-examples\secrets\public-key.pem',
-            #     'ssl_version': PROTOCOL_TLSv1_2,
-            #     'cert_reqs': CERT_REQUIRED  # Certificates are required and validated
-            # }
-            #
-            # ssl_context = SSLContext(PROTOCOL_TLSv1_2)
-            # ssl_context.verify_mode = CERT_NONE
+            self._cluster = Cluster(cloud = cloud_config,
+                                    auth_provider = authProvider,
+                                    load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"]),
+#                                    load_balancing_policy=RoundRobinPolicy(),
+                                    control_connection_timeout = 30,
+                                    idle_heartbeat_interval = 30,
+                                    connect_timeout = 30,
+                                    protocol_version = ProtocolVersion.V4)
+                                    #execution_profiles = {EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout = 30)},
 
+        else:
             # connection with 'ip' and 'port'
-            self._cluster = Cluster(contact_points=self._run_setup['ip'],
-                              port=self._run_setup['port'],
-                              auth_provider=authProvider,
-                              execution_profiles={EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout=30)},
-                              control_connection_timeout=30,
-                              idle_heartbeat_interval=30,
-                              connect_timeout=30)
+            self._cluster = Cluster(contact_points = self._run_setup['ip'],
+                                    port = self._run_setup['port'],
+                                    auth_provider = authProvider,
+                                    load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"]),
+                                    #load_balancing_policy = RoundRobinPolicy(),
+                                    control_connection_timeout = 30,
+                                    idle_heartbeat_interval = 30,
+                                    connect_timeout = 30,
+                                    protocol_version = ProtocolVersion.V4)
+                                    # execution_profiles = {EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout = 30)},
 
         self._session = self._cluster.connect()
 

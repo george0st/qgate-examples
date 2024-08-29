@@ -8,6 +8,7 @@ from qgate_perf.run_setup import RunSetup
 from dotenv import load_dotenv, dotenv_values
 from cql_config import CQLConfig, CQLType
 from cql_access import CQLAccess, Setting
+from colorama import Fore, Style
 
 
 def init_rng_generator():
@@ -194,22 +195,29 @@ if __name__ == '__main__':
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
     #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
     #
-    executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
-                 [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
-                 [8, 4, '4x threads'], [16, 4, '4x threads'], [32, 4, '4x threads']]
+    # executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
+    #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
+    #              [8, 4, '4x threads'], [16, 4, '4x threads'], [32, 4, '4x threads']]
 
-    #executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
+    executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
 
     # performance test duration
-    duration_seconds=60
+    duration_seconds=5
 
-    config = dotenv_values("config/perf_nosql_cql.env")
-    param=config.get('MULTIPLE_ENV', None)
-    if param:
+    config = dotenv_values("config/cass.env")
+    multiple_env = config.get('MULTIPLE_ENV', None)
+    if multiple_env:
         # multiple configurations
-        envs=config["MULTIPLE_ENV"].split(",")
+        multiple_env_delay = config.get('MULTIPLE_ENV_DELAY', 0)
+        envs=[env.strip() for env in multiple_env.split(",")]
+        env_count=0
         for env in envs:
-            exec_config(dotenv_values(env.strip()), bulks, duration_seconds, executors)
+            env_count+=1
+            print(Fore.BLUE + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
+            if env_count>1:
+                time.sleep(int(multiple_env_delay))
+            exec_config(dotenv_values(env), bulks, duration_seconds, executors)
+
     else:
         # single configuration
         exec_config(config, bulks, duration_seconds, executors)

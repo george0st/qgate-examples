@@ -36,7 +36,7 @@ class CQLConfig:
         param['keyspace'] = self._config.get("KEYSPACE", "tst")
         param['test_type'] = self._config.get("TEST_TYPE", "W")
 
-        if self._config[self._adapter].lower() == "on":
+        if self._config.get(self._adapter,"off").lower() == "on":
             # connection setting
             if self._config.get(f"{self._adapter}_IP", None):
                 param["ip"] = self._config[f"{self._adapter}_IP"].split(",")
@@ -57,6 +57,9 @@ class CQLConfig:
 
             # consistency level (default is "LOCAL_QUORUM")
             param['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get(f"{self._adapter}_CONSISTENCY_LEVEL", "LOCAL_QUORUM")]
+
+            # local data center for correct setting of balancing via DCAwareRoundRobinPolicy
+            param['local_dc'] = self._config.get(f"{self._adapter}_LB_LOCAL_DC", "datacenter1")
 
             # label
             param['label'] = self._config.get(f"{self._adapter}_LABEL", None)
