@@ -213,7 +213,7 @@ if __name__ == '__main__':
         env_count=0
         for env in envs:
             env_count+=1
-            print(Fore.BLUE + f"Environment switch '{env_count}/{len(envs)} :{env}' ..." + Style.RESET_ALL)
+            print(Fore.BLUE + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
             if env_count>1:
                 time.sleep(int(multiple_env_delay))
             exec_config(dotenv_values(env), bulks, duration_seconds, executors)
