@@ -58,6 +58,9 @@ class CQLConfig:
             # consistency level (default is "LOCAL_QUORUM")
             param['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get(f"{self._adapter}_CONSISTENCY_LEVEL", "LOCAL_QUORUM")]
 
+            # local data center for correct setting of balancing via DCAwareRoundRobinPolicy
+            param['local_dc'] = self._config.get(f"{self._adapter}_LB_LOCAL_DC", "datacenter1")
+
             # label
             param['label'] = self._config.get(f"{self._adapter}_LABEL", None)
 
