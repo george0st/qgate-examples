@@ -204,7 +204,7 @@ if __name__ == '__main__':
     executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
 
     # performance test duration
-    duration_seconds=60
+    duration_seconds=5
 
     config = dotenv_values("config/cass.env")
     multiple_env = config.get('MULTIPLE_ENV', None)
