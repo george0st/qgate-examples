@@ -77,45 +77,42 @@ class CQLAccess:
 
     def create_model(self):
 
-        try:
-            self.open()
-            self._session.default_timeout = Setting.TIMEOUT_CREATE_MODEL
-            if self._run_setup["cql"] != CQLType.AstraDB:
-                if self._run_setup['replication_factor']:
-                    # Drop key space
-                    self._session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']}")
+        self._session.default_timeout = Setting.TIMEOUT_CREATE_MODEL
+        if self._run_setup["cql"] != CQLType.AstraDB:
+            if self._run_setup['replication_factor']:
+                # Drop key space
+                self._session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']}")
 
-                    # Create key space
-                    self._session.execute(f"CREATE KEYSPACE IF NOT EXISTS {self._run_setup['keyspace']}" +
-                                    " WITH replication = {" +
-                                    f"'class':'{self._run_setup['replication_class']}', 'replication_factor' : {self._run_setup['replication_factor']}" +
-                                    "};")
+                # Create key space
+                self._session.execute(f"CREATE KEYSPACE IF NOT EXISTS {self._run_setup['keyspace']}" +
+                                " WITH replication = {" +
+                                f"'class':'{self._run_setup['replication_class']}', 'replication_factor' : {self._run_setup['replication_factor']}" +
+                                "};")
 
-            # use LTW atomic command with IF
-            self._session.execute(f"DROP TABLE IF EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME}")
+        # use LTW atomic command with IF
+        self._session.execute(f"DROP TABLE IF EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME}")
 
-            # prepare insert statement for batch
-            columns = ""
-            for i in range(0, self._run_setup.bulk_col):
-                columns += f"fn{i} int,"
+        # prepare insert statement for batch
+        columns = ""
+        for i in range(0, self._run_setup.bulk_col):
+            columns += f"fn{i} int,"
 
-            # complex primary key (partition key 'fn0' and cluster key 'fn1')
-            self._session.execute(
-                f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
-
-        finally:
-            self.close()
+        # complex primary key (partition key 'fn0' and cluster key 'fn1')
+        self._session.execute(
+            f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
 
     def close(self):
         if self._cluster:
             self._cluster.shutdown()
             self._cluster = None
-            self._session = None
 
     def get_node_status(self):
         nodes = []
+        session = None
+
         try:
-            self.open()
+            session = self._cluster.connect()
+            session.default_timeout = Setting.TIMEOUT
 
             # Execute a query to get node status information from system.peers
             query = "SELECT peer, data_center, rack, tokens, host_id, rpc_address FROM system.peers"
@@ -148,7 +145,9 @@ class CQLAccess:
             }
             nodes.append(local_node_info)
         finally:
-            self.close()
+            if session:
+                session.shutdown()
+
         return nodes
 
     def _read_file(self, file) -> str:

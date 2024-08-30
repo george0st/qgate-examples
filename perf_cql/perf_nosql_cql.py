@@ -28,6 +28,7 @@ def init_rng_generator():
 def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
     generator = init_rng_generator()
     columns, items="", ""
+    cql = None
 
     try:
         cql = CQLAccess(run_setup)
@@ -68,11 +69,17 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
 def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
     generator = init_rng_generator()
     columns, items = "", ""
+    cql = None
 
     if run_setup.is_init:
         # create schema for write data
-        cql = CQLAccess(run_setup)
-        cql.create_model()
+        try:
+            cql = CQLAccess(run_setup)
+            cql.open()
+            cql.create_model()
+        finally:
+            if cql:
+                cql.close()
         return None
 
     try:
