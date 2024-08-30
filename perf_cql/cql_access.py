@@ -41,10 +41,16 @@ class CQLAccess:
         """Create cluster for connection"""
         authProvider = None
 
-        # connection setting
+        # authentication provider
         if self._run_setup['username']:
             authProvider = PlainTextAuthProvider(username=self._run_setup["username"],
                                                  password=self._read_file(self._run_setup["password"]))
+
+        # load balancing policy
+        if int(self._run_setup['replication_factor'])==1:
+            load_balancing_policy=RoundRobinPolicy()
+        else:
+            load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"])
 
         if self._run_setup["secure_connect_bundle"]:
             # connection with 'secure_connect_bundle' to the cloud
@@ -54,8 +60,7 @@ class CQLAccess:
             }
             self._cluster = Cluster(cloud = cloud_config,
                                     auth_provider = authProvider,
-                                    load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"]),
-                                    #                                    load_balancing_policy=RoundRobinPolicy(),
+                                    load_balancing_policy = load_balancing_policy,
                                     control_connection_timeout = Setting.TIMEOUT,
                                     idle_heartbeat_interval = Setting.TIMEOUT,
                                     connect_timeout = Setting.TIMEOUT,
@@ -65,8 +70,7 @@ class CQLAccess:
             self._cluster = Cluster(contact_points = self._run_setup['ip'],
                                     port = self._run_setup['port'],
                                     auth_provider = authProvider,
-                                    load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"]),
-                                    #load_balancing_policy = RoundRobinPolicy(),
+                                    load_balancing_policy = load_balancing_policy,
                                     control_connection_timeout = Setting.TIMEOUT,
                                     idle_heartbeat_interval = Setting.TIMEOUT,
                                     connect_timeout = Setting.TIMEOUT,
