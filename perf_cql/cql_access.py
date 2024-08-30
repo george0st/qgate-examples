@@ -19,7 +19,8 @@ from cql_config import CQLType
 class Setting:
     TABLE_NAME = "t02"
     MAX_GNR_VALUE = 999999
-    TIMEOUTS_SEC = 30
+    TIMEOUT = 30
+    TIMEOUT_CREATE_MODEL = 180
 
 class CQLAccess:
 
@@ -54,10 +55,10 @@ class CQLAccess:
             self._cluster = Cluster(cloud = cloud_config,
                                     auth_provider = authProvider,
                                     load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"]),
-#                                    load_balancing_policy=RoundRobinPolicy(),
-                                    control_connection_timeout = Setting.TIMEOUTS_SEC,
-                                    idle_heartbeat_interval = Setting.TIMEOUTS_SEC,
-                                    connect_timeout = Setting.TIMEOUTS_SEC,
+                                    #                                    load_balancing_policy=RoundRobinPolicy(),
+                                    control_connection_timeout = Setting.TIMEOUT,
+                                    idle_heartbeat_interval = Setting.TIMEOUT,
+                                    connect_timeout = Setting.TIMEOUT,
                                     protocol_version = ProtocolVersion.V4)
         else:
             # connection with 'ip' and 'port'
@@ -66,18 +67,18 @@ class CQLAccess:
                                     auth_provider = authProvider,
                                     load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"]),
                                     #load_balancing_policy = RoundRobinPolicy(),
-                                    control_connection_timeout = Setting.TIMEOUTS_SEC,
-                                    idle_heartbeat_interval = Setting.TIMEOUTS_SEC,
-                                    connect_timeout = Setting.TIMEOUTS_SEC,
+                                    control_connection_timeout = Setting.TIMEOUT,
+                                    idle_heartbeat_interval = Setting.TIMEOUT,
+                                    connect_timeout = Setting.TIMEOUT,
                                     protocol_version = ProtocolVersion.V4)
 
         self._session = self._cluster.connect()
-        self._session.default_timeout = Setting.TIMEOUTS_SEC
+        self._session.default_timeout = Setting.TIMEOUT
 
     def create_model(self):
 
         try:
-            #session = self._cluster.connect()
+            self._session.default_timeout = Setting.TIMEOUT_CREATE_MODEL
             columns = ""
 
             if self._run_setup["cql"] != CQLType.AstraDB:
