@@ -119,7 +119,7 @@ class CQLAccess:
             session.default_timeout = Setting.TIMEOUT
 
             # Execute a query to get node status information from system.peers
-            query = "SELECT peer, data_center, rack, release_version, schema_version, tokens, host_id, rpc_address FROM system.peers"
+            query = "SELECT peer, data_center, rack, release_version, schema_version, host_id, rpc_address FROM system.peers"
             rows = self._session.execute(query)
 
             # Process the results
@@ -131,14 +131,13 @@ class CQLAccess:
                     'peer': row.peer,
                     'data_center': row.data_center,
                     'rack': row.rack,
-                    'tokens': row.tokens,
                     'host_id': row.host_id,
                     'rpc_address': row.rpc_address,
                 }
                 nodes[node_info['peer']]=node_info
 
             # Include the local node information
-            local_query = "SELECT data_center, rack, release_version, schema_version, tokens, host_id, rpc_address FROM system.local"
+            local_query = "SELECT data_center, rack, release_version, schema_version, host_id, rpc_address FROM system.local"
             local_row = self._session.execute(local_query).one()
             local_node_info = {
                 'status': 'UP' if local_row.rpc_address else 'DOWN',
@@ -147,16 +146,14 @@ class CQLAccess:
                 'peer': '127.0.0.1',  # Local node IP
                 'data_center': local_row.data_center,
                 'rack': local_row.rack,
-                'tokens': local_row.tokens,
                 'host_id': local_row.host_id,
                 'rpc_address': local_row.rpc_address
             }
             nodes[local_node_info['rpc_address']] = local_node_info
+
         finally:
             if session:
                 session.shutdown()
-
-        return nodes
 
     def _read_file(self, file) -> str:
         with open(file) as f:
