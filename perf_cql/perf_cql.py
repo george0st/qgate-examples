@@ -9,25 +9,12 @@ from dotenv import load_dotenv, dotenv_values
 from cql_config import CQLConfig, CQLType
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
-
-
-def init_rng_generator():
-    """Init generator of random values"""
-
-    # now
-    now = time.time()
-    now_ms = (now - int(now)) * 1000000000
-
-    # random value, based on CPU
-    ns_start = time.perf_counter_ns()
-    time.sleep(0.01)
-    ns_stop = time.perf_counter_ns()
-
-    return numpy.random.default_rng([int(now), int(now_ms), ns_stop - ns_start, ns_stop])
+import cql_helper
 
 def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
-    generator = init_rng_generator()
+    generator = cql_helper.init_rng_generator()
     columns, items="", ""
+    cql = None
 
     try:
         cql = CQLAccess(run_setup)
@@ -66,8 +53,9 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
     return probe
 
 def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
-    generator = init_rng_generator()
+    generator = cql_helper.init_rng_generator()
     columns, items = "", ""
+    cql = None
 
     if run_setup.is_init:
         # create schema for write data
@@ -75,6 +63,7 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
             cql = CQLAccess(run_setup)
             cql.open()
             cql.create_model()
+            #print(cql.get_node_status())
         finally:
             if cql:
                 cql.close()
@@ -195,14 +184,14 @@ if __name__ == '__main__':
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
     #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
     #
-    executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
-                 [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
-                 [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
+    # executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
+    #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
+    #              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
 
-    # executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
+    executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
 
     # performance test duration
-    duration_seconds=60
+    duration_seconds=5
 
     config = dotenv_values("config/cass.env")
     multiple_env = config.get('MULTIPLE_ENV', None)
@@ -217,7 +206,6 @@ if __name__ == '__main__':
             if env_count>1:
                 time.sleep(int(multiple_env_delay))
             exec_config(dotenv_values(env), bulks, duration_seconds, executors)
-
     else:
         # single configuration
         exec_config(config, bulks, duration_seconds, executors)

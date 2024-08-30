@@ -17,9 +17,10 @@ from cql_config import CQLType
 
 
 class Setting:
-    TABLE_NAME = "t02"
-    MAX_GNR_VALUE = 999999
-    TIMEOUTS_SEC = 30
+    TABLE_NAME = "t01"
+    MAX_GNR_VALUE = 99999
+    TIMEOUT = 30
+    TIMEOUT_CREATE_MODEL = 180
 
 class CQLAccess:
 
@@ -38,12 +39,18 @@ class CQLAccess:
 
     def open(self):
         """Create cluster for connection"""
-        authProvider = None
+        auth_provider = None
 
-        # connection setting
+        # authentication provider
         if self._run_setup['username']:
-            authProvider = PlainTextAuthProvider(username=self._run_setup["username"],
+            auth_provider = PlainTextAuthProvider(username=self._run_setup["username"],
                                                  password=self._read_file(self._run_setup["password"]))
+
+        # load balancing policy
+        if int(self._run_setup['replication_factor'])==1:
+            load_balancing_policy=RoundRobinPolicy()
+        else:
+            load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"])
 
         if self._run_setup["secure_connect_bundle"]:
             # connection with 'secure_connect_bundle' to the cloud
@@ -52,65 +59,101 @@ class CQLAccess:
                 'use_default_tempdir': True
             }
             self._cluster = Cluster(cloud = cloud_config,
-                                    auth_provider = authProvider,
-                                    load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"]),
-#                                    load_balancing_policy=RoundRobinPolicy(),
-                                    control_connection_timeout = Setting.TIMEOUTS_SEC,
-                                    idle_heartbeat_interval = Setting.TIMEOUTS_SEC,
-                                    connect_timeout = Setting.TIMEOUTS_SEC,
+                                    auth_provider = auth_provider,
+                                    load_balancing_policy = load_balancing_policy,
+                                    control_connection_timeout = Setting.TIMEOUT,
+                                    idle_heartbeat_interval = Setting.TIMEOUT,
+                                    connect_timeout = Setting.TIMEOUT,
                                     protocol_version = ProtocolVersion.V4)
         else:
             # connection with 'ip' and 'port'
             self._cluster = Cluster(contact_points = self._run_setup['ip'],
                                     port = self._run_setup['port'],
-                                    auth_provider = authProvider,
-                                    load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"]),
-                                    #load_balancing_policy = RoundRobinPolicy(),
-                                    control_connection_timeout = Setting.TIMEOUTS_SEC,
-                                    idle_heartbeat_interval = Setting.TIMEOUTS_SEC,
-                                    connect_timeout = Setting.TIMEOUTS_SEC,
+                                    auth_provider = auth_provider,
+                                    load_balancing_policy = load_balancing_policy,
+                                    control_connection_timeout = Setting.TIMEOUT,
+                                    idle_heartbeat_interval = Setting.TIMEOUT,
+                                    connect_timeout = Setting.TIMEOUT,
                                     protocol_version = ProtocolVersion.V4)
 
         self._session = self._cluster.connect()
-        self._session.default_timeout = Setting.TIMEOUTS_SEC
+        self._session.default_timeout = Setting.TIMEOUT
 
     def create_model(self):
 
-        try:
-            #session = self._cluster.connect()
-            columns = ""
+        self._session.default_timeout = Setting.TIMEOUT_CREATE_MODEL
+        if self._run_setup["cql"] != CQLType.AstraDB:
+            if self._run_setup['replication_factor']:
+                # Drop key space
+                self._session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']}")
 
-            if self._run_setup["cql"] != CQLType.AstraDB:
+                # Create key space
+                self._session.execute(f"CREATE KEYSPACE IF NOT EXISTS {self._run_setup['keyspace']}" +
+                                " WITH replication = {" +
+                                f"'class':'{self._run_setup['replication_class']}', 'replication_factor' : {self._run_setup['replication_factor']}" +
+                                "};")
 
-                if self._run_setup['replication_factor']:
-                    # Drop key space
-                    self._session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']}")
+        # use LTW atomic command with IF
+        self._session.execute(f"DROP TABLE IF EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME}")
 
-                    # Create key space
-                    self._session.execute(f"CREATE KEYSPACE IF NOT EXISTS {self._run_setup['keyspace']}" +
-                                    " WITH replication = {" +
-                                    f"'class':'{self._run_setup['replication_class']}', 'replication_factor' : {self._run_setup['replication_factor']}" +
-                                    "};")
+        # prepare insert statement for batch
+        columns = ""
+        for i in range(0, self._run_setup.bulk_col):
+            columns += f"fn{i} int,"
 
-            # use LTW atomic command with IF
-            self._session.execute(f"DROP TABLE IF EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME}")
-
-            # prepare insert statement for batch
-            for i in range(0, self._run_setup.bulk_col):
-                columns += f"fn{i} int,"
-
-            # complex primary key (partition key 'fn0' and cluster key 'fn1')
-            self._session.execute(
-                f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
-
-        finally:
-            self.close()
+        # complex primary key (partition key 'fn0' and cluster key 'fn1')
+        self._session.execute(
+            f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
 
     def close(self):
         if self._cluster:
             self._cluster.shutdown()
             self._cluster = None
-            self._session = None
+
+    def get_node_status(self):
+        nodes = {}
+        session = None
+
+        try:
+            session = self._cluster.connect()
+            session.default_timeout = Setting.TIMEOUT
+
+            # Execute a query to get node status information from system.peers
+            query = "SELECT peer, data_center, rack, release_version, schema_version, host_id, rpc_address FROM system.peers"
+            rows = self._session.execute(query)
+
+            # Process the results
+            for row in rows:
+                node_info = {
+                    'status': 'UP' if row.rpc_address else 'DOWN',
+                    'release_version': row.release_version,
+                    'schema_version': row.schema_version,
+                    'peer': row.peer,
+                    'data_center': row.data_center,
+                    'rack': row.rack,
+                    'host_id': row.host_id,
+                    'rpc_address': row.rpc_address,
+                }
+                nodes[node_info['peer']]=node_info
+
+            # Include the local node information
+            local_query = "SELECT data_center, rack, release_version, schema_version, host_id, rpc_address FROM system.local"
+            local_row = self._session.execute(local_query).one()
+            local_node_info = {
+                'status': 'UP' if local_row.rpc_address else 'DOWN',
+                'release_version': local_row.release_version,
+                'schema_version': local_row.schema_version,
+                'peer': '127.0.0.1',  # Local node IP
+                'data_center': local_row.data_center,
+                'rack': local_row.rack,
+                'host_id': local_row.host_id,
+                'rpc_address': local_row.rpc_address
+            }
+            nodes[local_node_info['rpc_address']] = local_node_info
+
+        finally:
+            if session:
+                session.shutdown()
 
     def _read_file(self, file) -> str:
         with open(file) as f:
