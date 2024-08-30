@@ -9,24 +9,10 @@ from dotenv import load_dotenv, dotenv_values
 from cql_config import CQLConfig, CQLType
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
-
-
-def init_rng_generator():
-    """Init generator of random values"""
-
-    # now
-    now = time.time()
-    now_ms = (now - int(now)) * 1000000000
-
-    # random value, based on CPU
-    ns_start = time.perf_counter_ns()
-    time.sleep(0.01)
-    ns_stop = time.perf_counter_ns()
-
-    return numpy.random.default_rng([int(now), int(now_ms), ns_stop - ns_start, ns_stop])
+import cql_helper
 
 def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
-    generator = init_rng_generator()
+    generator = cql_helper.init_rng_generator()
     columns, items="", ""
     cql = None
 
@@ -67,7 +53,7 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
     return probe
 
 def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
-    generator = init_rng_generator()
+    generator = cql_helper.init_rng_generator()
     columns, items = "", ""
     cql = None
 
