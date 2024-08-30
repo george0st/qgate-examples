@@ -39,11 +39,11 @@ class CQLAccess:
 
     def open(self):
         """Create cluster for connection"""
-        authProvider = None
+        auth_provider = None
 
         # authentication provider
         if self._run_setup['username']:
-            authProvider = PlainTextAuthProvider(username=self._run_setup["username"],
+            auth_provider = PlainTextAuthProvider(username=self._run_setup["username"],
                                                  password=self._read_file(self._run_setup["password"]))
 
         # load balancing policy
@@ -59,7 +59,7 @@ class CQLAccess:
                 'use_default_tempdir': True
             }
             self._cluster = Cluster(cloud = cloud_config,
-                                    auth_provider = authProvider,
+                                    auth_provider = auth_provider,
                                     load_balancing_policy = load_balancing_policy,
                                     control_connection_timeout = Setting.TIMEOUT,
                                     idle_heartbeat_interval = Setting.TIMEOUT,
@@ -69,7 +69,7 @@ class CQLAccess:
             # connection with 'ip' and 'port'
             self._cluster = Cluster(contact_points = self._run_setup['ip'],
                                     port = self._run_setup['port'],
-                                    auth_provider = authProvider,
+                                    auth_provider = auth_provider,
                                     load_balancing_policy = load_balancing_policy,
                                     control_connection_timeout = Setting.TIMEOUT,
                                     idle_heartbeat_interval = Setting.TIMEOUT,
@@ -111,7 +111,7 @@ class CQLAccess:
             self._cluster = None
 
     def get_node_status(self):
-        nodes = []
+        nodes = {}
         session = None
 
         try:
@@ -119,35 +119,39 @@ class CQLAccess:
             session.default_timeout = Setting.TIMEOUT
 
             # Execute a query to get node status information from system.peers
-            query = "SELECT peer, data_center, rack, tokens, host_id, rpc_address FROM system.peers"
+            query = "SELECT peer, data_center, rack, release_version, schema_version, tokens, host_id, rpc_address FROM system.peers"
             rows = self._session.execute(query)
 
             # Process the results
             for row in rows:
                 node_info = {
+                    'status': 'UP' if row.rpc_address else 'DOWN',
+                    'release_version': row.release_version,
+                    'schema_version': row.schema_version,
                     'peer': row.peer,
                     'data_center': row.data_center,
                     'rack': row.rack,
                     'tokens': row.tokens,
                     'host_id': row.host_id,
                     'rpc_address': row.rpc_address,
-                    'status': 'UP' if row.rpc_address else 'DOWN'
                 }
-                nodes.append(node_info)
+                nodes[node_info['peer']]=node_info
 
             # Include the local node information
-            local_query = "SELECT data_center, rack, tokens, host_id, rpc_address FROM system.local"
+            local_query = "SELECT data_center, rack, release_version, schema_version, tokens, host_id, rpc_address FROM system.local"
             local_row = self._session.execute(local_query).one()
             local_node_info = {
+                'status': 'UP' if local_row.rpc_address else 'DOWN',
+                'release_version': local_row.release_version,
+                'schema_version': local_row.schema_version,
                 'peer': '127.0.0.1',  # Local node IP
                 'data_center': local_row.data_center,
                 'rack': local_row.rack,
                 'tokens': local_row.tokens,
                 'host_id': local_row.host_id,
-                'rpc_address': local_row.rpc_address,
-                'status': 'UP' if local_row.rpc_address else 'DOWN'
+                'rpc_address': local_row.rpc_address
             }
-            nodes.append(local_node_info)
+            nodes[local_node_info['rpc_address']] = local_node_info
         finally:
             if session:
                 session.shutdown()
