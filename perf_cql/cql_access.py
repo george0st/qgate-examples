@@ -19,6 +19,7 @@ from cql_config import CQLType
 class Setting:
     TABLE_NAME = "t02"
     MAX_GNR_VALUE = 999999
+    TIMEOUTS_SEC = 30
 
 class CQLAccess:
 
@@ -54,9 +55,9 @@ class CQLAccess:
                                     auth_provider = authProvider,
                                     load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"]),
 #                                    load_balancing_policy=RoundRobinPolicy(),
-                                    control_connection_timeout = 30,
-                                    idle_heartbeat_interval = 30,
-                                    connect_timeout = 30,
+                                    control_connection_timeout = Setting.TIMEOUTS_SEC,
+                                    idle_heartbeat_interval = Setting.TIMEOUTS_SEC,
+                                    connect_timeout = Setting.TIMEOUTS_SEC,
                                     protocol_version = ProtocolVersion.V4)
                                     #execution_profiles = {EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout = 30)},
 
@@ -67,13 +68,14 @@ class CQLAccess:
                                     auth_provider = authProvider,
                                     load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"]),
                                     #load_balancing_policy = RoundRobinPolicy(),
-                                    control_connection_timeout = 30,
-                                    idle_heartbeat_interval = 30,
-                                    connect_timeout = 30,
+                                    control_connection_timeout = Setting.TIMEOUTS_SEC,
+                                    idle_heartbeat_interval = Setting.TIMEOUTS_SEC,
+                                    connect_timeout = Setting.TIMEOUTS_SEC,
                                     protocol_version = ProtocolVersion.V4)
                                     # execution_profiles = {EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout = 30)},
 
         self._session = self._cluster.connect()
+        self._session.default_timeout = Setting.TIMEOUTS_SEC
 
     def create_model(self):
 
