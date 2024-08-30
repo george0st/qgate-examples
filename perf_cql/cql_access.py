@@ -59,8 +59,6 @@ class CQLAccess:
                                     idle_heartbeat_interval = Setting.TIMEOUTS_SEC,
                                     connect_timeout = Setting.TIMEOUTS_SEC,
                                     protocol_version = ProtocolVersion.V4)
-                                    #execution_profiles = {EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout = 30)},
-
         else:
             # connection with 'ip' and 'port'
             self._cluster = Cluster(contact_points = self._run_setup['ip'],
@@ -72,7 +70,6 @@ class CQLAccess:
                                     idle_heartbeat_interval = Setting.TIMEOUTS_SEC,
                                     connect_timeout = Setting.TIMEOUTS_SEC,
                                     protocol_version = ProtocolVersion.V4)
-                                    # execution_profiles = {EXEC_PROFILE_DEFAULT: ExecutionProfile(request_timeout = 30)},
 
         self._session = self._cluster.connect()
         self._session.default_timeout = Setting.TIMEOUTS_SEC
