@@ -106,12 +106,12 @@ class CQLAccess:
 
         finally:
             self.close()
-            # if self._cluster:
-            #     self._cluster.shutdown()
 
     def close(self):
         if self._cluster:
             self._cluster.shutdown()
+            self._cluster = None
+            self._session = None
 
     def _read_file(self, file) -> str:
         with open(file) as f:
