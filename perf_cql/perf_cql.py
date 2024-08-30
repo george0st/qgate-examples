@@ -63,7 +63,7 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
             cql = CQLAccess(run_setup)
             cql.open()
             cql.create_model()
-            print(cql.get_node_status())
+            #print(cql.get_node_status())
         finally:
             if cql:
                 cql.close()
