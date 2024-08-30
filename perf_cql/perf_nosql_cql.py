@@ -184,7 +184,7 @@ def exec_config(config, bulks, duration_seconds, executors):
 if __name__ == '__main__':
 
     # size of data bulks, requested format [[rows, columns], ...]
-    bulks = [[200, 20]]
+    bulks = [[200, 10]]
 
     # list of executors (for application to all bulks)
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
@@ -212,7 +212,6 @@ if __name__ == '__main__':
             if env_count>1:
                 time.sleep(int(multiple_env_delay))
             exec_config(dotenv_values(env), bulks, duration_seconds, executors)
-
     else:
         # single configuration
         exec_config(config, bulks, duration_seconds, executors)
