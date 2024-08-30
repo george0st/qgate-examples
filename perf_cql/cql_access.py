@@ -17,8 +17,8 @@ from cql_config import CQLType
 
 
 class Setting:
-    TABLE_NAME = "t02"
-    MAX_GNR_VALUE = 999999
+    TABLE_NAME = "t01"
+    MAX_GNR_VALUE = 99999
     TIMEOUT = 30
     TIMEOUT_CREATE_MODEL = 180
 
@@ -78,11 +78,9 @@ class CQLAccess:
     def create_model(self):
 
         try:
+            self.open()
             self._session.default_timeout = Setting.TIMEOUT_CREATE_MODEL
-            columns = ""
-
             if self._run_setup["cql"] != CQLType.AstraDB:
-
                 if self._run_setup['replication_factor']:
                     # Drop key space
                     self._session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']}")
@@ -97,6 +95,7 @@ class CQLAccess:
             self._session.execute(f"DROP TABLE IF EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME}")
 
             # prepare insert statement for batch
+            columns = ""
             for i in range(0, self._run_setup.bulk_col):
                 columns += f"fn{i} int,"
 
@@ -112,6 +111,45 @@ class CQLAccess:
             self._cluster.shutdown()
             self._cluster = None
             self._session = None
+
+    def get_node_status(self):
+        nodes = []
+        try:
+            self.open()
+
+            # Execute a query to get node status information from system.peers
+            query = "SELECT peer, data_center, rack, tokens, host_id, rpc_address FROM system.peers"
+            rows = self._session.execute(query)
+
+            # Process the results
+            for row in rows:
+                node_info = {
+                    'peer': row.peer,
+                    'data_center': row.data_center,
+                    'rack': row.rack,
+                    'tokens': row.tokens,
+                    'host_id': row.host_id,
+                    'rpc_address': row.rpc_address,
+                    'status': 'UP' if row.rpc_address else 'DOWN'
+                }
+                nodes.append(node_info)
+
+            # Include the local node information
+            local_query = "SELECT data_center, rack, tokens, host_id, rpc_address FROM system.local"
+            local_row = self._session.execute(local_query).one()
+            local_node_info = {
+                'peer': '127.0.0.1',  # Local node IP
+                'data_center': local_row.data_center,
+                'rack': local_row.rack,
+                'tokens': local_row.tokens,
+                'host_id': local_row.host_id,
+                'rpc_address': local_row.rpc_address,
+                'status': 'UP' if local_row.rpc_address else 'DOWN'
+            }
+            nodes.append(local_node_info)
+        finally:
+            self.close()
+        return nodes
 
     def _read_file(self, file) -> str:
         with open(file) as f:

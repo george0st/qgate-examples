@@ -71,13 +71,8 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
 
     if run_setup.is_init:
         # create schema for write data
-        try:
-            cql = CQLAccess(run_setup)
-            cql.open()
-            cql.create_model()
-        finally:
-            if cql:
-                cql.close()
+        cql = CQLAccess(run_setup)
+        cql.create_model()
         return None
 
     try:
@@ -189,7 +184,7 @@ def exec_config(config, bulks, duration_seconds, executors):
 if __name__ == '__main__':
 
     # size of data bulks, requested format [[rows, columns], ...]
-    bulks = [[200, 10]]
+    bulks = [[200, 20]]
 
     # list of executors (for application to all bulks)
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
