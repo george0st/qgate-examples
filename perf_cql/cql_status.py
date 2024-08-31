@@ -11,7 +11,7 @@ class CQLStatus:
 
         status = self.get_status()
 
-        # print output Up/Down, Synch/Unsynch nodes
+        # print output Up/Down, Synch/Unsynch nodes (based on the root node)
 
     def get_status(self):
         final_status = {}
