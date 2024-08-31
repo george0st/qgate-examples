@@ -1,16 +1,17 @@
 import time
-import numpy
+import numpy as np
 
-def init_rng_generator():
-    """Init generator of random values"""
+def get_rng_generator() -> np.random._generator.Generator:
+    """Create generator of random values with initiation"""
 
-    # now
+    # now and now_ms (as detail about miliseconds)
     now = time.time()
     now_ms = (now - int(now)) * 1000000000
 
-    # random value, based on CPU
+    # calc based on CPU speed
     ns_start = time.perf_counter_ns()
     time.sleep(0.01)
     ns_stop = time.perf_counter_ns()
 
-    return numpy.random.default_rng([int(now), int(now_ms), ns_stop - ns_start, ns_stop])
+    # create generator with more random seed (now, now_ms, cpu speed)
+    return np.random.default_rng([int(now), int(now_ms), ns_stop - ns_start, ns_stop])

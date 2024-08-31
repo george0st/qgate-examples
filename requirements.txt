@@ -11,3 +11,5 @@ qgate-graph==1.4.9
 
 # https://github.com/theskumar/python-dotenv
 python-dotenv~=1.0
+
+prettytable==3.11.0
