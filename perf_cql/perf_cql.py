@@ -66,9 +66,10 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
             cql.open()
             cql.create_model()
 
-            status=CQLStatus(cql._cluster)
-            status.diagnose()
-            #status.test()
+            if run_setup['cluster_check']:
+                status=CQLStatus(cql._cluster)
+                status.diagnose(True)
+
         finally:
             if cql:
                 cql.close()
