@@ -35,6 +35,7 @@ class CQLConfig:
         # shared params for all providers
         param['keyspace'] = self._config.get("KEYSPACE", "tst")
         param['test_type'] = self._config.get("TEST_TYPE", "W")
+        param['cluster_check'] = True if self._config.get("CLUSTER_CHECK", "Off").lower() == "on" else False
 
         if self._config.get(self._adapter,"off").lower() == "on":
             # connection setting

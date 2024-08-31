@@ -13,10 +13,81 @@ import cql_helper
 from cql_status import CQLStatus
 
 
+def prf_cql_read2(run_setup: RunSetup) -> ParallelProbe:
+    generator = cql_helper.get_rng_generator()
+    columns, items="", ""
+    cql = None
+
+    if run_setup.is_init:
+        # cluster check
+        if run_setup['cluster_check']:
+            try:
+                cql = CQLAccess(run_setup)
+                cql.open(False)
+                status=CQLStatus(cql._cluster)
+                status.diagnose(True)
+            finally:
+                if cql:
+                    cql.close()
+        return None
+
+    try:
+        cql = CQLAccess(run_setup)
+        cql.open()
+
+        # INIT - contains executor synchronization, if needed
+        probe = ParallelProbe(run_setup)
+
+        # prepare select statement
+        for i in range(0, run_setup.bulk_col):
+            columns+=f"fn{i},"
+
+        for i in range(0, run_setup.bulk_row):
+            items+="?,"
+
+        select_statement = cql.session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0 IN ({items[:-1]}) and fn1 IN ({items[:-1]})")
+        bound = cassandra.query.BoundStatement(select_statement, consistency_level=run_setup['consistency_level'])
+
+        while True:
+
+            # generate synthetic data
+            #  NOTE: It will generate only values for two columns (as primary keys), not for all columns
+            synthetic_data = generator.integers(Setting.MAX_GNR_VALUE, size=run_setup.bulk_row*2)
+
+            # prepare data
+            bound.bind(synthetic_data)
+
+            # START - probe, only for this specific code part
+            probe.start()
+
+            rows = cql.session.execute(bound)
+
+            # STOP - probe
+            if probe.stop():
+                break
+    finally:
+        if cql:
+            cql.close()
+
+    return probe
+
 def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
     generator = cql_helper.get_rng_generator()
     columns, items="", ""
     cql = None
+
+    if run_setup.is_init:
+        # cluster check
+        if run_setup['cluster_check']:
+            try:
+                cql = CQLAccess(run_setup)
+                cql.open(False)
+                status=CQLStatus(cql._cluster)
+                status.diagnose(True)
+            finally:
+                if cql:
+                    cql.close()
+        return None
 
     try:
         cql = CQLAccess(run_setup)
@@ -36,6 +107,10 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
             # generate synthetic data
             #  NOTE: It will generate only values for two columns (as primary keys), not for all columns
             synthetic_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, 2))
+
+            #SELECT fn0, fn1, fn2, fn3, fn4, fn5, fn6, fn7, fn8, fn9
+            #FROM t01
+            #WHERE fn0 IN (10,20,30,40,50,60,70) and fn1 IN (39437,15789);
 
             # START - probe, only for this specific code part
             probe.start()
@@ -66,9 +141,9 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
             cql.open()
             cql.create_model()
 
-            status=CQLStatus(cql._cluster)
-            status.diagnose()
-            #status.test()
+            if run_setup['cluster_check']:
+                status=CQLStatus(cql._cluster)
+                status.diagnose(True)
         finally:
             if cql:
                 cql.close()
@@ -125,10 +200,10 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
                                      output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
     elif parameters['test_type']=='R':    # READ perf test
-        generator = ParallelExecutor(prf_cql_read(),
+        generator = ParallelExecutor(prf_cql_read2,
                                      label=f"{lbl}-read{lbl_suffix}",
                                      detail_output=True,
-                                     output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
+                                     output_file=f"../output/prf_{lbl.lower()}-read{lbl_suffix.lower()}-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
     # TODO: Add read & write
     # elif parameters['test_type']=='RW' or parameters['test_type']=='WR':    # READ & WRITE perf test
@@ -194,6 +269,8 @@ if __name__ == '__main__':
     #              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
 
     executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
+
+    #executors = [[1, 1, '1x threads']]
 
     # performance test duration
     duration_seconds=5

@@ -31,7 +31,7 @@ class CQLAccess:
     def session(self):
         return self._session
 
-    def open(self):
+    def open(self, create_session = True):
         """Create cluster for connection"""
         auth_provider = None
 
@@ -70,8 +70,9 @@ class CQLAccess:
                                     connect_timeout = Setting.TIMEOUT,
                                     protocol_version = ProtocolVersion.V4)
 
-        self._session = self._cluster.connect()
-        self._session.default_timeout = Setting.TIMEOUT
+        if create_session:
+            self._session = self._cluster.connect()
+            self._session.default_timeout = Setting.TIMEOUT
 
     def create_model(self):
 
