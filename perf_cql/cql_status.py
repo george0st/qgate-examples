@@ -8,6 +8,13 @@ class CQLStatus:
         self._hosts = None
 
     def diagnose(self):
+
+        status = self.get_status()
+
+        # print output Up/Down, Synch nodes
+
+    def get_status(self):
+        final_status = {}
         session = None
 
         try:
@@ -16,29 +23,23 @@ class CQLStatus:
 
             nodes = self._get_nodes(session)
             node_status = self._get_node_status(session)
-            final_status = {}
-            count_up_state=0
 
             for key in nodes.keys():
                 node = nodes[key]
-                state = node_status.get(key,None)
-
-                count_up_state += 1 if state and state['status']=="UP" else 0
+                state = node_status.get(key, None)
 
                 final_status_info = {
                     'status': state['status'] if state else "DOWN",
-                    'location': f"{node['data_center']}:{node['rack']}",
+                    'location': f"{node['data_center']}\{node['rack']}",
                     'schema_version': state["schema_version"],
                     'release_version': node["release_version"],
                 }
-                final_status[key]=final_status_info
+                final_status[key] = final_status_info
 
         finally:
             if session:
                 session.shutdown()
-
-    def get_status(self):
-        pass
+        return final_status
 
     def _get_nodes(self, session) -> dict:
         """Return all nodes in cluster"""
@@ -57,7 +58,7 @@ class CQLStatus:
         return hosts
 
     def _get_node_status(self, session) -> dict:
-        """Return states of live nodes"""
+        """Return states of all live nodes"""
         nodes = {}
 
         # Execute a query to get node status information from system.peers
