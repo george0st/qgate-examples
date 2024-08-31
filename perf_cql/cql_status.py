@@ -20,7 +20,7 @@ class CQLStatus:
                 self.print_status(status)
         return status
 
-    def print_status(self, status):
+    def print_status(self, status, prefix_output = "  DIAGNOSE>> "):
 
         node_down = []
         schemas = {}
@@ -36,10 +36,10 @@ class CQLStatus:
                 schemas[node['schema_version']] += 1
             else:
                 schemas[node['schema_version']] = 1
-        #down_info="" if len(node_down)==0 else f"({len(node_down)} [Down]: {str(node_down)})"
+
         missing_schemas=len(status)-schemas.get(root_schema,0)
         down_info=f"({len(node_down)} Down{'' if len(node_down)==0 else ' '+Fore.RED+str(node_down)+Style.RESET_ALL})"
-        print(f"DIAGNOSE>> Nodes: {len(status)} [Total] {down_info}, Synch: {'0' if missing_schemas==0 else Fore.BLUE+str(missing_schemas)+Style.RESET_ALL} [Missing]")
+        print(f"{prefix_output}Nodes: {len(status)} [Total] {down_info}, Synch: {'0' if missing_schemas==0 else Fore.BLUE+str(missing_schemas)+Style.RESET_ALL} [Missing]")
 
     def print_status_full(self, status):
         table = PrettyTable()
