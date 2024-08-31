@@ -1,4 +1,5 @@
 from cassandra.cluster import Cluster
+from prettytable import PrettyTable
 
 class CQLStatus:
 
@@ -8,12 +9,26 @@ class CQLStatus:
         self._hosts = None
 
     def diagnose(self):
+        output = []
+        status=self.get_status()
 
-        status = self.get_status()
-
+        table = PrettyTable()
+        table.border = False
+        table.header = True
+        table.padding_width = 1
         # print output Up/Down, Synch/Unsynch nodes (based on the root node)
+        table.field_names = ["State", "IP", "Location", "Ver", "Synch", "Root"]
+        table.align="l"
+        table.align["Root"]="c"
 
-    def get_status(self):
+        for ip in status.keys():
+            node=status[ip]
+            row = [node['status'], ip, node['location'], node['release_version'], node['schema_version'], node['root']]
+            table.add_row(row)
+        table.sortby = "Location"
+        print(table)
+
+    def get_status(self) -> dict:
         final_status = {}
         session = None
 
@@ -31,9 +46,9 @@ class CQLStatus:
                 final_status_info = {
                     'status': state['status'] if state else "DOWN",
                     'location': f"{node['data_center']}/{node['rack']}",
-                    'schema_version': state["schema_version"],
+                    'schema_version': state["schema_version"] if state else "n/a",
                     'release_version': node["release_version"],
-                    'root': state['root'] if state else False,
+                    'root': state['root'] if state else "",
                 }
                 final_status[key] = final_status_info
 
@@ -73,7 +88,7 @@ class CQLStatus:
                 'schema_version': row.schema_version,
                 'peer': row.peer,
                 'rpc_address': row.rpc_address,
-                'root': False,
+                'root': "",
             }
             nodes[node_info['peer']]=node_info
 
@@ -85,7 +100,7 @@ class CQLStatus:
             'schema_version': local_row.schema_version,
             'peer': '127.0.0.1',  # Local node IP
             'rpc_address': local_row.rpc_address,
-            'root': True,
+            'root': "x",
         }
         nodes[local_node_info['rpc_address']] = local_node_info
         return nodes
