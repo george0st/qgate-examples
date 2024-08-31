@@ -11,7 +11,7 @@ class CQLStatus:
 
         status = self.get_status()
 
-        # print output Up/Down, Synch nodes
+        # print output Up/Down, Synch/Unsynch nodes
 
     def get_status(self):
         final_status = {}
@@ -30,9 +30,10 @@ class CQLStatus:
 
                 final_status_info = {
                     'status': state['status'] if state else "DOWN",
-                    'location': f"{node['data_center']}\{node['rack']}",
+                    'location': f"{node['data_center']}/{node['rack']}",
                     'schema_version': state["schema_version"],
                     'release_version': node["release_version"],
+                    'root': state['root'] if state else False,
                 }
                 final_status[key] = final_status_info
 
@@ -72,6 +73,7 @@ class CQLStatus:
                 'schema_version': row.schema_version,
                 'peer': row.peer,
                 'rpc_address': row.rpc_address,
+                'root': False,
             }
             nodes[node_info['peer']]=node_info
 
@@ -82,7 +84,8 @@ class CQLStatus:
             'status': 'UP' if local_row.rpc_address else 'DOWN',
             'schema_version': local_row.schema_version,
             'peer': '127.0.0.1',  # Local node IP
-            'rpc_address': local_row.rpc_address
+            'rpc_address': local_row.rpc_address,
+            'root': True,
         }
         nodes[local_node_info['rpc_address']] = local_node_info
         return nodes
