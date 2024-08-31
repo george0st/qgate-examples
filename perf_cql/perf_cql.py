@@ -18,6 +18,19 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
     columns, items="", ""
     cql = None
 
+    if run_setup.is_init:
+        # cluster check
+        if run_setup['cluster_check']:
+            try:
+                cql = CQLAccess(run_setup)
+                cql.open(False)
+                status=CQLStatus(cql._cluster)
+                status.diagnose(True)
+            finally:
+                if cql:
+                    cql.close()
+        return None
+
     try:
         cql = CQLAccess(run_setup)
         cql.open()
@@ -69,7 +82,6 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
             if run_setup['cluster_check']:
                 status=CQLStatus(cql._cluster)
                 status.diagnose(True)
-
         finally:
             if cql:
                 cql.close()
