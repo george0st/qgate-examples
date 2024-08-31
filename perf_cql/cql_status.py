@@ -15,6 +15,7 @@ class CQLStatus:
         table = PrettyTable()
         table.border = False
         table.header = True
+        #table.header_style
         table.padding_width = 1
         # print output Up/Down, Synch/Unsynch nodes (based on the root node)
         table.field_names = ["State", "IP", "Location", "Ver", "Synch", "Root"]
