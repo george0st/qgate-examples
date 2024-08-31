@@ -1,5 +1,7 @@
 from cassandra.cluster import Cluster
 from prettytable import PrettyTable
+from colorama import Fore, Style
+
 
 class CQLStatus:
 
@@ -8,23 +10,67 @@ class CQLStatus:
         self._nodes = None
         self._hosts = None
 
-    def diagnose(self):
-        output = []
+    def diagnose(self, print = True, full_detail = False):
         status=self.get_status()
 
-        table = PrettyTable()
-        table.border = False
-        table.header = True
-        #table.header_style
-        table.padding_width = 1
-        # print output Up/Down, Synch/Unsynch nodes (based on the root node)
-        table.field_names = ["State", "IP", "Location", "Ver", "Synch", "Root"]
-        table.align="l"
-        table.align["Root"]="c"
+        if print:
+            if full_detail:
+                self.print_status_full(status)
+            else:
+                self.print_status(status)
+        return status
+
+    def print_status(self, status, prefix_output = "  Cluster check>> "):
+
+        node_down = []
+        schemas = {}
+        root_schema = None
 
         for ip in status.keys():
-            node=status[ip]
-            row = [node['status'], ip, node['location'], node['release_version'], node['schema_version'], node['root']]
+            node = status[ip]
+            if node['status'] == "DOWN":
+                node_down.append(ip)
+            if node['root'] == "x":
+                root_schema=node['schema_version']
+            if schemas.get(node['schema_version'],None):
+                schemas[node['schema_version']] += 1
+            else:
+                schemas[node['schema_version']] = 1
+
+        missing_schemas=len(status)-schemas.get(root_schema,0)
+        down_info=f"({len(node_down)}x Down{'' if len(node_down)==0 else ' '+Fore.RED+str(node_down)+Style.RESET_ALL})"
+        print(f"{prefix_output}Nodes: {len(status)}x [Total] {down_info}, Synch: {'0x' if missing_schemas==0 else Fore.BLUE+str(missing_schemas)+'x'+Style.RESET_ALL} [Missing]")
+
+    def print_status_full(self, status):
+        table = PrettyTable()
+
+        table.border = False
+        table.header = True
+        table.padding_width = 1
+
+        table.field_names = ["State", "IP", "Location", "Ver", "Synch", "Root"]
+        table.align = "l"
+        table.align["Root"] = "c"
+
+        for ip in status.keys():
+            node = status[ip]
+            color_prefix = ""
+            color_suffix = ""
+
+            if node['root'] == "x":
+                color_prefix = Fore.BLUE
+                color_suffix = Style.RESET_ALL
+
+            if node['status'] == "DOWN":
+                color_prefix = Fore.RED
+                color_suffix = Style.RESET_ALL
+
+            row = [f"{color_prefix}{node['status']}{color_suffix}",
+                   f"{color_prefix}{ip}{color_suffix}",
+                   node['location'],
+                   f"{color_prefix}{node['release_version']}{color_suffix}",
+                   f"{color_prefix}{node['schema_version']}{color_suffix}",
+                   f"{color_prefix}{node['root']}{color_suffix}"]
             table.add_row(row)
         table.sortby = "Location"
         print(table)
