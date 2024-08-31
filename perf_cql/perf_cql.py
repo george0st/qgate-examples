@@ -10,9 +10,11 @@ from cql_config import CQLConfig, CQLType
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
 import cql_helper
+from cql_status import CQLStatus
+
 
 def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
-    generator = cql_helper.init_rng_generator()
+    generator = cql_helper.get_rng_generator()
     columns, items="", ""
     cql = None
 
@@ -53,7 +55,7 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
     return probe
 
 def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
-    generator = cql_helper.init_rng_generator()
+    generator = cql_helper.get_rng_generator()
     columns, items = "", ""
     cql = None
 
@@ -63,7 +65,9 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
             cql = CQLAccess(run_setup)
             cql.open()
             cql.create_model()
-            #print(cql.get_node_status())
+
+            status=CQLStatus(cql._cluster)
+            status.diagnose()
         finally:
             if cql:
                 cql.close()

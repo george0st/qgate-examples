@@ -7,12 +7,6 @@ from cassandra.cluster import ExecutionProfile
 from cassandra.cluster import EXEC_PROFILE_DEFAULT
 from cassandra import ProtocolVersion
 from cassandra.policies import DCAwareRoundRobinPolicy, RoundRobinPolicy, DefaultLoadBalancingPolicy
-#from cassandra.policies import DCAwareRoundRobinPolicy
-# from cassandra.auth import PlainTextAuthProvider
-# from cassandra.cluster import Cluster
-# from ssl import PROTOCOL_TLSv1_2, PROTOCOL_TLSv1, SSLContext, CERT_NONE, CERT_REQUIRED
-
-
 from cql_config import CQLType
 
 
@@ -110,50 +104,6 @@ class CQLAccess:
             self._cluster.shutdown()
             self._cluster = None
 
-    def get_node_status(self):
-        nodes = {}
-        session = None
-
-        try:
-            session = self._cluster.connect()
-            session.default_timeout = Setting.TIMEOUT
-
-            # Execute a query to get node status information from system.peers
-            query = "SELECT peer, data_center, rack, release_version, schema_version, host_id, rpc_address FROM system.peers"
-            rows = self._session.execute(query)
-
-            # Process the results
-            for row in rows:
-                node_info = {
-                    'status': 'UP' if row.rpc_address else 'DOWN',
-                    'release_version': row.release_version,
-                    'schema_version': row.schema_version,
-                    'peer': row.peer,
-                    'data_center': row.data_center,
-                    'rack': row.rack,
-                    'host_id': row.host_id,
-                    'rpc_address': row.rpc_address,
-                }
-                nodes[node_info['peer']]=node_info
-
-            # Include the local node information
-            local_query = "SELECT data_center, rack, release_version, schema_version, host_id, rpc_address FROM system.local"
-            local_row = self._session.execute(local_query).one()
-            local_node_info = {
-                'status': 'UP' if local_row.rpc_address else 'DOWN',
-                'release_version': local_row.release_version,
-                'schema_version': local_row.schema_version,
-                'peer': '127.0.0.1',  # Local node IP
-                'data_center': local_row.data_center,
-                'rack': local_row.rack,
-                'host_id': local_row.host_id,
-                'rpc_address': local_row.rpc_address
-            }
-            nodes[local_node_info['rpc_address']] = local_node_info
-
-        finally:
-            if session:
-                session.shutdown()
 
     def _read_file(self, file) -> str:
         with open(file) as f:
