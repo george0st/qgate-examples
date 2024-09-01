@@ -17,14 +17,15 @@ def prf_cql_read2(run_setup: RunSetup) -> ParallelProbe:
     generator = cql_helper.get_rng_generator()
     columns, items="", ""
     cql = None
+    session = None
 
     if run_setup.is_init:
         # cluster check
         if run_setup['cluster_check']:
             try:
                 cql = CQLAccess(run_setup)
-                cql.open(False)
-                status=CQLStatus(cql._cluster)
+                cql.open()
+                status=CQLStatus(cql.cluster)
                 status.diagnose(True)
             finally:
                 if cql:
@@ -34,6 +35,7 @@ def prf_cql_read2(run_setup: RunSetup) -> ParallelProbe:
     try:
         cql = CQLAccess(run_setup)
         cql.open()
+        session = cql.get_session()
 
         # INIT - contains executor synchronization, if needed
         probe = ParallelProbe(run_setup)
@@ -45,7 +47,7 @@ def prf_cql_read2(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_row):
             items+="?,"
 
-        select_statement = cql.session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0 IN ({items[:-1]}) and fn1 IN ({items[:-1]})")
+        select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0 IN ({items[:-1]}) and fn1 IN ({items[:-1]})")
         bound = cassandra.query.BoundStatement(select_statement, consistency_level=run_setup['consistency_level'])
 
         while True:
@@ -60,79 +62,23 @@ def prf_cql_read2(run_setup: RunSetup) -> ParallelProbe:
             # START - probe, only for this specific code part
             probe.start()
 
-            rows = cql.session.execute(bound)
+            rows = session.execute(bound)
 
             # STOP - probe
             if probe.stop():
                 break
     finally:
+        if session:
+            session.shutdown()
         if cql:
             cql.close()
-
-    return probe
-
-def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
-    generator = cql_helper.get_rng_generator()
-    columns, items="", ""
-    cql = None
-
-    if run_setup.is_init:
-        # cluster check
-        if run_setup['cluster_check']:
-            try:
-                cql = CQLAccess(run_setup)
-                cql.open(False)
-                status=CQLStatus(cql._cluster)
-                status.diagnose(True)
-            finally:
-                if cql:
-                    cql.close()
-        return None
-
-    try:
-        cql = CQLAccess(run_setup)
-        cql.open()
-
-        # INIT - contains executor synchronization, if needed
-        probe = ParallelProbe(run_setup)
-
-        # prepare select statement
-        for i in range(0, run_setup.bulk_col):
-            columns+=f"fn{i},"
-        select_statement = cql.session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0=? and fn1=?")
-        bound = cassandra.query.BoundStatement(select_statement, consistency_level=run_setup['consistency_level'])
-
-        while True:
-
-            # generate synthetic data
-            #  NOTE: It will generate only values for two columns (as primary keys), not for all columns
-            synthetic_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, 2))
-
-            #SELECT fn0, fn1, fn2, fn3, fn4, fn5, fn6, fn7, fn8, fn9
-            #FROM t01
-            #WHERE fn0 IN (10,20,30,40,50,60,70) and fn1 IN (39437,15789);
-
-            # START - probe, only for this specific code part
-            probe.start()
-
-            # prepare data
-            for row in synthetic_data:
-                bound.bind(row)
-                cql.session.execute(bound)
-
-            # STOP - probe
-            if probe.stop():
-                break
-    finally:
-        if cql:
-            cql.close()
-
     return probe
 
 def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
     generator = cql_helper.get_rng_generator()
     columns, items = "", ""
     cql = None
+    session = None
 
     if run_setup.is_init:
         # create schema for write data
@@ -142,7 +88,7 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
             cql.create_model()
 
             if run_setup['cluster_check']:
-                status=CQLStatus(cql._cluster)
+                status=CQLStatus(cql.cluster)
                 status.diagnose(True)
         finally:
             if cql:
@@ -150,9 +96,9 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
         return None
 
     try:
-
         cql = CQLAccess(run_setup)
         cql.open()
+        session = cql.get_session()
 
         # INIT - contains executor synchronization, if needed
         probe = ParallelProbe(run_setup)
@@ -161,7 +107,7 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
             items+="?,"
-        insert_statement = cql.session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]})")
+        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]})")
         batch = BatchStatement(consistency_level=run_setup['consistency_level'])
 
         while True:
@@ -177,12 +123,14 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
             # START - probe, only for this specific code part
             probe.start()
 
-            cql.session.execute(batch)
+            session.execute(batch)
 
             # STOP - probe
             if probe.stop():
                 break
     finally:
+        if session:
+            session.shutdown()
         if cql:
             cql.close()
 
@@ -264,11 +212,11 @@ if __name__ == '__main__':
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
     #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
     #
-    # executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
-    #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
-    #              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
+    executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
+                 [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
+                 [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
 
-    executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
+#    executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
 
     #executors = [[1, 1, '1x threads']]
 
