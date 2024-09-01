@@ -1,4 +1,6 @@
 import datetime, time
+import os.path
+
 import cassandra.query
 import numpy
 from cassandra.query import BatchStatement, BoundStatement
@@ -219,18 +221,19 @@ if __name__ == '__main__':
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
     #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
     #
-    # executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
-    #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
-    #              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
+    executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
+                 [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
+                 [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
 
-    executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
+    # executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
 
     #executors = [[1, 1, '1x threads']]
 
     # performance test duration
     duration_seconds=5
 
-    config = dotenv_values("config/cass.env")
+    config_dir = "config"
+    config = dotenv_values(os.path.join(config_dir,"cass.env"))
     multiple_env = config.get('MULTIPLE_ENV', None)
     if multiple_env:
         # multiple configurations
@@ -242,7 +245,7 @@ if __name__ == '__main__':
             print(Fore.BLUE + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
             if env_count>1:
                 time.sleep(int(multiple_env_delay))
-            exec_config(dotenv_values(env), bulks, duration_seconds, executors)
+            exec_config(dotenv_values(os.path.join(config_dir,env)), bulks, duration_seconds, executors)
     else:
         # single configuration
         exec_config(config, bulks, duration_seconds, executors)
