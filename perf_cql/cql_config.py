@@ -34,6 +34,12 @@ class CQLConfig:
 
         # shared params for all providers
         param['keyspace'] = self._config.get("KEYSPACE", "tst")
+        param['bundle'] = self._config.get("BUNDLE", "[50]")
+
+        # import ast
+        # list = ast.literal_eval(param['bundle'])
+        # print(list)
+
         param['test_type'] = self._config.get("TEST_TYPE", "W").lower()
         param['cluster_check'] = True if self._config.get("CLUSTER_CHECK", "Off").lower() == "on" else False
 

@@ -209,7 +209,7 @@ def exec_config(config, bulks, duration_seconds, executors):
 if __name__ == '__main__':
 
     # size of data bulks, requested format [[rows, columns], ...]
-    bulks = [[200, 10]]
+    bulks = [[10, 10]]
 
     # list of executors (for application to all bulks)
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
