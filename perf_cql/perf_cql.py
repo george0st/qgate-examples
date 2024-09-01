@@ -141,6 +141,7 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
     lbl = str(cql).split('.')[1]
     lbl_suffix = f"-{parameters['label']}" if parameters.get('label', None) else ""
 
+    generator = None
     if parameters['test_type']=='w':    # WRITE perf test
         generator = ParallelExecutor(prf_cql_write,
                                      label=f"{lbl}-write{lbl_suffix}",
