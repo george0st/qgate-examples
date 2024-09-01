@@ -141,13 +141,13 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
     lbl = str(cql).split('.')[1]
     lbl_suffix = f"-{parameters['label']}" if parameters.get('label', None) else ""
 
-    if parameters['test_type']=='W':    # WRITE perf test
+    if parameters['test_type']=='w':    # WRITE perf test
         generator = ParallelExecutor(prf_cql_write,
                                      label=f"{lbl}-write{lbl_suffix}",
                                      detail_output=True,
                                      output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
-    elif parameters['test_type']=='R':    # READ perf test
+    elif parameters['test_type']=='r':    # READ perf test
         generator = ParallelExecutor(prf_cql_read,
                                      label=f"{lbl}-read{lbl_suffix}",
                                      detail_output=True,
