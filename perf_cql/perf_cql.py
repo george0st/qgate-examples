@@ -1,4 +1,6 @@
 import datetime, time
+import os.path
+
 import cassandra.query
 import numpy
 from cassandra.query import BatchStatement, BoundStatement
@@ -230,7 +232,8 @@ if __name__ == '__main__':
     # performance test duration
     duration_seconds=5
 
-    config = dotenv_values("config/cass.env")
+    config_dir = "config"
+    config = dotenv_values(os.path.join(config_dir,"cass.env"))
     multiple_env = config.get('MULTIPLE_ENV', None)
     if multiple_env:
         # multiple configurations
@@ -242,7 +245,7 @@ if __name__ == '__main__':
             print(Fore.BLUE + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
             if env_count>1:
                 time.sleep(int(multiple_env_delay))
-            exec_config(dotenv_values(env), bulks, duration_seconds, executors)
+            exec_config(dotenv_values(os.path.join(config_dir,env)), bulks, duration_seconds, executors)
     else:
         # single configuration
         exec_config(config, bulks, duration_seconds, executors)
