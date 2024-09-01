@@ -13,7 +13,7 @@ import cql_helper
 from cql_status import CQLStatus
 
 
-def prf_cql_read2(run_setup: RunSetup) -> ParallelProbe:
+def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
     generator = cql_helper.get_rng_generator()
     columns, items="", ""
     cql = None
@@ -148,7 +148,7 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
                                      output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
     elif parameters['test_type']=='R':    # READ perf test
-        generator = ParallelExecutor(prf_cql_read2,
+        generator = ParallelExecutor(prf_cql_read,
                                      label=f"{lbl}-read{lbl_suffix}",
                                      detail_output=True,
                                      output_file=f"../output/prf_{lbl.lower()}-read{lbl_suffix.lower()}-{datetime.date.today()}.txt",
