@@ -143,6 +143,10 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
     lbl = str(cql).split('.')[1]
     lbl_suffix = f"-{parameters['label']}" if parameters.get('label', None) else ""
 
+    # FORCE bulk_list from ENV (if the value is defined in ENV file)
+    if parameters['bulk_list']:
+        bulk_list=parameters['bulk_list']
+
     generator = None
     if parameters['test_type']=='w':    # WRITE perf test
         generator = ParallelExecutor(prf_write,
