@@ -12,8 +12,10 @@ from colorama import Fore, Style
 import cql_helper
 from cql_status import CQLStatus
 
+def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
+    pass
 
-def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
+def prf_read(run_setup: RunSetup) -> ParallelProbe:
     generator = cql_helper.get_rng_generator()
     columns, items="", ""
     cql = None
@@ -74,7 +76,7 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
             cql.close()
     return probe
 
-def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
+def prf_write(run_setup: RunSetup) -> ParallelProbe:
     generator = cql_helper.get_rng_generator()
     columns, items = "", ""
     cql = None
@@ -143,13 +145,13 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
 
     generator = None
     if parameters['test_type']=='w':    # WRITE perf test
-        generator = ParallelExecutor(prf_cql_write,
+        generator = ParallelExecutor(prf_write,
                                      label=f"{lbl}-write{lbl_suffix}",
                                      detail_output=True,
                                      output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
     elif parameters['test_type']=='r':    # READ perf test
-        generator = ParallelExecutor(prf_cql_read,
+        generator = ParallelExecutor(prf_read,
                                      label=f"{lbl}-read{lbl_suffix}",
                                      detail_output=True,
                                      output_file=f"../output/prf_{lbl.lower()}-read{lbl_suffix.lower()}-{datetime.date.today()}.txt",
