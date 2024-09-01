@@ -12,8 +12,10 @@ from colorama import Fore, Style
 import cql_helper
 from cql_status import CQLStatus
 
+def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
+    pass
 
-def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
+def prf_read(run_setup: RunSetup) -> ParallelProbe:
     generator = cql_helper.get_rng_generator()
     columns, items="", ""
     cql = None
@@ -74,7 +76,7 @@ def prf_cql_read(run_setup: RunSetup) -> ParallelProbe:
             cql.close()
     return probe
 
-def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
+def prf_write(run_setup: RunSetup) -> ParallelProbe:
     generator = cql_helper.get_rng_generator()
     columns, items = "", ""
     cql = None
@@ -141,15 +143,19 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
     lbl = str(cql).split('.')[1]
     lbl_suffix = f"-{parameters['label']}" if parameters.get('label', None) else ""
 
+    # FORCE bulk_list from ENV (if the value is defined in ENV file)
+    if parameters['bulk_list']:
+        bulk_list=parameters['bulk_list']
+
     generator = None
     if parameters['test_type']=='w':    # WRITE perf test
-        generator = ParallelExecutor(prf_cql_write,
+        generator = ParallelExecutor(prf_write,
                                      label=f"{lbl}-write{lbl_suffix}",
                                      detail_output=True,
                                      output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
     elif parameters['test_type']=='r':    # READ perf test
-        generator = ParallelExecutor(prf_cql_read,
+        generator = ParallelExecutor(prf_read,
                                      label=f"{lbl}-read{lbl_suffix}",
                                      detail_output=True,
                                      output_file=f"../output/prf_{lbl.lower()}-read{lbl_suffix.lower()}-{datetime.date.today()}.txt",
@@ -207,17 +213,17 @@ def exec_config(config, bulks, duration_seconds, executors):
 if __name__ == '__main__':
 
     # size of data bulks, requested format [[rows, columns], ...]
-    bulks = [[200, 10]]
+    bulks = [[10, 10]]
 
     # list of executors (for application to all bulks)
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
     #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
     #
-    executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
-                 [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
-                 [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
+    # executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
+    #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
+    #              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
 
-#    executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
+    executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
 
     #executors = [[1, 1, '1x threads']]
 
