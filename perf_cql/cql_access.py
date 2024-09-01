@@ -65,7 +65,7 @@ class CQLAccess:
                                     connect_timeout = Setting.TIMEOUT,
                                     protocol_version = ProtocolVersion.V4)
 
-    def get_session(self, timeout = Setting.TIMEOUT) -> Session:
+    def create_session(self, timeout = Setting.TIMEOUT) -> Session:
         session = self._cluster.connect()
         session.default_timeout = timeout
         return session
@@ -74,7 +74,7 @@ class CQLAccess:
 
         session = None
         try:
-            session = self.get_session(Setting.TIMEOUT_CREATE_MODEL)
+            session = self.create_session(Setting.TIMEOUT_CREATE_MODEL)
             if self._run_setup["cql"] != CQLType.AstraDB:
                 if self._run_setup['replication_factor']:
                     # Drop key space

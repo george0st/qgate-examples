@@ -35,7 +35,7 @@ def prf_cql_read2(run_setup: RunSetup) -> ParallelProbe:
     try:
         cql = CQLAccess(run_setup)
         cql.open()
-        session = cql.get_session()
+        session = cql.create_session()
 
         # INIT - contains executor synchronization, if needed
         probe = ParallelProbe(run_setup)
@@ -98,7 +98,7 @@ def prf_cql_write(run_setup: RunSetup) -> ParallelProbe:
     try:
         cql = CQLAccess(run_setup)
         cql.open()
-        session = cql.get_session()
+        session = cql.create_session()
 
         # INIT - contains executor synchronization, if needed
         probe = ParallelProbe(run_setup)
