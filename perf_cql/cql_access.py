@@ -2,7 +2,7 @@ import cassandra.policies
 from qgate_perf.run_setup import RunSetup
 
 from cassandra.auth import PlainTextAuthProvider
-from cassandra.cluster import Cluster
+from cassandra.cluster import Cluster, Session
 from cassandra.cluster import ExecutionProfile
 from cassandra.cluster import EXEC_PROFILE_DEFAULT
 from cassandra import ProtocolVersion
@@ -21,17 +21,12 @@ class CQLAccess:
     def __init__(self, run_setup: RunSetup):
         self._run_setup = run_setup
         self._cluster = None
-        self._session = None
 
     @property
     def cluster(self):
         return self._cluster
 
-    @property
-    def session(self):
-        return self._session
-
-    def open(self, create_session = True):
+    def open(self):
         """Create cluster for connection"""
         auth_provider = None
 
@@ -70,35 +65,41 @@ class CQLAccess:
                                     connect_timeout = Setting.TIMEOUT,
                                     protocol_version = ProtocolVersion.V4)
 
-        if create_session:
-            self._session = self._cluster.connect()
-            self._session.default_timeout = Setting.TIMEOUT
+    def create_session(self, timeout = Setting.TIMEOUT) -> Session:
+        session = self._cluster.connect()
+        session.default_timeout = timeout
+        return session
 
     def create_model(self):
 
-        self._session.default_timeout = Setting.TIMEOUT_CREATE_MODEL
-        if self._run_setup["cql"] != CQLType.AstraDB:
-            if self._run_setup['replication_factor']:
-                # Drop key space
-                self._session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']}")
+        session = None
+        try:
+            session = self.create_session(Setting.TIMEOUT_CREATE_MODEL)
+            if self._run_setup["cql"] != CQLType.AstraDB:
+                if self._run_setup['replication_factor']:
+                    # Drop key space
+                    session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']}")
 
-                # Create key space
-                self._session.execute(f"CREATE KEYSPACE IF NOT EXISTS {self._run_setup['keyspace']}" +
-                                " WITH replication = {" +
-                                f"'class':'{self._run_setup['replication_class']}', 'replication_factor' : {self._run_setup['replication_factor']}" +
-                                "};")
+                    # Create key space
+                    session.execute(f"CREATE KEYSPACE IF NOT EXISTS {self._run_setup['keyspace']}" +
+                                    " WITH replication = {" +
+                                    f"'class':'{self._run_setup['replication_class']}', 'replication_factor' : {self._run_setup['replication_factor']}" +
+                                    "};")
 
-        # use LTW atomic command with IF
-        self._session.execute(f"DROP TABLE IF EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME}")
+            # use LTW atomic command with IF
+            session.execute(f"DROP TABLE IF EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME}")
 
-        # prepare insert statement for batch
-        columns = ""
-        for i in range(0, self._run_setup.bulk_col):
-            columns += f"fn{i} int,"
+            # prepare insert statement for batch
+            columns = ""
+            for i in range(0, self._run_setup.bulk_col):
+                columns += f"fn{i} int,"
 
-        # complex primary key (partition key 'fn0' and cluster key 'fn1')
-        self._session.execute(
-            f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
+            # complex primary key (partition key 'fn0' and cluster key 'fn1')
+            session.execute(
+                f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
+        finally:
+            if session:
+                session.shutdown()
 
     def close(self):
         if self._cluster:

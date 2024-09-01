@@ -34,7 +34,7 @@ class CQLConfig:
 
         # shared params for all providers
         param['keyspace'] = self._config.get("KEYSPACE", "tst")
-        param['test_type'] = self._config.get("TEST_TYPE", "W")
+        param['test_type'] = self._config.get("TEST_TYPE", "W").lower()
         param['cluster_check'] = True if self._config.get("CLUSTER_CHECK", "Off").lower() == "on" else False
 
         if self._config.get(self._adapter,"off").lower() == "on":
@@ -57,7 +57,7 @@ class CQLConfig:
                 param['replication_factor'] = self._config.get(f"{self._adapter}_REPLICATION_FACTOR", None)
 
             # consistency level (default is "LOCAL_QUORUM")
-            param['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get(f"{self._adapter}_CONSISTENCY_LEVEL", "LOCAL_QUORUM")]
+            param['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get(f"{self._adapter}_CONSISTENCY_LEVEL", "LOCAL_QUORUM").upper()]
 
             # local data center for correct setting of balancing via DCAwareRoundRobinPolicy
             param['local_dc'] = self._config.get(f"{self._adapter}_LB_LOCAL_DC", "datacenter1")
