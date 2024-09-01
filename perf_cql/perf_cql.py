@@ -155,8 +155,8 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
                                      output_file=f"../output/prf_{lbl.lower()}-read{lbl_suffix.lower()}-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
     # TODO: Add read & write
-    # elif parameters['test_type']=='RW' or parameters['test_type']=='WR':    # READ & WRITE perf test
-    #     generator = ParallelExecutor(prf_cql_read(),
+    # elif parameters['test_type']=='rw' or parameters['test_type']=='wr':    # READ & WRITE perf test
+    #     generator = ParallelExecutor(prf_cql_readwrite(),
     #                                  label=f"{lbl}-read{lbl_suffix}",
     #                                  detail_output=True,
     #                                  output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
