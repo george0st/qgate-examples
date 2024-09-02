@@ -1,7 +1,5 @@
 import datetime, time
 import os.path
-
-import cassandra.query
 import numpy
 from cassandra.query import BatchStatement, BoundStatement
 from qgate_perf.parallel_executor import ParallelExecutor
@@ -52,7 +50,7 @@ def prf_read(run_setup: RunSetup) -> ParallelProbe:
             items+="?,"
 
         select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0 IN ({items[:-1]}) and fn1 IN ({items[:-1]})")
-        bound = cassandra.query.BoundStatement(select_statement, consistency_level=run_setup['consistency_level'])
+        bound = BoundStatement(select_statement, consistency_level=run_setup['consistency_level'])
 
         while True:
 
@@ -230,7 +228,7 @@ if __name__ == '__main__':
     #executors = [[1, 1, '1x threads']]
 
     # performance test duration
-    duration_seconds=5
+    duration_seconds=60
 
     config_dir = "config"
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
