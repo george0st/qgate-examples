@@ -232,13 +232,13 @@ if __name__ == '__main__':
     #executors = [[1, 1, '1x threads']]
 
     # performance test duration
-    duration_seconds = 30
+    duration_seconds = 5
 
     config_dir = "config"
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
     multiple_env = config.get('MULTIPLE_ENV', None)
     if multiple_env:
-        unique_id="-"+cql_helper.generate_id(4)
+        unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
         # multiple configurations
         multiple_env_delay = config.get('MULTIPLE_ENV_DELAY', 0)
         envs=[env.strip() for env in multiple_env.split(",")]
