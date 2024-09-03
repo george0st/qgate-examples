@@ -138,7 +138,7 @@ def prf_write(run_setup: RunSetup) -> ParallelProbe:
 
     return probe
 
-def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, executor_list=None):
+def perf_test(cql: CQLType, unique_id, parameters: dict, duration=5, bulk_list=None, executor_list=None):
 
     lbl = str(cql).split('.')[1]
     lbl_suffix = f"{parameters['label']}" if parameters.get('label', None) else ""
@@ -150,13 +150,13 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
     generator = None
     if parameters['test_type']=='w':    # WRITE perf test
         generator = ParallelExecutor(prf_write,
-                                     label=f"{lbl}-W{lbl_suffix}",
+                                     label=f"{lbl}{unique_id}-W{lbl_suffix}",
                                      detail_output=True,
                                      output_file=f"../output/prf_{lbl.lower()}-W{lbl_suffix.lower()}-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
     elif parameters['test_type']=='r':  # READ perf test
         generator = ParallelExecutor(prf_read,
-                                     label=f"{lbl}-R{lbl_suffix}",
+                                     label=f"{lbl}{unique_id}-R{lbl_suffix}",
                                      detail_output=True,
                                      output_file=f"../output/prf_{lbl.lower()}-R{lbl_suffix.lower()}-{datetime.date.today()}.txt",
                                      init_each_bulk=True)
@@ -176,11 +176,12 @@ def perf_test(cql: CQLType, parameters: dict, duration=5, bulk_list=None, execut
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf("../output", suppress_error = True)
 
-def exec_config(config, bulks, duration_seconds, executors):
+def exec_config(config, unique_id, bulks, duration_seconds, executors):
 
     param = CQLConfig(config, 'COSMOSDB').get_params()
     if param:
         perf_test(CQLType.CosmosDB,
+                  unique_id,
                   param,
                   bulk_list=bulks,
                   duration=duration_seconds,
@@ -189,6 +190,7 @@ def exec_config(config, bulks, duration_seconds, executors):
     param = CQLConfig(config, 'SCYLLADB').get_params()
     if param:
         perf_test(CQLType.ScyllaDB,
+                  unique_id,
                   param,
                   duration=duration_seconds,
                   bulk_list=bulks,
@@ -197,6 +199,7 @@ def exec_config(config, bulks, duration_seconds, executors):
     param = CQLConfig(config, 'CASSANDRA').get_params()
     if param:
         perf_test(CQLType.Cassandra,
+                  unique_id,
                   param,
                   duration=duration_seconds,
                   bulk_list=bulks,
@@ -205,6 +208,7 @@ def exec_config(config, bulks, duration_seconds, executors):
     param = CQLConfig(config, 'ASTRADB').get_params()
     if param:
         perf_test(CQLType.AstraDB,
+                  unique_id,
                   param,
                   bulk_list=bulks,
                   duration=duration_seconds,
@@ -228,12 +232,13 @@ if __name__ == '__main__':
     #executors = [[1, 1, '1x threads']]
 
     # performance test duration
-    duration_seconds = 5
+    duration_seconds = 30
 
     config_dir = "config"
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
     multiple_env = config.get('MULTIPLE_ENV', None)
     if multiple_env:
+        unique_id="-"+cql_helper.generate_id(4)
         # multiple configurations
         multiple_env_delay = config.get('MULTIPLE_ENV_DELAY', 0)
         envs=[env.strip() for env in multiple_env.split(",")]
@@ -245,7 +250,7 @@ if __name__ == '__main__':
             print(Fore.BLUE + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
             if env_count > 1:
                 time.sleep(int(multiple_env_delay))
-            exec_config(dotenv_values(os.path.join(config_dir,env)), bulks, duration_seconds, executors)
+            exec_config(dotenv_values(os.path.join(config_dir,env)), unique_id, bulks, duration_seconds, executors)
     else:
         # single configuration
-        exec_config(config, bulks, duration_seconds, executors)
+        exec_config(config, "", bulks, duration_seconds, executors)
