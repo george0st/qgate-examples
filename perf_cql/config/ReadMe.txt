@@ -14,5 +14,5 @@ PRF_*max*.png
   CASSANDRA_CONSISTENCY_LEVEL = ALL
 
 Network routing
-  RoundRobinPolicy for CASSANDRA_REPLICATION_FACTOR = 1
-  DCAwareRoundRobinPolicy for CASSANDRA_REPLICATION_FACTOR > 1
+  RoundRobinPolicy (for CASSANDRA_REPLICATION_FACTOR = 1)
+  DCAwareRoundRobinPolicy (for CASSANDRA_REPLICATION_FACTOR > 1)
