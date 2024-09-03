@@ -228,7 +228,7 @@ if __name__ == '__main__':
     #executors = [[1, 1, '1x threads']]
 
     # performance test duration
-    duration_seconds=30
+    duration_seconds = 30
 
     config_dir = "config"
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
@@ -237,11 +237,13 @@ if __name__ == '__main__':
         # multiple configurations
         multiple_env_delay = config.get('MULTIPLE_ENV_DELAY', 0)
         envs=[env.strip() for env in multiple_env.split(",")]
-        env_count=0
+        env_count = 0
         for env in envs:
-            env_count+=1
+            if not env.lower().endswith(".env"):
+                env += ".env"
+            env_count += 1
             print(Fore.BLUE + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
-            if env_count>1:
+            if env_count > 1:
                 time.sleep(int(multiple_env_delay))
             exec_config(dotenv_values(os.path.join(config_dir,env)), bulks, duration_seconds, executors)
     else:
