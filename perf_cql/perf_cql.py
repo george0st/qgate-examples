@@ -172,7 +172,7 @@ def perf_test(cql: CQLType, unique_id, parameters: dict, duration=5, bulk_list=N
     parameters["cql"] = cql
 
     # run tests & generate graphs
-    setup = RunSetup(duration_second=duration, start_delay=15, parameters=parameters)
+    setup = RunSetup(duration_second=duration, start_delay=30, parameters=parameters)
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf("../output", suppress_error = True)
 
@@ -223,9 +223,12 @@ if __name__ == '__main__':
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
     #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
     #
-    executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
-                 [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
-                 [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
+    # executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
+    #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
+    #              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
+
+    executors = [[32, 2, '2x threads'], [64, 2, '2x threads'],
+                 [32, 3, '3x threads'], [64, 3, '3x threads']]
 
     #executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
 
