@@ -246,8 +246,8 @@ if __name__ == '__main__':
     if multiple_env:
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
         # multiple configurations
-        multiple_env_delay = config.get('MULTIPLE_ENV_DELAY', 0)
-        executor_start_delay = config.get('EXECUTOR_START_DELAY', 0)
+        multiple_env_delay = int(config.get('MULTIPLE_ENV_DELAY', 0))
+        executor_start_delay = int(config.get('EXECUTOR_START_DELAY', 0))
         envs=[env.strip() for env in multiple_env.split(",")]
         env_count = 0
         for env in envs:
@@ -256,7 +256,7 @@ if __name__ == '__main__':
             env_count += 1
             print(Fore.BLUE + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
             if env_count > 1:
-                time.sleep(int(multiple_env_delay))
+                time.sleep(multiple_env_delay)
             exec_config(dotenv_values(os.path.join(config_dir,env)), unique_id, executor_start_delay, bulks, duration_seconds, executors)
     else:
         # single configuration
