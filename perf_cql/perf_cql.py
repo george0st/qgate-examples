@@ -172,7 +172,7 @@ def perf_test(cql: CQLType, unique_id, parameters: dict, duration=5, bulk_list=N
     parameters["cql"] = cql
 
     # run tests & generate graphs
-    setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
+    setup = RunSetup(duration_second=duration, start_delay=15, parameters=parameters)
     generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
     generator.create_graph_perf("../output", suppress_error = True)
 
@@ -232,7 +232,7 @@ if __name__ == '__main__':
     #executors = [[1, 1, '1x threads']]
 
     # performance test duration
-    duration_seconds = 30
+    duration_seconds = 60
 
     config_dir = "config"
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
