@@ -1,12 +1,8 @@
-import cassandra.policies
 from qgate_perf.run_setup import RunSetup
-
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster, Session
-from cassandra.cluster import ExecutionProfile
-from cassandra.cluster import EXEC_PROFILE_DEFAULT
 from cassandra import ProtocolVersion
-from cassandra.policies import DCAwareRoundRobinPolicy, RoundRobinPolicy, DefaultLoadBalancingPolicy
+from cassandra.policies import DCAwareRoundRobinPolicy, RoundRobinPolicy
 from cql_config import CQLType
 
 
@@ -66,12 +62,13 @@ class CQLAccess:
                                     protocol_version = ProtocolVersion.V4)
 
     def create_session(self, timeout = Setting.TIMEOUT) -> Session:
+        """Create new session"""
         session = self._cluster.connect()
         session.default_timeout = timeout
         return session
 
     def create_model(self):
-
+        """Create new NoSQL model (create keyspace and table)"""
         session = None
         try:
             session = self.create_session(Setting.TIMEOUT_CREATE_MODEL)
@@ -102,6 +99,7 @@ class CQLAccess:
                 session.shutdown()
 
     def close(self):
+        """Close cluster connection and all sessions"""
         if self._cluster:
             self._cluster.shutdown()
             self._cluster = None

@@ -5,7 +5,7 @@ from cassandra.query import BatchStatement, BoundStatement
 from qgate_perf.parallel_executor import ParallelExecutor
 from qgate_perf.parallel_probe import ParallelProbe
 from qgate_perf.run_setup import RunSetup
-from dotenv import load_dotenv, dotenv_values
+from dotenv import dotenv_values
 from cql_config import CQLConfig, CQLType
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
@@ -138,7 +138,7 @@ def prf_write(run_setup: RunSetup) -> ParallelProbe:
 
     return probe
 
-def perf_test(cql: CQLType, unique_id, parameters: dict, duration=5, bulk_list=None, executor_list=None):
+def perf_test(cql: CQLType, unique_id, executor_start_delay, parameters: dict, duration=5, bulk_list=None, executor_list=None):
 
     lbl = str(cql).split('.')[1]
     lbl_suffix = f"{parameters['label']}" if parameters.get('label', None) else ""
@@ -168,20 +168,20 @@ def perf_test(cql: CQLType, unique_id, parameters: dict, duration=5, bulk_list=N
     #                                  output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
     #                                  init_each_bulk=True)
 
-
     parameters["cql"] = cql
 
     # run tests & generate graphs
-    setup = RunSetup(duration_second=duration, start_delay=0, parameters=parameters)
-    generator.run_bulk_executor(bulk_list, executor_list, run_setup=setup)
+    setup = RunSetup(duration_second = duration, start_delay = executor_start_delay, parameters = parameters)
+    generator.run_bulk_executor(bulk_list, executor_list, run_setup = setup)
     generator.create_graph_perf("../output", suppress_error = True)
 
-def exec_config(config, unique_id, bulks, duration_seconds, executors):
+def exec_config(config, unique_id, executor_start_delay, bulks, duration_seconds, executors):
 
     param = CQLConfig(config, 'COSMOSDB').get_params()
     if param:
         perf_test(CQLType.CosmosDB,
                   unique_id,
+                  executor_start_delay,
                   param,
                   bulk_list=bulks,
                   duration=duration_seconds,
@@ -191,6 +191,7 @@ def exec_config(config, unique_id, bulks, duration_seconds, executors):
     if param:
         perf_test(CQLType.ScyllaDB,
                   unique_id,
+                  executor_start_delay,
                   param,
                   duration=duration_seconds,
                   bulk_list=bulks,
@@ -200,6 +201,7 @@ def exec_config(config, unique_id, bulks, duration_seconds, executors):
     if param:
         perf_test(CQLType.Cassandra,
                   unique_id,
+                  executor_start_delay,
                   param,
                   duration=duration_seconds,
                   bulk_list=bulks,
@@ -209,6 +211,7 @@ def exec_config(config, unique_id, bulks, duration_seconds, executors):
     if param:
         perf_test(CQLType.AstraDB,
                   unique_id,
+                  executor_start_delay,
                   param,
                   bulk_list=bulks,
                   duration=duration_seconds,
@@ -226,13 +229,16 @@ if __name__ == '__main__':
     # executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
     #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
     #              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
-    #
-    executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
 
-    #executors = [[1, 1, '1x threads']]
+    # executors = [[32, 2, '2x threads'], [64, 2, '2x threads'],
+    #              [32, 3, '3x threads'], [64, 3, '3x threads']]
+
+    #executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
+
+    executors = [[1, 1, '1x threads']]
 
     # performance test duration
-    duration_seconds = 5
+    duration_seconds = 30
 
     config_dir = "config"
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
@@ -240,7 +246,8 @@ if __name__ == '__main__':
     if multiple_env:
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
         # multiple configurations
-        multiple_env_delay = config.get('MULTIPLE_ENV_DELAY', 0)
+        multiple_env_delay = int(config.get('MULTIPLE_ENV_DELAY', 0))
+        executor_start_delay = int(config.get('EXECUTOR_START_DELAY', 0))
         envs=[env.strip() for env in multiple_env.split(",")]
         env_count = 0
         for env in envs:
@@ -249,8 +256,8 @@ if __name__ == '__main__':
             env_count += 1
             print(Fore.BLUE + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
             if env_count > 1:
-                time.sleep(int(multiple_env_delay))
-            exec_config(dotenv_values(os.path.join(config_dir,env)), unique_id, bulks, duration_seconds, executors)
+                time.sleep(multiple_env_delay)
+            exec_config(dotenv_values(os.path.join(config_dir,env)), unique_id, executor_start_delay, bulks, duration_seconds, executors)
     else:
         # single configuration
-        exec_config(config, "", bulks, duration_seconds, executors)
+        exec_config(config, "", 0, bulks, duration_seconds, executors)
