@@ -5,7 +5,7 @@ from cassandra.query import BatchStatement, BoundStatement
 from qgate_perf.parallel_executor import ParallelExecutor
 from qgate_perf.parallel_probe import ParallelProbe
 from qgate_perf.run_setup import RunSetup
-from dotenv import load_dotenv, dotenv_values
+from dotenv import dotenv_values
 from cql_config import CQLConfig, CQLType
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
@@ -226,12 +226,12 @@ if __name__ == '__main__':
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
     #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
     #
-    # executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
-    #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
-    #              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
+    executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
+                 [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
+                 [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
 
-    executors = [[32, 2, '2x threads'], [64, 2, '2x threads'],
-                 [32, 3, '3x threads'], [64, 3, '3x threads']]
+    # executors = [[32, 2, '2x threads'], [64, 2, '2x threads'],
+    #              [32, 3, '3x threads'], [64, 3, '3x threads']]
 
     #executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
 

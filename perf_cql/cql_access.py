@@ -1,12 +1,8 @@
-import cassandra.policies
 from qgate_perf.run_setup import RunSetup
-
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster, Session
-from cassandra.cluster import ExecutionProfile
-from cassandra.cluster import EXEC_PROFILE_DEFAULT
 from cassandra import ProtocolVersion
-from cassandra.policies import DCAwareRoundRobinPolicy, RoundRobinPolicy, DefaultLoadBalancingPolicy
+from cassandra.policies import DCAwareRoundRobinPolicy, RoundRobinPolicy
 from cql_config import CQLType
 
 
