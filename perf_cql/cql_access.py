@@ -66,12 +66,13 @@ class CQLAccess:
                                     protocol_version = ProtocolVersion.V4)
 
     def create_session(self, timeout = Setting.TIMEOUT) -> Session:
+        """Create new session"""
         session = self._cluster.connect()
         session.default_timeout = timeout
         return session
 
     def create_model(self):
-
+        """Create new NoSQL model (create keyspace and table)"""
         session = None
         try:
             session = self.create_session(Setting.TIMEOUT_CREATE_MODEL)
@@ -102,6 +103,7 @@ class CQLAccess:
                 session.shutdown()
 
     def close(self):
+        """Close cluster connection and all sessions"""
         if self._cluster:
             self._cluster.shutdown()
             self._cluster = None

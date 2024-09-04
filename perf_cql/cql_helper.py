@@ -23,6 +23,7 @@ def get_rng_generator(complex_init = True) -> np.random._generator.Generator:
 
 
 def generate_id(id_size = 4):
+    """Generate random text sequence"""
     generator = get_rng_generator(False)
 
     sequence = list(string.ascii_lowercase + string.digits)
