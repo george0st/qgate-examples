@@ -238,7 +238,7 @@ if __name__ == '__main__':
     #executors = [[1, 1, '1x threads']]
 
     # performance test duration
-    duration_seconds = 60
+    duration_seconds = 30
 
     config_dir = "config"
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
