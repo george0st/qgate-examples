@@ -233,12 +233,12 @@ if __name__ == '__main__':
     # executors = [[32, 2, '2x threads'], [64, 2, '2x threads'],
     #              [32, 3, '3x threads'], [64, 3, '3x threads']]
 
-    #executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
+    executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
 
-    executors = [[1, 1, '1x threads']]
+    # executors = [[1, 1, '1x threads']]
 
     # performance test duration
-    duration_seconds = 30
+    duration_seconds = 5
 
     config_dir = "config"
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
