@@ -25,11 +25,24 @@ class ConsistencyHelper:
 
 class CQLConfig:
 
-    def __init__(self, config, adapter):
+    def __init__(self, config):
         self._config = config
-        self._adapter = adapter
 
-    def get_params(self):
+    def get_global_params(self):
+        param={}
+
+        # shared params for all providers
+        param['multiple_env'] = self._config.get('MULTIPLE_ENV', None)
+        if param['multiple_env']:
+            # multiple configurations
+            param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', 0))
+            param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', 5))
+            param['executor_start_delay'] = int(self._config.get('EXECUTOR_START_DELAY', 0))
+            return param
+        else:
+            return None
+
+    def get_params(self, adapter):
         import ast
         param={}
 
@@ -39,33 +52,33 @@ class CQLConfig:
         param['test_type'] = self._config.get("TEST_TYPE", "W").lower()
         param['cluster_check'] = True if self._config.get("CLUSTER_CHECK", "Off").lower() == "on" else False
 
-        if self._config.get(self._adapter,"off").lower() == "on":
+        if self._config.get(adapter,"off").lower() == "on":
             # connection setting
-            if self._config.get(f"{self._adapter}_IP", None):
-                param["ip"] = self._config[f"{self._adapter}_IP"].split(",")
-            if self._config.get(f"{self._adapter}_PORT", None):
-                param["port"] = self._config[f"{self._adapter}_PORT"]
-            if self._config.get(f"{self._adapter}_SECURE_CONNECT_BUNDLE", None):
-                param["secure_connect_bundle"] = self._config[f"{self._adapter}_SECURE_CONNECT_BUNDLE"]
+            if self._config.get(f"{adapter}_IP", None):
+                param["ip"] = self._config[f"{adapter}_IP"].split(",")
+            if self._config.get(f"{adapter}_PORT", None):
+                param["port"] = self._config[f"{adapter}_PORT"]
+            if self._config.get(f"{adapter}_SECURE_CONNECT_BUNDLE", None):
+                param["secure_connect_bundle"] = self._config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
 
             # login setting
-            if self._config.get(f"{self._adapter}_USERNAME", None) or self._config.get(f"{self._adapter}_PASSWORD", None):
-                param['username'] = self._config.get(f"{self._adapter}_USERNAME", None)
-                param['password'] = self._config.get(f"{self._adapter}_PASSWORD", None)
+            if self._config.get(f"{adapter}_USERNAME", None) or self._config.get(f"{adapter}_PASSWORD", None):
+                param['username'] = self._config.get(f"{adapter}_USERNAME", None)
+                param['password'] = self._config.get(f"{adapter}_PASSWORD", None)
 
             # replication setting
-            if self._config.get(f"{self._adapter}_REPLICATION_CLASS", None) or self._config.get(f"{self._adapter}_REPLICATION_FACTOR", None):
-                param['replication_class'] = self._config.get(f"{self._adapter}_REPLICATION_CLASS", None)
-                param['replication_factor'] = self._config.get(f"{self._adapter}_REPLICATION_FACTOR", None)
+            if self._config.get(f"{adapter}_REPLICATION_CLASS", None) or self._config.get(f"{adapter}_REPLICATION_FACTOR", None):
+                param['replication_class'] = self._config.get(f"{adapter}_REPLICATION_CLASS", None)
+                param['replication_factor'] = self._config.get(f"{adapter}_REPLICATION_FACTOR", None)
 
             # consistency level (default is "LOCAL_QUORUM")
-            param['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get(f"{self._adapter}_CONSISTENCY_LEVEL", "LOCAL_QUORUM").upper()]
+            param['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get(f"{adapter}_CONSISTENCY_LEVEL", "LOCAL_QUORUM").upper()]
 
             # local data center for correct setting of balancing via DCAwareRoundRobinPolicy
-            param['local_dc'] = self._config.get(f"{self._adapter}_LB_LOCAL_DC", "datacenter1")
+            param['local_dc'] = self._config.get(f"{adapter}_LB_LOCAL_DC", "datacenter1")
 
             # label
-            param['label'] = self._config.get(f"{self._adapter}_LABEL", None)
+            param['label'] = self._config.get(f"{adapter}_LABEL", None)
 
             return param
         else:
