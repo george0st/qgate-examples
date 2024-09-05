@@ -244,6 +244,7 @@ if __name__ == '__main__':
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
     param = CQLConfig(config).get_global_params()
     if param:
+        # multiple configurations
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
         envs = [env.strip() for env in param['multiple_env'].split(",")]
         env_count = 0
