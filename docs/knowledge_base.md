@@ -13,7 +13,7 @@
 
 
  - **OperationTimedOut**: errors={<Host: 10.117.19.5:9042 datacenter2>: ConnectionShutdown('Connection to 10.117.19.5:9042 was closed')}, last_host=10.117.19.6:9042
-   - **Info**: Connection issue e.g. with VPN, Wifi, etc.
+   - **Info**: Connection issue e.g. with VPN, Wifi, etc. 
 
 
  - **OperationTimedOut**: errors={'10.129.53.154:9042': 'Client request timeout. See Session.execute[_async](timeout)'}, last_host=10.129.53.154:9042
