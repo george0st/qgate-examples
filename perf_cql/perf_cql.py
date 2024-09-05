@@ -177,7 +177,7 @@ def perf_test(cql: CQLType, unique_id, executor_start_delay, parameters: dict, d
 
 def exec_config(config, unique_id, executor_start_delay, bulks, duration_seconds, executors):
 
-    param = CQLConfig(config, 'COSMOSDB').get_params()
+    param = CQLConfig(config).get_params('COSMOSDB')
     if param:
         perf_test(CQLType.CosmosDB,
                   unique_id,
@@ -187,7 +187,7 @@ def exec_config(config, unique_id, executor_start_delay, bulks, duration_seconds
                   duration=duration_seconds,
                   executor_list=executors)
 
-    param = CQLConfig(config, 'SCYLLADB').get_params()
+    param = CQLConfig(config).get_params('SCYLLADB')
     if param:
         perf_test(CQLType.ScyllaDB,
                   unique_id,
@@ -197,7 +197,7 @@ def exec_config(config, unique_id, executor_start_delay, bulks, duration_seconds
                   bulk_list=bulks,
                   executor_list=executors)
 
-    param = CQLConfig(config, 'CASSANDRA').get_params()
+    param = CQLConfig(config).get_params('CASSANDRA')
     if param:
         perf_test(CQLType.Cassandra,
                   unique_id,
@@ -207,7 +207,7 @@ def exec_config(config, unique_id, executor_start_delay, bulks, duration_seconds
                   bulk_list=bulks,
                   executor_list=executors)
 
-    param = CQLConfig(config, 'ASTRADB').get_params()
+    param = CQLConfig(config).get_params('ASTRADB')
     if param:
         perf_test(CQLType.AstraDB,
                   unique_id,
@@ -226,29 +226,26 @@ if __name__ == '__main__':
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
     #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
     #
-    # executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
-    #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
-    #              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
+    executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
+                 [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
+                 [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
 
     # executors = [[32, 2, '2x threads'], [64, 2, '2x threads'],
     #              [32, 3, '3x threads'], [64, 3, '3x threads']]
 
-    #executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
+    # executors = [[32, 2, '1x threads'], [32, 3, '1x threads']]
 
-    executors = [[1, 1, '1x threads']]
+    # executors = [[1, 1, '1x threads']]
 
     # performance test duration
-    duration_seconds = 30
+    duration_seconds = 5
 
     config_dir = "config"
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
-    multiple_env = config.get('MULTIPLE_ENV', None)
-    if multiple_env:
+    param = CQLConfig(config).get_global_params()
+    if param:
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
-        # multiple configurations
-        multiple_env_delay = int(config.get('MULTIPLE_ENV_DELAY', 0))
-        executor_start_delay = int(config.get('EXECUTOR_START_DELAY', 0))
-        envs=[env.strip() for env in multiple_env.split(",")]
+        envs = [env.strip() for env in param['multiple_env'].split(",")]
         env_count = 0
         for env in envs:
             if not env.lower().endswith(".env"):
@@ -256,8 +253,18 @@ if __name__ == '__main__':
             env_count += 1
             print(Fore.BLUE + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
             if env_count > 1:
-                time.sleep(multiple_env_delay)
-            exec_config(dotenv_values(os.path.join(config_dir,env)), unique_id, executor_start_delay, bulks, duration_seconds, executors)
+                time.sleep(param['multiple_env_delay'])
+            exec_config(dotenv_values(os.path.join(config_dir,env)),
+                        unique_id,
+                        param['executor_start_delay'],
+                        bulks,
+                        param['executor_duration'],
+                        executors)
     else:
         # single configuration
-        exec_config(config, "", 0, bulks, duration_seconds, executors)
+        exec_config(config,
+                    "",
+                    0,
+                    bulks,
+                    duration_seconds,
+                    executors)
