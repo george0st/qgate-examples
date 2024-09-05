@@ -1,5 +1,6 @@
 from cassandra import ConsistencyLevel
 from enum import Enum
+import cql_helper
 
 
 class CQLType(Enum):
@@ -29,16 +30,17 @@ class CQLConfig:
         self._config = config
 
     def get_global_params(self):
-        param={}
+        global_param={}
 
         # shared params for all providers
-        param['multiple_env'] = self._config.get('MULTIPLE_ENV', None)
-        if param['multiple_env']:
+        global_param['multiple_env'] = self._config.get('MULTIPLE_ENV', None)
+        if global_param['multiple_env']:
             # multiple configurations
-            param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', 0))
-            param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', 5))
-            param['executor_start_delay'] = int(self._config.get('EXECUTOR_START_DELAY', 0))
-            return param
+            global_param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', 0))
+            global_param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', 5))
+            global_param['executor_start_delay'] = int(self._config.get('EXECUTOR_START_DELAY', 0))
+            global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', "True"))
+            return global_param
         else:
             return None
 
