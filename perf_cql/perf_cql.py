@@ -233,7 +233,7 @@ if __name__ == '__main__':
     # executors = [[32, 2, '2x threads'], [64, 2, '2x threads'],
     #              [32, 3, '3x threads'], [64, 3, '3x threads']]
 
-    executors = [[2, 2, '1x threads'], [4, 2, '1x threads']]
+    executors = [[32, 2, '1x threads'], [32, 3, '1x threads']]
 
     # executors = [[1, 1, '1x threads']]
 
@@ -247,6 +247,7 @@ if __name__ == '__main__':
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
         # multiple configurations
         multiple_env_delay = int(config.get('MULTIPLE_ENV_DELAY', 0))
+        duration_seconds = int(config.get('EXECUTOR_DURATION', 5))
         executor_start_delay = int(config.get('EXECUTOR_START_DELAY', 0))
         envs=[env.strip() for env in multiple_env.split(",")]
         env_count = 0
