@@ -72,7 +72,7 @@ class CQLConfig:
 
             # replication setting
             if self._config.get(f"{adapter}_REPLICATION_CLASS", None) or self._config.get(f"{adapter}_REPLICATION_FACTOR", None):
-                param['replication_class'] = self._config.get(f"{adapter}_REPLICATION_CLASS", None)
+                param['replication_class'] = self._config.get(f"{adapter}_REPLICATION_CLASS", "NetworkTopologyStrategy")
                 param['replication_factor'] = self._config.get(f"{adapter}_REPLICATION_FACTOR", None)
 
             # consistency level (default is "LOCAL_QUORUM")
