@@ -1,8 +1,6 @@
 from cassandra import ConsistencyLevel
 from enum import Enum
-from cql_access import Setting
 import cql_helper
-
 
 
 class CQLType(Enum):
@@ -26,6 +24,22 @@ class ConsistencyHelper:
     'SERIAL': ConsistencyLevel.SERIAL,
     }
 
+class CQLConfigSetting:
+    KEYSPACE = "jist"
+    BULK_LIST = "[[200, 10]]"
+    TEST_TYPE = "W"
+    CLUSTER_CHECK = "On"
+    REPLICATION_CLASS = "NetworkTopologyStrategy"
+    REPLICATION_FACTOR = "3"
+    CONSISTENCY_LEVEL = "LOCAL_QUORUM"
+    LB_LOCAL_DC = "datacenter1"
+    DETAIL_OUTPUT = "True"
+    USERNAME = "cassandra"
+    PASSWORD = "cassandra"
+    PORT = "9042"
+    IP = "localhost"
+    LABEL = "local"
+
 class CQLConfig:
 
     def __init__(self, config):
@@ -41,7 +55,7 @@ class CQLConfig:
             global_param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', 0))
             global_param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', 5))
             global_param['executor_start_delay'] = int(self._config.get('EXECUTOR_START_DELAY', 0))
-            global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', Setting.DETAIL_OUTPUT))
+            global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', CQLConfigSetting.DETAIL_OUTPUT))
             return global_param
         else:
             return None
@@ -51,35 +65,35 @@ class CQLConfig:
         param={}
 
         # shared params for all providers
-        param['keyspace'] = self._config.get("KEYSPACE", Setting.KEYSPACE)
-        param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", Setting.BULK_LIST))
-        param['test_type'] = self._config.get("TEST_TYPE", Setting.TEST_TYPE).lower()
-        param['cluster_check'] = cql_helper.str2bool(self._config.get("CLUSTER_CHECK", Setting.CLUSTER_CHECK))
+        param['keyspace'] = self._config.get("KEYSPACE", CQLConfigSetting.KEYSPACE)
+        param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
+        param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
+        param['cluster_check'] = cql_helper.str2bool(self._config.get("CLUSTER_CHECK", CQLConfigSetting.CLUSTER_CHECK))
 
         if cql_helper.str2bool(self._config.get(adapter, "Off")):
             # connection setting
-            param["ip"] = self._config.get(f"{adapter}_IP", Setting.IP).split(",")
-            param["port"] = self._config.get(f"{adapter}_PORT", Setting.PORT)
+            param["ip"] = self._config.get(f"{adapter}_IP", CQLConfigSetting.IP).split(",")
+            param["port"] = self._config.get(f"{adapter}_PORT", CQLConfigSetting.PORT)
             if self._config.get(f"{adapter}_SECURE_CONNECT_BUNDLE", None):
                 param["secure_connect_bundle"] = self._config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
 
             # login setting
-            param['username'] = self._config.get(f"{adapter}_USERNAME", Setting.USERNAME)
-            param['password'] = self._config.get(f"{adapter}_PASSWORD", Setting.PASSWORD)
+            param['username'] = self._config.get(f"{adapter}_USERNAME", CQLConfigSetting.USERNAME)
+            param['password'] = self._config.get(f"{adapter}_PASSWORD", CQLConfigSetting.PASSWORD)
 
             # replication setting
-            param['replication_class'] = self._config.get(f"{adapter}_REPLICATION_CLASS", Setting.REPLICATION_CLASS)
-            param['replication_factor'] = self._config.get(f"{adapter}_REPLICATION_FACTOR", Setting.REPLICATION_FACTOR)
+            param['replication_class'] = self._config.get(f"{adapter}_REPLICATION_CLASS", CQLConfigSetting.REPLICATION_CLASS)
+            param['replication_factor'] = self._config.get(f"{adapter}_REPLICATION_FACTOR", CQLConfigSetting.REPLICATION_FACTOR)
 
             # consistency level
             param['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get(f"{adapter}_CONSISTENCY_LEVEL",
-                                                                                          Setting.CONSISTENCY_LEVEL).upper()]
+                                                                                          CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
 
             # local data center for correct setting of balancing (RoundRobinPolicy or DCAwareRoundRobinPolicy)
-            param['local_dc'] = self._config.get(f"{adapter}_LB_LOCAL_DC", Setting.LB_LOCAL_DC)
+            param['local_dc'] = self._config.get(f"{adapter}_LB_LOCAL_DC", CQLConfigSetting.LB_LOCAL_DC)
 
             # label
-            param['label'] = self._config.get(f"{adapter}_LABEL", Setting.LABEL)
+            param['label'] = self._config.get(f"{adapter}_LABEL", CQLConfigSetting.LABEL)
 
             return param
         else:

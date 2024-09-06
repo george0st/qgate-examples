@@ -7,24 +7,10 @@ from cql_config import CQLType
 
 
 class Setting:
-    KEYSPACE = "jist"
     TABLE_NAME = "t01"
-    BULK_LIST = "[[200, 10]]"
-    TEST_TYPE = "W"
-    CLUSTER_CHECK = "On"
-    REPLICATION_CLASS = "NetworkTopologyStrategy"
-    REPLICATION_FACTOR = "3"
-    CONSISTENCY_LEVEL = "LOCAL_QUORUM"
-    LB_LOCAL_DC = "datacenter1"
     MAX_GNR_VALUE = 99999
     TIMEOUT = 30
     TIMEOUT_CREATE_MODEL = 180
-    DETAIL_OUTPUT = "True"
-    USERNAME = "cassandra"
-    PASSWORD = "cassandra"
-    PORT = "9042"
-    IP = "localhost"
-    LABEL = "local"
 
 class CQLAccess:
 
@@ -42,12 +28,12 @@ class CQLAccess:
 
         # authentication provider
         if self._run_setup['username']:
-            auth_provider = PlainTextAuthProvider(username=self._run_setup["username"],
-                                                 password=self._read_file(self._run_setup["password"]))
+            auth_provider = PlainTextAuthProvider(username = self._run_setup["username"],
+                                                 password = self._read_file(self._run_setup["password"]))
 
         # load balancing policy
         if int(self._run_setup['replication_factor'])==1:
-            load_balancing_policy=RoundRobinPolicy()
+            load_balancing_policy = RoundRobinPolicy()
         else:
             load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"])
 
@@ -117,7 +103,6 @@ class CQLAccess:
         if self._cluster:
             self._cluster.shutdown()
             self._cluster = None
-
 
     def _read_file(self, file) -> str:
         with open(file) as f:
