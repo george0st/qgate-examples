@@ -41,7 +41,7 @@ class CQLConfig:
             global_param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', 0))
             global_param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', 5))
             global_param['executor_start_delay'] = int(self._config.get('EXECUTOR_START_DELAY', 0))
-            global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', "True"))
+            global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', Setting.DETAIL_OUTPUT))
             return global_param
         else:
             return None

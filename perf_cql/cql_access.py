@@ -19,6 +19,7 @@ class Setting:
     MAX_GNR_VALUE = 99999
     TIMEOUT = 30
     TIMEOUT_CREATE_MODEL = 180
+    DETAIL_OUTPUT = "True"
 
 class CQLAccess:
 
