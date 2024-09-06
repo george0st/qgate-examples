@@ -1,6 +1,5 @@
 from cassandra import ConsistencyLevel
 from enum import Enum
-#from cql_access import Setting
 import cql_helper
 
 
