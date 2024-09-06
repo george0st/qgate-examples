@@ -54,9 +54,9 @@ class CQLConfig:
         param['keyspace'] = self._config.get("KEYSPACE", Setting.KEYSPACE)
         param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", None))
         param['test_type'] = self._config.get("TEST_TYPE", "W").lower()
-        param['cluster_check'] = True if self._config.get("CLUSTER_CHECK", "Off").lower() == "on" else False
+        param['cluster_check'] = cql_helper.str2bool(self._config.get("CLUSTER_CHECK", "Off"))
 
-        if self._config.get(adapter,"off").lower() == "on":
+        if cql_helper.str2bool(self._config.get(adapter,"Off")):
             # connection setting
             if self._config.get(f"{adapter}_IP", None):
                 param["ip"] = self._config[f"{adapter}_IP"].split(",")
