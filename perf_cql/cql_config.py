@@ -1,6 +1,8 @@
 from cassandra import ConsistencyLevel
 from enum import Enum
+from cql_access import Setting
 import cql_helper
+
 
 
 class CQLType(Enum):
@@ -49,7 +51,7 @@ class CQLConfig:
         param={}
 
         # shared params for all providers
-        param['keyspace'] = self._config.get("KEYSPACE", "tst")
+        param['keyspace'] = self._config.get("KEYSPACE", Setting.KEYSPACE)
         param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", None))
         param['test_type'] = self._config.get("TEST_TYPE", "W").lower()
         param['cluster_check'] = True if self._config.get("CLUSTER_CHECK", "Off").lower() == "on" else False
