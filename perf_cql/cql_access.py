@@ -9,6 +9,13 @@ from cql_config import CQLType
 class Setting:
     KEYSPACE = "jist"
     TABLE_NAME = "t01"
+    BULK_LIST = "[[200, 10]]"
+    TEST_TYPE = "W"
+    CLUSTER_CHECK = "On"
+    REPLICATION_CLASS = "NetworkTopologyStrategy"
+    REPLICATION_FACTOR = "3"
+    CONSISTENCY_LEVEL = "LOCAL_QUORUM"
+    LB_LOCAL_DC = "datacenter1"
     MAX_GNR_VALUE = 99999
     TIMEOUT = 30
     TIMEOUT_CREATE_MODEL = 180
