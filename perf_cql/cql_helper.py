@@ -30,4 +30,5 @@ def generate_id(id_size = 4):
     return ''.join(generator.choice(sequence) for _ in range(id_size))
 
 def str2bool(value):
+    """Conversion of text value ("True", "1", "Yes", "On") to Bool value"""
     return value.lower() in ['true', '1', 'yes', 'on']
