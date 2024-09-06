@@ -20,6 +20,8 @@ class Setting:
     TIMEOUT = 30
     TIMEOUT_CREATE_MODEL = 180
     DETAIL_OUTPUT = "True"
+    USERNAME = "cassandra"
+    PASSWORD = "cassandra"
 
 class CQLAccess:
 

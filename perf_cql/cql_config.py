@@ -66,9 +66,8 @@ class CQLConfig:
                 param["secure_connect_bundle"] = self._config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
 
             # login setting
-            if self._config.get(f"{adapter}_USERNAME", None) or self._config.get(f"{adapter}_PASSWORD", None):
-                param['username'] = self._config.get(f"{adapter}_USERNAME", None)
-                param['password'] = self._config.get(f"{adapter}_PASSWORD", None)
+            param['username'] = self._config.get(f"{adapter}_USERNAME", Setting.USERNAME)
+            param['password'] = self._config.get(f"{adapter}_PASSWORD", Setting.PASSWORD)
 
             # replication setting
             param['replication_class'] = self._config.get(f"{adapter}_REPLICATION_CLASS", Setting.REPLICATION_CLASS)
