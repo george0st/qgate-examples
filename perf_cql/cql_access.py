@@ -28,12 +28,12 @@ class CQLAccess:
 
         # authentication provider
         if self._run_setup['username']:
-            auth_provider = PlainTextAuthProvider(username=self._run_setup["username"],
-                                                 password=self._read_file(self._run_setup["password"]))
+            auth_provider = PlainTextAuthProvider(username = self._run_setup["username"],
+                                                 password = self._read_file(self._run_setup["password"]))
 
         # load balancing policy
         if int(self._run_setup['replication_factor'])==1:
-            load_balancing_policy=RoundRobinPolicy()
+            load_balancing_policy = RoundRobinPolicy()
         else:
             load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"])
 
@@ -103,7 +103,6 @@ class CQLAccess:
         if self._cluster:
             self._cluster.shutdown()
             self._cluster = None
-
 
     def _read_file(self, file) -> str:
         with open(file) as f:
