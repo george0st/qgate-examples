@@ -27,7 +27,6 @@ class ConsistencyHelper:
 
 class CQLConfigSetting:
     KEYSPACE = "jist"
-    #TABLE_NAME = "t01"
     BULK_LIST = "[[200, 10]]"
     TEST_TYPE = "W"
     CLUSTER_CHECK = "On"
