@@ -22,6 +22,9 @@ class Setting:
     DETAIL_OUTPUT = "True"
     USERNAME = "cassandra"
     PASSWORD = "cassandra"
+    PORT = "9042"
+    IP = "localhost"
+    LABEL = "local"
 
 class CQLAccess:
 

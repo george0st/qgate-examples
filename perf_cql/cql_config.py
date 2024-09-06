@@ -58,10 +58,8 @@ class CQLConfig:
 
         if cql_helper.str2bool(self._config.get(adapter, "Off")):
             # connection setting
-            if self._config.get(f"{adapter}_IP", None):
-                param["ip"] = self._config[f"{adapter}_IP"].split(",")
-            if self._config.get(f"{adapter}_PORT"):
-                param["port"] = self._config[f"{adapter}_PORT"]
+            param["ip"] = self._config.get(f"{adapter}_IP", Setting.IP).split(",")
+            param["port"] = self._config.get(f"{adapter}_PORT", Setting.PORT)
             if self._config.get(f"{adapter}_SECURE_CONNECT_BUNDLE", None):
                 param["secure_connect_bundle"] = self._config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
 
@@ -81,7 +79,7 @@ class CQLConfig:
             param['local_dc'] = self._config.get(f"{adapter}_LB_LOCAL_DC", Setting.LB_LOCAL_DC)
 
             # label
-            param['label'] = self._config.get(f"{adapter}_LABEL", None)
+            param['label'] = self._config.get(f"{adapter}_LABEL", Setting.LABEL)
 
             return param
         else:
