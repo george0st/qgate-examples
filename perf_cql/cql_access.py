@@ -7,24 +7,24 @@ from cql_config import CQLType
 
 
 class Setting:
-    KEYSPACE = "jist"
+    # KEYSPACE = "jist"
     TABLE_NAME = "t01"
-    BULK_LIST = "[[200, 10]]"
-    TEST_TYPE = "W"
-    CLUSTER_CHECK = "On"
-    REPLICATION_CLASS = "NetworkTopologyStrategy"
-    REPLICATION_FACTOR = "3"
-    CONSISTENCY_LEVEL = "LOCAL_QUORUM"
-    LB_LOCAL_DC = "datacenter1"
+    # BULK_LIST = "[[200, 10]]"
+    # TEST_TYPE = "W"
+    # CLUSTER_CHECK = "On"
+    # REPLICATION_CLASS = "NetworkTopologyStrategy"
+    # REPLICATION_FACTOR = "3"
+    # CONSISTENCY_LEVEL = "LOCAL_QUORUM"
+    # LB_LOCAL_DC = "datacenter1"
     MAX_GNR_VALUE = 99999
     TIMEOUT = 30
     TIMEOUT_CREATE_MODEL = 180
-    DETAIL_OUTPUT = "True"
-    USERNAME = "cassandra"
-    PASSWORD = "cassandra"
-    PORT = "9042"
-    IP = "localhost"
-    LABEL = "local"
+    # DETAIL_OUTPUT = "True"
+    # USERNAME = "cassandra"
+    # PASSWORD = "cassandra"
+    # PORT = "9042"
+    # IP = "localhost"
+    # LABEL = "local"
 
 class CQLAccess:
 

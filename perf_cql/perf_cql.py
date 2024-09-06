@@ -13,6 +13,7 @@ import cql_helper
 from cql_status import CQLStatus
 
 def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
+    # TODO: Add readwrite operations
     pass
 
 def prf_read(run_setup: RunSetup) -> ParallelProbe:
@@ -221,12 +222,12 @@ if __name__ == '__main__':
     bulks = [[10, 10]]
 
     # list of executors (for application to all bulks)
-    # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
-    #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
-    #
-    executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
-                 [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
-                 [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
+    executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
+                 [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
+
+    # executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
+    #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
+    #              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
 
     # executors = [[32, 2, '2x threads'], [64, 2, '2x threads'],
     #              [32, 3, '3x threads'], [64, 3, '3x threads']]
