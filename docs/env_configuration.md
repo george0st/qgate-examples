@@ -1,23 +1,25 @@
 # Description for ENV Configuration
 
-## Multi ENV setting
-TBD.
+## 1. Multi ENV setting
 
-## Single ENV setting
-TBD.
+ - DETAIL_OUTPUT 
+ - EXECUTOR_DURATION 
+ - EXECUTOR_START_DELAY 
+ - MULTIPLE_ENV_DELAY 
+ - MULTIPLE_ENV
 
-## Output description
- - **PRF...min...** it means:
-   - CASSANDRA_REPLICATION_CLASS = **SimpleStrategy** 
-   - CASSANDRA_REPLICATION_FACTOR = **1** 
-   - CASSANDRA_CONSISTENCY_LEVEL = **ONE**
+## 2. Single ENV setting
 
- - **PRF...opt...**
-   - CASSANDRA_REPLICATION_CLASS = **NetworkTopologyStrategy** 
-   - CASSANDRA_REPLICATION_FACTOR = **3** 
-   - CASSANDRA_CONSISTENCY_LEVEL = **EACH_QUORUM**
-
- - **PRF...max..**
-   - CASSANDRA_REPLICATION_CLASS = **NetworkTopologyStrategy** 
-   - CASSANDRA_REPLICATION_FACTOR = **3** 
-   - CASSANDRA_CONSISTENCY_LEVEL = **ALL**
+ - **TEST_TYPE**
+   - Type of operation, can be 'R' read, 'W' write (as default) 
+ - **BULK_LIST**
+   - Definition the data bulk size in format [[rows, columns], ...] (default "[[200, 10]]")
+ - **KEYSPACE**
+   - Name of keyspace for test (default is 'jist')
+ - **CLUSTER_CHECK**
+   - Run cluster check, can be 'On' (as default) or 'Off' 
+ - **REPLICATION_CLASS**
+   - can be 'SimpleStrategy' or 'NetworkTopologyStrategy' (as default)
+ - **CONSISTENCY_LEVEL**
+   - can be 'ANY', 'ONE', 'TWO', 'THREE', 'QUORUM', 'ALL'
+      'LOCAL_QUORUM', 'EACH_QUORUM', 'SERIAL', 'LOCAL_SERIAL', 'LOCAL_ONE'
