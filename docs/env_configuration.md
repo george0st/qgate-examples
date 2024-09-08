@@ -16,7 +16,7 @@
  - **MULTIPLE_ENV_DELAY**
    - The delay before switch to different config file (value in seconds, default is 0)
  - **MULTIPLE_ENV**
-   - The list of ENV files e.g. "A.env, b.env, C.env, ..."
+   - The list of ENV files e.g. "A.env, B.env, C.env, ..."
 
 ## 2. Single ENV setting
 
@@ -29,9 +29,17 @@
  - **CLUSTER_CHECK**
    - The run cluster check, can be 'On' (as default) or 'Off' 
  - **REPLICATION_CLASS**
-   - The replication class can be 'SimpleStrategy' or 'NetworkTopologyStrategy'
-     (as default)
+   - The replication class can be 'SimpleStrategy' or 
+     'NetworkTopologyStrategy' (as default)
+   - NOTE: detailed description see [DataStax](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeReplication.html)
  - **CONSISTENCY_LEVEL**
-   - The consistency level can be 
-     - 'ANY', 'ONE', 'TWO', 'THREE', 'QUORUM', 'ALL', 
-     'LOCAL_QUORUM', 'EACH_QUORUM', 'SERIAL', 'LOCAL_SERIAL', 'LOCAL_ONE'
+   - The consistency level can be cross
+     - Only local data center: 'LOCAL_ONE', 'LOCAL_QUORUM', 'LOCAL_SERIAL' 
+     - All data centers: 'EACH_QUORUM', 'QUORUM', 'SERIAL', 'ALL'
+     - Some data center:  'ONE', 'TWO', 'THREE', 'ANY'
+   - NOTE: detailed description see [DataStax](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
+
+ ## NOTEs
+ - The **network routing** will be used based on setting of replication factor 
+   - RoundRobinPolicy (for REPLICATION_FACTOR = 1)
+   - DCAwareRoundRobinPolicy (for CASSANDRA_REPLICATION_FACTOR > 1)
