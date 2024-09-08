@@ -29,9 +29,13 @@
  - **CLUSTER_CHECK**
    - The run cluster check, can be 'On' (as default) or 'Off' 
  - **REPLICATION_CLASS**
-   - The replication class can be 'SimpleStrategy' or 'NetworkTopologyStrategy'
-     (as default)
+   - The replication class can be 'SimpleStrategy' or 
+     'NetworkTopologyStrategy' (as default)
+   - NOTE: detailed description see [DataStax](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeReplication.html)
  - **CONSISTENCY_LEVEL**
-   - The consistency level can be 
-     - 'ANY', 'ONE', 'TWO', 'THREE', 'QUORUM', 'ALL', 
-     'LOCAL_QUORUM', 'EACH_QUORUM', 'SERIAL', 'LOCAL_SERIAL', 'LOCAL_ONE'
+   - The consistency level can be cross
+     - Only local data center: 'LOCAL_ONE', 'LOCAL_QUORUM', 'LOCAL_SERIAL' 
+     - All data centers: 'EACH_QUORUM', 'QUORUM', 'SERIAL', 'ALL'
+     - Some data center:  'ONE', 'TWO', 'THREE', 'ANY'
+   - NOTE: detailed description see [DataStax](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
+      
