@@ -29,7 +29,7 @@ class CQLAccess:
         # authentication provider
         if self._run_setup['username']:
             auth_provider = PlainTextAuthProvider(username = self._run_setup["username"],
-                                                 password = self._read_file(self._run_setup["password"]))
+                                                 password = self._run_setup["password"])
 
         # load balancing policy
         if int(self._run_setup['replication_factor'])==1:

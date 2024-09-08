@@ -79,7 +79,10 @@ class CQLConfig:
 
             # login setting
             param['username'] = self._config.get(f"{adapter}_USERNAME", CQLConfigSetting.USERNAME)
-            param['password'] = self._config.get(f"{adapter}_PASSWORD", CQLConfigSetting.PASSWORD)
+            if self._config.get(f"{adapter}_PASSWORD", None):
+                param['password'] = self._read_file(self._config[f"{adapter}_PASSWORD"])
+            else:
+                param['password'] = CQLConfigSetting.PASSWORD
 
             # replication setting
             param['replication_class'] = self._config.get(f"{adapter}_REPLICATION_CLASS", CQLConfigSetting.REPLICATION_CLASS)
