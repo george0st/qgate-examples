@@ -11,7 +11,7 @@ class CQLStatus:
         self._hosts = None
 
     def diagnose(self, print = False, full_detail = False):
-        status=self.get_status()
+        status=self._get_status()
 
         if print:
             if full_detail:
@@ -75,7 +75,7 @@ class CQLStatus:
         table.sortby = "Location"
         print(table)
 
-    def get_status(self) -> dict:
+    def _get_status(self) -> dict:
         final_status = {}
         session = None
 
