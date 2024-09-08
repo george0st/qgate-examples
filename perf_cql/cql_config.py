@@ -80,13 +80,16 @@ class CQLConfig:
             # login setting
             param['username'] = self._config.get(f"{adapter}_USERNAME", CQLConfigSetting.USERNAME)
             if self._config.get(f"{adapter}_PASSWORD", None):
-                param['password'] = self._read_file(self._config[f"{adapter}_PASSWORD"])
+                param['password'] = cql_helper.read_file(self._config[f"{adapter}_PASSWORD"])
             else:
                 param['password'] = CQLConfigSetting.PASSWORD
 
             # replication setting
             param['replication_class'] = self._config.get(f"{adapter}_REPLICATION_CLASS", CQLConfigSetting.REPLICATION_CLASS)
             param['replication_factor'] = self._config.get(f"{adapter}_REPLICATION_FACTOR", CQLConfigSetting.REPLICATION_FACTOR)
+
+            # compaction
+            param['compaction'] = self._config.get(f"{adapter}_COMPACTION", None)
 
             # consistency level
             param['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get(f"{adapter}_CONSISTENCY_LEVEL",

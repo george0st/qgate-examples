@@ -75,7 +75,7 @@ class CQLAccess:
             if self._run_setup["cql"] != CQLType.AstraDB:
                 if self._run_setup['replication_factor']:
                     # Drop key space
-                    session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']}")
+                    session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']};")
 
                     # Create key space
                     session.execute(f"CREATE KEYSPACE IF NOT EXISTS {self._run_setup['keyspace']}" +
@@ -84,7 +84,7 @@ class CQLAccess:
                                     "};")
 
             # use LTW atomic command with IF
-            session.execute(f"DROP TABLE IF EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME}")
+            session.execute(f"DROP TABLE IF EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME};")
 
             # prepare insert statement for batch
             columns = ""
@@ -92,8 +92,22 @@ class CQLAccess:
                 columns += f"fn{i} int,"
 
             # complex primary key (partition key 'fn0' and cluster key 'fn1')
-            session.execute(
-                f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
+            create_tbl = f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))"
+            if self._run_setup['compaction']:
+                create_tbl += " WITH compaction = {" \
+                f"'class': '{self._run_setup['compaction']}'" \
+                "};"
+
+            session.execute(create_tbl)
+            # session.execute(
+            #     f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
+
+
+            #WITH compaction = {
+            #     'class': 'UnifiedCompactionStrategy',
+            #     'max_sstable_age_days': 7,
+            #     'base_shard_count': 4
+            # }
         finally:
             if session:
                 session.shutdown()
@@ -103,7 +117,3 @@ class CQLAccess:
         if self._cluster:
             self._cluster.shutdown()
             self._cluster = None
-
-    def _read_file(self, file) -> str:
-        with open(file) as f:
-            return f.readline()

@@ -32,3 +32,7 @@ def generate_id(id_size = 4):
 def str2bool(value) -> bool:
     """Conversion of text value ("True", "1", "Yes", "On") to Bool value"""
     return value.lower() in ['true', '1', 'yes', 'on']
+
+def read_file(file) -> str:
+    with open(file) as f:
+        return f.readline()
