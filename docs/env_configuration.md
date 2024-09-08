@@ -28,18 +28,34 @@
    - The name of keyspace for test (default is 'jist')
  - **CLUSTER_CHECK**
    - The run cluster check, can be 'On' (as default) or 'Off' 
- - **REPLICATION_CLASS**
+
+ - **system_LABEL**
+   - The label used in output file name
+ - **system_IP**
+   - The list of IP addresses splited by comma, e.g. "10.129.53.159, 10.129.53.153"
+ - **system_PORT**
+   - The port name (default is 9042)
+- **system_USERNAME**
+   - The username for login (default is "cassandra")
+- **system_PASSWORD**
+   - The path to the file with password for login (default is password "cassandra")
+ - **system_REPLICATION_CLASS**
    - The replication class can be 'SimpleStrategy' or 
      'NetworkTopologyStrategy' (as default)
    - NOTE: detailed description see [DataStax](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeReplication.html)
- - **CONSISTENCY_LEVEL**
+ - **system_REPLICATION_FACTOR**
+   - tbd.
+ - **system_CONSISTENCY_LEVEL**
    - The consistency level can be cross
      - Only local data center: 'LOCAL_ONE', 'LOCAL_QUORUM', 'LOCAL_SERIAL' 
      - All data centers: 'EACH_QUORUM', 'QUORUM', 'SERIAL', 'ALL'
      - Some data center:  'ONE', 'TWO', 'THREE', 'ANY'
    - NOTE: detailed description see [DataStax](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
+ - **system_LB_LOCAL_DC**
+   - TBD
 
- ## NOTEs
+
+## NOTEs
  - The **network routing** will be used based on setting of replication factor 
    - RoundRobinPolicy (for REPLICATION_FACTOR = 1)
    - DCAwareRoundRobinPolicy (for CASSANDRA_REPLICATION_FACTOR > 1)
