@@ -43,7 +43,7 @@
    - **XXX_REPLICATION_CLASS**
      - The replication class can be 'SimpleStrategy' or 
        'NetworkTopologyStrategy' (as default)
-     - NOTE: detailed description see [DataStax](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeReplication.html)
+     - NOTE: detailed description see [DataStax Replication](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeReplication.html)
    - **XXX_REPLICATION_FACTOR**
      - The amount of replicas (default is 3)
    - **XXX_CONSISTENCY_LEVEL**
@@ -51,7 +51,7 @@
        - Only local data center: 'LOCAL_ONE', 'LOCAL_QUORUM' (as default), 'LOCAL_SERIAL' 
        - All data centers: 'EACH_QUORUM', 'QUORUM', 'SERIAL', 'ALL'
        - Some data center:  'ONE', 'TWO', 'THREE', 'ANY'
-     - NOTE: detailed description see [DataStax](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
+     - NOTE: detailed description see [DataStax Consistency](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
    - **XXX_LB_LOCAL_DC**
      - The name of local data center for correct balancing (default is 'datacenter1'')
 
