@@ -28,31 +28,32 @@
    - The name of keyspace for test (default is 'jist')
  - **CLUSTER_CHECK**
    - The run cluster check, can be 'On' (as default) or 'Off' 
-
- - **system_LABEL**
-   - The label used in output file name
- - **system_IP**
-   - The list of IP addresses splited by comma, e.g. "10.129.53.159, 10.129.53.153"
- - **system_PORT**
-   - The port name (default is 9042)
-- **system_USERNAME**
-   - The username for login (default is "cassandra")
-- **system_PASSWORD**
-   - The path to the file with password for login (default is password "cassandra")
- - **system_REPLICATION_CLASS**
-   - The replication class can be 'SimpleStrategy' or 
-     'NetworkTopologyStrategy' (as default)
-   - NOTE: detailed description see [DataStax](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeReplication.html)
- - **system_REPLICATION_FACTOR**
-   - tbd.
- - **system_CONSISTENCY_LEVEL**
-   - The consistency level can be cross
-     - Only local data center: 'LOCAL_ONE', 'LOCAL_QUORUM', 'LOCAL_SERIAL' 
-     - All data centers: 'EACH_QUORUM', 'QUORUM', 'SERIAL', 'ALL'
-     - Some data center:  'ONE', 'TWO', 'THREE', 'ANY'
-   - NOTE: detailed description see [DataStax](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
- - **system_LB_LOCAL_DC**
-   - TBD
+ - **XXX** is the value based on system 'SCYLLADB', 'CASSANDRA', 'ASTRADB', 'COSMOSDB'
+   - **XXX_LABEL**
+     - The label used in output file name (default is 'local')
+   - **XXX_IP**
+     - The list of IP addresses separated by a comma, e.g. '10.129.53.159, 10.129.53.153' 
+       (default is 'localhost')
+   - **XXX_PORT**
+     - The port name (default is 9042)
+   - **XXX_USERNAME**
+      - The username for login (default is 'cassandra')
+   - **XXX_PASSWORD**
+      - The path to the file with password for login (default is password 'cassandra')
+   - **XXX_REPLICATION_CLASS**
+     - The replication class can be 'SimpleStrategy' or 
+       'NetworkTopologyStrategy' (as default)
+     - NOTE: detailed description see [DataStax](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeReplication.html)
+   - **XXX_REPLICATION_FACTOR**
+     - The amount of replicas (default is 3)
+   - **XXX_CONSISTENCY_LEVEL**
+     - The consistency level can be cross
+       - Only local data center: 'LOCAL_ONE', 'LOCAL_QUORUM' (as default), 'LOCAL_SERIAL' 
+       - All data centers: 'EACH_QUORUM', 'QUORUM', 'SERIAL', 'ALL'
+       - Some data center:  'ONE', 'TWO', 'THREE', 'ANY'
+     - NOTE: detailed description see [DataStax](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
+   - **XXX_LB_LOCAL_DC**
+     - The name of local data center for correct balancing (default is 'datacenter1'')
 
 
 ## NOTEs
