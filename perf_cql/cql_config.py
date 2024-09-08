@@ -25,7 +25,7 @@ class ConsistencyHelper:
     }
 
 class CQLConfigSetting:
-    KEYSPACE = "jist"
+    KEYSPACE = "prftest"
     BULK_LIST = "[[200, 10]]"
     TEST_TYPE = "W"
     CLUSTER_CHECK = "On"

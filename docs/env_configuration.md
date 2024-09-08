@@ -32,7 +32,7 @@
      - 200 insert/upsert operation during the test type Write
      - 200 select operation during the test type Read
  - **KEYSPACE**
-   - The name of keyspace for test (default is '_jist_')
+   - The name of keyspace for test (default is '_prftest_')
  - **CLUSTER_CHECK**
    - The run cluster check, can be '_On_' (as default) or '_Off_' 
  - **XXX** is the value based on system '_SCYLLADB_', 
