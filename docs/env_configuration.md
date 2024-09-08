@@ -38,4 +38,8 @@
      - All data centers: 'EACH_QUORUM', 'QUORUM', 'SERIAL', 'ALL'
      - Some data center:  'ONE', 'TWO', 'THREE', 'ANY'
    - NOTE: detailed description see [DataStax](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
-      
+
+ ## NOTEs
+ - The **network routing** will be used based on setting of replication factor 
+   - RoundRobinPolicy (for REPLICATION_FACTOR = 1)
+   - DCAwareRoundRobinPolicy (for CASSANDRA_REPLICATION_FACTOR > 1)
