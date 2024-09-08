@@ -57,9 +57,9 @@
      - NOTE: detailed description see [DataStax Consistency](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
    - **XXX_LB_LOCAL_DC**
      - The name of local data center for correct balancing (default is '_datacenter1_')
-
-
+ 
 ## NOTEs
+
  - The **network routing** will be used based on setting of replication factor 
    - _RoundRobinPolicy_ (for REPLICATION_FACTOR = 1)
    - _DCAwareRoundRobinPolicy_ (for CASSANDRA_REPLICATION_FACTOR > 1) with local 
