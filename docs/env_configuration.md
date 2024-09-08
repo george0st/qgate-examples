@@ -16,7 +16,7 @@
  - **MULTIPLE_ENV_DELAY**
    - The delay before switch to different config file (value in seconds, default is 0)
  - **MULTIPLE_ENV**
-   - The list of ENV files e.g. "A.env, b.env, C.env, ..."
+   - The list of ENV files e.g. "A.env, B.env, C.env, ..."
 
 ## 2. Single ENV setting
 
