@@ -10,7 +10,7 @@ class CQLStatus:
         self._nodes = None
         self._hosts = None
 
-    def diagnose(self, print = False, full_detail = False):
+    def diagnose(self, print = False, full_detail = False) -> dict:
         status=self._get_status()
 
         if print:

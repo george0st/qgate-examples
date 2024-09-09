@@ -64,6 +64,17 @@
    - **XXX_LB_LOCAL_DC**
      - The name of local data center for correct balancing 
        (default is '_datacenter1_')
+   - **XXX_COMPACTION**
+     - The type of compaction (without default)
+     - NOTE: detailed description see [Apache Compaction](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/index.html),
+       [DataStax Compaction](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/operations/opsConfigureCompaction.html)
+   - **XXX_COMPACTION_PARAMS**
+     - The parameters for the compaction (without default)
+     - NOTE: detailed description see params [UCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/ucs.html#ucs_options), 
+       [STCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/stcs.html#stcs_options),
+       [LCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/lcs.html#lcs_options),
+       [TWCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/twcs.html#twcs_options)
+
  
 ## NOTEs
 
