@@ -93,21 +93,18 @@ class CQLAccess:
 
             # complex primary key (partition key 'fn0' and cluster key 'fn1')
             create_tbl = f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))"
+
+            # add compaction setting
             if self._run_setup['compaction']:
-                create_tbl += " WITH compaction = {" \
-                f"'class': '{self._run_setup['compaction']}'" \
+                compaction_params = f", {self._run_setup['compaction_params']}" if self._run_setup['compaction_params'] else ""
+                compaction = " WITH compaction = {" \
+                f"'class': '{self._run_setup['compaction']}'{compaction_params}" \
                 "};"
+                create_tbl += compaction
 
+            # create table
             session.execute(create_tbl)
-            # session.execute(
-            #     f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
 
-
-            #WITH compaction = {
-            #     'class': 'UnifiedCompactionStrategy',
-            #     'max_sstable_age_days': 7,
-            #     'base_shard_count': 4
-            # }
         finally:
             if session:
                 session.shutdown()

@@ -89,7 +89,10 @@ class CQLConfig:
             param['replication_factor'] = self._config.get(f"{adapter}_REPLICATION_FACTOR", CQLConfigSetting.REPLICATION_FACTOR)
 
             # compaction
-            param['compaction'] = self._config.get(f"{adapter}_COMPACTION", None)
+            if self._config.get(f"{adapter}_COMPACTION", None):
+                param['compaction'] = self._config[f"{adapter}_COMPACTION"]
+            if self._config.get(f"{adapter}_COMPACTION_PARAMS", None):
+                param['compaction_params'] = self._config[f"{adapter}_COMPACTION_PARAMS"]
 
             # consistency level
             param['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get(f"{adapter}_CONSISTENCY_LEVEL",
