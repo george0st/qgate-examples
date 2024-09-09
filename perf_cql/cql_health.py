@@ -29,14 +29,12 @@ class CQLHealth:
             session.default_timeout = 20
 
             row = session.execute("SELECT release_version FROM system.local;").one()
-            if row:
-                return str(row)
-
+            return str(row.release_version) if row else ""
         finally:
             if session:
                 session.shutdown()
 
-    def get_size(self, keyspace_name):
+    def get_size(self, keyspace_name) -> int:
         """Return size of keyspace"""
 
         session = None
@@ -48,8 +46,7 @@ class CQLHealth:
                                    "FROM system.size_estimates "
                                    f"WHERE keyspace_name = '{keyspace_name}' "
                                    "GROUP BY keyspace_name;").one()
-            if row:
-                return str(row)
+            return int(row.size_mb) if row else -1
 
         finally:
             if session:
