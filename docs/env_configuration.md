@@ -69,7 +69,9 @@
      - NOTE: detailed description see [Apache Compaction](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/index.html),
        [DataStax Compaction](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/operations/opsConfigureCompaction.html)
    - **XXX_COMPACTION_PARAMS**
-     - The parameters for the compaction (without default)
+     - The parameters for the compaction (without default), 
+       e.g _'max_threshold': 32, 'min_threshold': 4_ for
+       COMPACTION '_SizeTieredCompactionStrategy_' 
      - NOTE: detailed description see params [UCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/ucs.html#ucs_options), 
        [STCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/stcs.html#stcs_options),
        [LCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/lcs.html#lcs_options),

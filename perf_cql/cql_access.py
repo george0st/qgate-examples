@@ -95,9 +95,12 @@ class CQLAccess:
             # TODO: add compaction parameters
             create_tbl = f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))"
             if self._run_setup['compaction']:
-                create_tbl += " WITH compaction = {" \
-                f"'class': '{self._run_setup['compaction']}'" \
+                compaction_params = f", {self._run_setup['compaction_params']}" if self._run_setup.get(
+                    'compaction_params', None) else ""
+                compaction = " WITH compaction = {" \
+                f"'class': '{self._run_setup['compaction']}'{compaction_params}" \
                 "};"
+                create_tbl += compaction
 
                 #WITH compaction = {
                 #     'class': 'UnifiedCompactionStrategy',
