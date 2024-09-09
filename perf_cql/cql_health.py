@@ -20,6 +20,8 @@ class CQLHealth:
                 self._print_status_short(status)
         return status
 
+    #region DIAGNOSE private functions
+
     def _print_status_short(self, status, prefix_output ="  Cluster check>> "):
 
         node_down = []
@@ -151,3 +153,5 @@ class CQLHealth:
         }
         nodes[local_node_info['rpc_address']] = local_node_info
         return nodes
+
+    #endregion
