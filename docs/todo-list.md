@@ -1,7 +1,6 @@
  # TODO list
  
 1. Add executors to multi ENV
-4. Add CQL version (SELECT release_version FROM system.local;)
 5. Move diagnostic out of perf procedure
 6. Add to diagnostic, calculation of size
    

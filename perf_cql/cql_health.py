@@ -20,6 +20,23 @@ class CQLHealth:
                 self._print_status_short(status)
         return status
 
+    def get_version(self):
+        """Return CQL runtime version e.g. 5.0.0 such as Cassandra v 5.0.0, etc."""
+        versions = []
+        session = None
+        try:
+            session = self._cluster.connect()
+            session.default_timeout = 20
+
+            rows = session.execute("SELECT release_version FROM system.local;")
+            for row in rows:
+                versions.append(row.release_version)
+
+        finally:
+            if session:
+                session.shutdown()
+        return str(versions)
+
     #region DIAGNOSE private functions
 
     def _print_status_short(self, status, prefix_output ="  Cluster check>> "):
