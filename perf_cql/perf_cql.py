@@ -10,7 +10,8 @@ from cql_config import CQLConfig, CQLType
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
 import cql_helper
-from cql_status import CQLStatus
+from cql_health import CQLHealth
+
 
 def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
     # TODO: Add readwrite operations
@@ -28,7 +29,7 @@ def prf_read(run_setup: RunSetup) -> ParallelProbe:
             try:
                 cql = CQLAccess(run_setup)
                 cql.open()
-                status=CQLStatus(cql.cluster)
+                status=CQLHealth(cql.cluster)
                 status.diagnose(True)
             finally:
                 if cql:
@@ -91,7 +92,7 @@ def prf_write(run_setup: RunSetup) -> ParallelProbe:
             cql.create_model()
 
             if run_setup['cluster_check']:
-                status=CQLStatus(cql.cluster)
+                status=CQLHealth(cql.cluster)
                 status.diagnose(True)
         finally:
             if cql:
