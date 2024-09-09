@@ -2,6 +2,9 @@
 
 ## 1. Multi ENV setting
 
+The configuration define global setting and relation to the many 
+single ENV settings.
+
  - **DETAIL_OUTPUT**
    - The detail output can be '_On_' (as default) or '_Off_'. 
      The detail output is useful for execution graph.
@@ -19,9 +22,13 @@
    - The delay before switch to different config file (value in seconds,
      default is _0_)
  - **MULTIPLE_ENV**
-   - The list of ENV files e.g. '_A.env, B.env, C.env, ..._'
+   - The list of single ENV files e.g. '_A.env, B.env, C.env, ..._'
+   - Expected content, see next chapter '_2. Single ENV setting_'
 
 ## 2. Single ENV setting
+
+The configuration for connection to the specific CQL solution such as
+ScyllaDB, Cassandra, AstraDB, CosmosDB.
 
  - **TEST_TYPE**
    - The type of operation can be '_R_' read, '_W_' write (as default) 
