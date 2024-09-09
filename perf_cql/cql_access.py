@@ -92,8 +92,9 @@ class CQLAccess:
                 columns += f"fn{i} int,"
 
             # complex primary key (partition key 'fn0' and cluster key 'fn1')
-            # TODO: add compaction parameters
             create_tbl = f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}, PRIMARY KEY (fn0, fn1))"
+
+            # add compaction setting
             if self._run_setup['compaction']:
                 compaction_params = f", {self._run_setup['compaction_params']}" if self._run_setup['compaction_params'] else ""
                 compaction = " WITH compaction = {" \
@@ -101,12 +102,7 @@ class CQLAccess:
                 "};"
                 create_tbl += compaction
 
-                #WITH compaction = {
-                #     'class': 'UnifiedCompactionStrategy',
-                #     'max_sstable_age_days': 7,
-                #     'base_shard_count': 4
-                # }
-
+            # create table
             session.execute(create_tbl)
 
         finally:

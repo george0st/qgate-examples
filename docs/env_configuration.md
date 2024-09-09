@@ -52,9 +52,13 @@
    - **XXX_REPLICATION_CLASS**
      - The replication class can be '_SimpleStrategy_' or 
        '_NetworkTopologyStrategy_' (as default)
-     - NOTE: detailed description see [DataStax Replication](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeReplication.html)
+     - NOTE: 
+       - detailed description see [DataStax Replication](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeReplication.html)
+       - relevant setting for Write TEST_TYPE
    - **XXX_REPLICATION_FACTOR**
      - The amount of replicas (default is _3_)
+     - NOTE:
+       - relevant setting for Write TEST_TYPE
    - **XXX_CONSISTENCY_LEVEL**
      - The consistency level can be cross
        - Only local data center: '_LOCAL_ONE_', '_LOCAL_QUORUM_' (as default), '_LOCAL_SERIAL_' 
@@ -68,16 +72,20 @@
      - The type of compaction (without default as optional), expected values
        '_UnifiedCompactionStrategy_', '_SizeTieredCompactionStrategy_',
        '_LeveledCompactionStrategy_', '_TimeWindowCompactionStrategy_'
-     - NOTE: detailed description see [Apache Compaction](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/index.html),
-       [DataStax Compaction](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/operations/opsConfigureCompaction.html)
+     - NOTE: 
+       - detailed description see [Apache Compaction](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/index.html),
+         [DataStax Compaction](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/operations/opsConfigureCompaction.html)
+       - relevant setting for Write TEST_TYPE
    - **XXX_COMPACTION_PARAMS**
      - The parameters for the compaction (without default as optional), value must be 
        in **quotation marks** e.g _"'max_threshold': 32, 'min_threshold': 4"_ for
        COMPACTION '_SizeTieredCompactionStrategy_' 
-     - NOTE: detailed description see params [UCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/ucs.html#ucs_options), 
-       [STCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/stcs.html#stcs_options),
-       [LCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/lcs.html#lcs_options),
-       [TWCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/twcs.html#twcs_options)
+     - NOTE: 
+       - detailed description see params [UCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/ucs.html#ucs_options), 
+         [STCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/stcs.html#stcs_options),
+         [LCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/lcs.html#lcs_options),
+         [TWCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/twcs.html#twcs_options)
+       - relevant setting for Write TEST_TYPE
 
  
 ## NOTEs
