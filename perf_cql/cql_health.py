@@ -21,7 +21,7 @@ class CQLHealth:
         return status
 
     def get_version(self):
-        """Return Cassandra, Scylla, etc. runtime version e.g. 5.0.0 such as Cassandra v 5.0.0, etc."""
+        """Return runtime version (4.0, 5.0.0, etc.) for platform such as Cassandra, Scylla, etc."""
 
         session = None
         try:
@@ -35,7 +35,7 @@ class CQLHealth:
                 session.shutdown()
 
     def get_size(self, keyspace_name) -> int:
-        """Return size of keyspace"""
+        """Return size of keyspace in Mb. The error indicate value -1."""
 
         session = None
         try:
@@ -51,15 +51,6 @@ class CQLHealth:
         finally:
             if session:
                 session.shutdown()
-
-
-        #   SELECT keyspace_name,
-        #        SUM(mean_partition_size * partitions_count) / 1048576 AS total_size_mb
-        # FROM system.size_estimates
-        # WHERE keyspace_name = 'jist'
-        # GROUP BY keyspace_name;
-
-
 
     #region DIAGNOSE private functions
 
