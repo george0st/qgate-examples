@@ -3,7 +3,7 @@ from prettytable import PrettyTable
 from colorama import Fore, Style
 
 
-class CQLStatus:
+class CQLHealth:
 
     def __init__(self, cluster: Cluster):
         self._cluster = cluster
@@ -15,12 +15,12 @@ class CQLStatus:
 
         if print:
             if full_detail:
-                self.print_status_full(status)
+                self._print_status_full(status)
             else:
-                self.print_status(status)
+                self._print_status_short(status)
         return status
 
-    def print_status(self, status, prefix_output = "  Cluster check>> "):
+    def _print_status_short(self, status, prefix_output ="  Cluster check>> "):
 
         node_down = []
         schemas = {}
@@ -41,7 +41,7 @@ class CQLStatus:
         down_info=f"({len(node_down)}x Down{'' if len(node_down)==0 else ' '+Fore.RED+str(node_down)+Style.RESET_ALL})"
         print(f"{prefix_output}Nodes: {len(status)}x [Total] {down_info}, Synch: {'0x' if missing_schemas==0 else Fore.BLUE+str(missing_schemas)+'x'+Style.RESET_ALL} [Missing]")
 
-    def print_status_full(self, status):
+    def _print_status_full(self, status):
         table = PrettyTable()
 
         table.border = False
