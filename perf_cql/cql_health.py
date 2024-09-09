@@ -21,21 +21,48 @@ class CQLHealth:
         return status
 
     def get_version(self):
-        """Return CQL runtime version e.g. 5.0.0 such as Cassandra v 5.0.0, etc."""
-        versions = []
+        """Return Cassandra, Scylla, etc. runtime version e.g. 5.0.0 such as Cassandra v 5.0.0, etc."""
+
         session = None
         try:
             session = self._cluster.connect()
             session.default_timeout = 20
 
-            rows = session.execute("SELECT release_version FROM system.local;")
-            for row in rows:
-                versions.append(row.release_version)
+            row = session.execute("SELECT release_version FROM system.local;").one()
+            if row:
+                return str(row)
 
         finally:
             if session:
                 session.shutdown()
-        return str(versions)
+
+    def get_size(self, keyspace_name):
+        """Return size of keyspace"""
+
+        session = None
+        try:
+            session = self._cluster.connect()
+            session.default_timeout = 20
+
+            row = session.execute("SELECT SUM(mean_partition_size * partitions_count) / 1048576 AS size_mb "
+                                   "FROM system.size_estimates "
+                                   f"WHERE keyspace_name = '{keyspace_name}' "
+                                   "GROUP BY keyspace_name;").one()
+            if row:
+                return str(row)
+
+        finally:
+            if session:
+                session.shutdown()
+
+
+        #   SELECT keyspace_name,
+        #        SUM(mean_partition_size * partitions_count) / 1048576 AS total_size_mb
+        # FROM system.size_estimates
+        # WHERE keyspace_name = 'jist'
+        # GROUP BY keyspace_name;
+
+
 
     #region DIAGNOSE private functions
 
