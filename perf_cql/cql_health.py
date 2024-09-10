@@ -20,6 +20,38 @@ class CQLHealth:
                 self._print_status_short(status)
         return status
 
+    def get_version(self):
+        """Return runtime version (4.0, 5.0.0, etc.) for platform such as Cassandra, Scylla, etc."""
+
+        session = None
+        try:
+            session = self._cluster.connect()
+            session.default_timeout = 20
+
+            row = session.execute("SELECT release_version FROM system.local;").one()
+            return str(row.release_version) if row else ""
+        finally:
+            if session:
+                session.shutdown()
+
+    def get_size(self, keyspace_name) -> int:
+        """Return size of keyspace in Mb. The error indicate value -1."""
+
+        session = None
+        try:
+            session = self._cluster.connect()
+            session.default_timeout = 20
+
+            row = session.execute("SELECT SUM(mean_partition_size * partitions_count) / 1048576 AS size_mb "
+                                   "FROM system.size_estimates "
+                                   f"WHERE keyspace_name = '{keyspace_name}' "
+                                   "GROUP BY keyspace_name;").one()
+            return int(row.size_mb) if row else -1
+
+        finally:
+            if session:
+                session.shutdown()
+
     #region DIAGNOSE private functions
 
     def _print_status_short(self, status, prefix_output ="  Cluster check>> "):

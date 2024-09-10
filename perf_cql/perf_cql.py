@@ -181,7 +181,7 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, bulk_list
 
 def exec_config(config, unique_id, global_param, bulks, executors):
 
-    param = CQLConfig(config).get_params('COSMOSDB')
+    param = CQLConfig(config).get_params('COSMOSDB', global_param)
     if param:
         perf_test(CQLType.CosmosDB,
                   unique_id,
@@ -190,7 +190,7 @@ def exec_config(config, unique_id, global_param, bulks, executors):
                   bulk_list=bulks,
                   executor_list=executors)
 
-    param = CQLConfig(config).get_params('SCYLLADB')
+    param = CQLConfig(config).get_params('SCYLLADB', global_param)
     if param:
         perf_test(CQLType.ScyllaDB,
                   unique_id,
@@ -199,7 +199,7 @@ def exec_config(config, unique_id, global_param, bulks, executors):
                   bulk_list=bulks,
                   executor_list=executors)
 
-    param = CQLConfig(config).get_params('CASSANDRA')
+    param = CQLConfig(config).get_params('CASSANDRA', global_param)
     if param:
         perf_test(CQLType.Cassandra,
                   unique_id,
@@ -208,7 +208,7 @@ def exec_config(config, unique_id, global_param, bulks, executors):
                   bulk_list=bulks,
                   executor_list=executors)
 
-    param = CQLConfig(config).get_params('ASTRADB')
+    param = CQLConfig(config).get_params('ASTRADB', global_param)
     if param:
         perf_test(CQLType.AstraDB,
                   unique_id,

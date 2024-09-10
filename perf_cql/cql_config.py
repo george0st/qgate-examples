@@ -46,6 +46,7 @@ class CQLConfig:
         self._config = config
 
     def get_global_params(self):
+        import ast
         global_param={}
 
         # shared params for all providers
@@ -56,17 +57,25 @@ class CQLConfig:
             global_param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', 5))
             global_param['executor_start_delay'] = int(self._config.get('EXECUTOR_START_DELAY', 0))
             global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', CQLConfigSetting.DETAIL_OUTPUT))
+            global_param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
             return global_param
         else:
             return None
 
-    def get_params(self, adapter):
+    def get_params(self, adapter, global_param):
         import ast
         param={}
 
         # shared params for all providers
         param['keyspace'] = self._config.get("KEYSPACE", CQLConfigSetting.KEYSPACE)
-        param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
+        if self._config.get("BULK_LIST", None):
+            param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
+        else:
+            # inheritage of param from global_param
+            if global_param:
+                if global_param.get('bulk_list', None):
+                    param['bulk_list'] = global_param['bulk_list']
+
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
         param['cluster_check'] = cql_helper.str2bool(self._config.get("CLUSTER_CHECK", CQLConfigSetting.CLUSTER_CHECK))
 

@@ -88,7 +88,8 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
        in **quotation marks** e.g _"'max_threshold': 32, 'min_threshold': 4"_ for
        COMPACTION '_SizeTieredCompactionStrategy_' 
      - NOTE: 
-       - detailed description see params [UCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/ucs.html#ucs_options), 
+       - detailed description see params
+         [UCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/ucs.html#ucs_options), 
          [STCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/stcs.html#stcs_options),
          [LCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/lcs.html#lcs_options),
          [TWCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/twcs.html#twcs_options)
