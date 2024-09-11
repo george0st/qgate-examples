@@ -58,6 +58,9 @@ class CQLConfig:
             global_param['executor_start_delay'] = int(self._config.get('EXECUTOR_START_DELAY', 0))
             global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', CQLConfigSetting.DETAIL_OUTPUT))
             global_param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
+            global_param['cluster_check'] = cql_helper.str2bool(
+                self._config.get("CLUSTER_CHECK", CQLConfigSetting.CLUSTER_CHECK))
+
             return global_param
         else:
             return None
@@ -77,7 +80,6 @@ class CQLConfig:
                     param['bulk_list'] = global_param['bulk_list']
 
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
-        param['cluster_check'] = cql_helper.str2bool(self._config.get("CLUSTER_CHECK", CQLConfigSetting.CLUSTER_CHECK))
 
         if cql_helper.str2bool(self._config.get(adapter, "Off")):
             # connection setting
