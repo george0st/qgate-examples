@@ -54,7 +54,7 @@ class CQLHealth:
 
     #region DIAGNOSE private functions
 
-    def print_status_short(self, status, prefix_output ="Cluster check>> "):
+    def print_status_short(self, status, prefix_output ="  Cluster check>> "):
 
         node_down = []
         schemas = {}
