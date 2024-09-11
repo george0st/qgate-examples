@@ -24,16 +24,6 @@ def prf_read(run_setup: RunSetup) -> ParallelProbe:
     session = None
 
     if run_setup.is_init:
-        # cluster check
-        if run_setup['cluster_check']:
-            try:
-                cql = CQLAccess(run_setup)
-                cql.open()
-                status=CQLHealth(cql.cluster)
-                status.diagnose(True)
-            finally:
-                if cql:
-                    cql.close()
         return None
 
     try:
@@ -90,10 +80,6 @@ def prf_write(run_setup: RunSetup) -> ParallelProbe:
             cql = CQLAccess(run_setup)
             cql.open()
             cql.create_model()
-
-            if run_setup['cluster_check']:
-                status=CQLHealth(cql.cluster)
-                status.diagnose(True)
         finally:
             if cql:
                 cql.close()
@@ -140,6 +126,16 @@ def prf_write(run_setup: RunSetup) -> ParallelProbe:
 
     return probe
 
+def diagnose(run_setup):
+    try:
+        cql = CQLAccess(run_setup)
+        cql.open()
+        status = CQLHealth(cql.cluster)
+        status.diagnose(True)
+    finally:
+        if cql:
+            cql.close()
+
 def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, bulk_list=None, executor_list=None):
 
     lbl = str(cql).split('.')[1]
@@ -176,6 +172,10 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, bulk_list
     setup = RunSetup(duration_second = global_param['executor_duration'],
                      start_delay = global_param['executor_start_delay'],
                      parameters = parameters)
+
+    if global_param['cluster_check']:
+        diagnose(setup)
+
     generator.run_bulk_executor(bulk_list, executor_list, run_setup = setup)
     generator.create_graph_perf("../output", suppress_error = True)
 
@@ -223,8 +223,8 @@ if __name__ == '__main__':
     bulks = [[10, 10]]
 
     # list of executors (for application to all bulks)
-    executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
-                 [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
+    # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
+    #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
 
     # executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
     #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
@@ -233,9 +233,9 @@ if __name__ == '__main__':
     # executors = [[32, 2, '2x threads'], [64, 2, '2x threads'],
     #              [32, 3, '3x threads'], [64, 3, '3x threads']]
 
-    # executors = [[32, 2, '1x threads'], [32, 3, '1x threads']]
+    #executors = [[32, 2, '1x threads'], [32, 3, '1x threads']]
 
-    # executors = [[1, 1, '1x threads']]
+    executors = [[1, 1, '1x threads'], [2, 1, '1x threads']]
 
     # performance test duration
     duration_seconds = 5
@@ -266,7 +266,7 @@ if __name__ == '__main__':
         global_param['executor_duration'] = duration_seconds
         global_param['executor_start_delay'] = 0
         global_param['detail_output'] = True
-
+        global_param['cluster_check'] = True
         exec_config(config,
                     "",
                     global_param,

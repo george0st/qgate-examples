@@ -15,9 +15,9 @@ class CQLHealth:
 
         if print:
             if full_detail:
-                self._print_status_full(status)
+                self.print_status_full(status)
             else:
-                self._print_status_short(status)
+                self.print_status_short(status)
         return status
 
     def get_version(self):
@@ -54,7 +54,7 @@ class CQLHealth:
 
     #region DIAGNOSE private functions
 
-    def _print_status_short(self, status, prefix_output ="  Cluster check>> "):
+    def print_status_short(self, status, prefix_output ="Cluster check>> "):
 
         node_down = []
         schemas = {}
@@ -75,7 +75,7 @@ class CQLHealth:
         down_info=f"({len(node_down)}x Down{'' if len(node_down)==0 else ' '+Fore.RED+str(node_down)+Style.RESET_ALL})"
         print(f"{prefix_output}Nodes: {len(status)}x [Total] {down_info}, Synch: {'0x' if missing_schemas==0 else Fore.BLUE+str(missing_schemas)+'x'+Style.RESET_ALL} [Missing]")
 
-    def _print_status_full(self, status):
+    def print_status_full(self, status):
         table = PrettyTable()
 
         table.border = False
