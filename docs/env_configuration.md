@@ -66,6 +66,9 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
      - The amount of replicas (default is _3_)
      - NOTE:
        - relevant setting for Write TEST_TYPE
+       - replication factor is applied for each data center under the cluster
+         (e.g. if replication factor is 3 in 2 data centers, it means, that we
+         have totally 6 copies of data in cluster)
    - **XXX_CONSISTENCY_LEVEL**
      - The consistency level can be cross
        - Only local data center: '_LOCAL_ONE_', '_LOCAL_QUORUM_' (as default), '_LOCAL_SERIAL_' 
