@@ -18,6 +18,8 @@ single ENV settings.
      when you need ASAP high performance of executors in the same time
      (it will generate perf peek). Use zero value, when you need slightly
      increase number of executors (it is without synchronization)
+ - **CLUSTER_CHECK**
+   - The run cluster check, can be '_On_' (as default) or '_Off_' 
  - **MULTIPLE_ENV_DELAY**
    - The delay before switch to different config file (value in seconds,
      default is _0_)
@@ -40,8 +42,6 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
      - 200 select operation during the test type Read
  - **KEYSPACE**
    - The name of keyspace for test (default is '_prftest_')
- - **CLUSTER_CHECK**
-   - The run cluster check, can be '_On_' (as default) or '_Off_' 
  - **XXX** is the value based on system '_SCYLLADB_', 
    '_CASSANDRA_', '_ASTRADB_', '_COSMOSDB_'
    - **XXX_LABEL**
