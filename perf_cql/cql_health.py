@@ -93,9 +93,10 @@ class CQLHealth:
         missing_schemas=len(status)-schemas.get(root_schema,0)
         release_versions=str([key for key in release_versions.keys()])
         down_info=f"{len(node_down)}x Down{'' if len(node_down)==0 else ' '+Fore.RED+str(node_down)+Style.RESET_ALL}"
-        down_peer_info = f"{len(node_peer_down)}x Gossip{'' if len(node_peer_down) == 0 else ' ' + Fore.YELLOW + str(node_peer_down) + Style.RESET_ALL}"
-        print(f"{prefix_output}Nodes: {len(status)}x [Total] ({down_info}, {down_peer_info}),"
-              f" Synch: {'0x' if missing_schemas==0 else Fore.BLUE+str(missing_schemas)+'x'+Style.RESET_ALL} [Missing],"
+        #down_peer_info = f"{len(node_peer_down)}x Gossip{'' if len(node_peer_down) == 0 else ' ' + Fore.YELLOW + str(node_peer_down) + Style.RESET_ALL}"
+        print(f"{prefix_output}Nodes: {len(status)}x [Total] ({down_info}),"
+#              f" Synch: {'0x' if missing_schemas==0 else Fore.BLUE+str(missing_schemas)+'x'+Style.RESET_ALL} [Missing],"
+              f" Not-synch: {'0x' if missing_schemas == 0 else Fore.BLUE + str(missing_schemas) + 'x' + Style.RESET_ALL}{'' if len(node_peer_down) == 0 else ' ' + Fore.BLUE + str(node_peer_down) + Style.RESET_ALL},"             
               f" Versions: {release_versions}")
 
     def print_status_full(self, status):
@@ -127,14 +128,14 @@ class CQLHealth:
                 color_status_suffix = Style.RESET_ALL
 
             if node['peer_status'] == "DOWN":
-                color_peer_prefix = Fore.YELLOW
+                color_peer_prefix = Fore.BLUE
                 color_peer_suffix = Style.RESET_ALL
 
             row = [f"{color_status_prefix}{node['status']}{color_status_suffix}",
                    f"{color_peer_prefix}{node['peer_status']}{color_peer_suffix}",
                    f"{ip}",
                    node['location'],
-                   f"{color_prefix}{node['release_version']}{color_suffix}",
+                   f"{node['release_version']}",
                    f"{color_prefix}{node['schema_version']}{color_suffix}",
                    f"{color_prefix}{node['root']}{color_suffix}"]
             table.add_row(row)
