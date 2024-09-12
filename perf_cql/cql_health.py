@@ -93,9 +93,7 @@ class CQLHealth:
         missing_schemas=len(status)-schemas.get(root_schema,0)
         release_versions=str([key for key in release_versions.keys()])
         down_info=f"{len(node_down)}x Down{'' if len(node_down)==0 else ' '+Fore.RED+str(node_down)+Style.RESET_ALL}"
-        #down_peer_info = f"{len(node_peer_down)}x Gossip{'' if len(node_peer_down) == 0 else ' ' + Fore.YELLOW + str(node_peer_down) + Style.RESET_ALL}"
         print(f"{prefix_output}Nodes: {len(status)}x [Total] ({down_info}),"
-#              f" Synch: {'0x' if missing_schemas==0 else Fore.BLUE+str(missing_schemas)+'x'+Style.RESET_ALL} [Missing],"
               f" Not-synch: {'0x' if missing_schemas == 0 else Fore.BLUE + str(missing_schemas) + 'x' + Style.RESET_ALL}{'' if len(node_peer_down) == 0 else ' ' + Fore.BLUE + str(node_peer_down) + Style.RESET_ALL},"             
               f" Versions: {release_versions}")
 
