@@ -18,8 +18,9 @@ single ENV settings (single ENV setting will rewrite global setting).
      when you need ASAP high performance of executors in the same time
      (it will generate perf peek). Use zero value, when you need slightly
      increase number of executors (it is without synchronization)
- - **CLUSTER_CHECK** (opt)
-   - The run cluster check, can be '_On_' (as default) or '_Off_' 
+ - **CLUSTER_DIAGNOSE** (opt)
+   - The run cluster diagnose, can be '_Off_', '_Short_' (as default),
+     '_Full_' or '_Extra_' 
  - **KEYSPACE** (opt)
    - The name of keyspace for test (default is '_prftest_') 
  - **BULK_LIST** (opt)
