@@ -65,19 +65,53 @@ class CQLConfig:
         else:
             return None
 
+    def _inherit_param_eval(self, param_name, global_param, param_name_default = None, adapter = None):
+        """Get adapter from single or from global ENV"""
+        import ast
+
+        if adapter:
+            param_name=f"{adapter}_{param_name}"
+
+        if self._config.get(param_name, None):
+            return ast.literal_eval(self._config[param_name])
+        else:
+            # inheritage of param from global_param
+            if global_param:
+                if global_param.get(param_name.lower(), None):
+                    return global_param[param_name.lower()]
+            return param_name_default
+
+
+    def _inherit_param(self, param_name, global_param, param_name_default = None, adapter = None):
+        """Get adapter from single or from global ENV"""
+
+        if adapter:
+            param_name=f"{adapter}_{param_name}"
+
+        if self._config.get(param_name, None):
+            return self._config[param_name]
+        else:
+            # inheritage of param from global_param
+            if global_param:
+                if global_param.get(param_name.lower(), None):
+                    return global_param[param_name.lower()]
+            return param_name_default
+
     def get_params(self, adapter, global_param):
         import ast
         param={}
 
         # shared params for all providers
         param['keyspace'] = self._config.get("KEYSPACE", CQLConfigSetting.KEYSPACE)
-        if self._config.get("BULK_LIST", None):
-            param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
-        else:
-            # inheritage of param from global_param
-            if global_param:
-                if global_param.get('bulk_list', None):
-                    param['bulk_list'] = global_param['bulk_list']
+        param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, CQLConfigSetting.BULK_LIST)
+
+        # if self._config.get("BULK_LIST", None):
+        #     param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
+        # else:
+        #     # inheritage of param from global_param
+        #     if global_param:
+        #         if global_param.get('bulk_list', None):
+        #             param['bulk_list'] = global_param['bulk_list']
 
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
 
