@@ -169,7 +169,7 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, executor_
                      start_delay = global_param['executor_start_delay'],
                      parameters = parameters)
 
-    if global_param['cluster_check']:
+    if global_param['cluster_diagnose']:
         diagnose(setup)
 
     generator.run_bulk_executor(parameters['bulk_list'],

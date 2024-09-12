@@ -1,7 +1,14 @@
 from cassandra.cluster import Cluster
 from prettytable import PrettyTable
 from colorama import Fore, Style
+from enum import Enum
 
+
+class CQLDiagnosePrint(Enum):
+    Off = 1
+    Short = 2
+    Full = 3
+    Extra = 4
 
 class CQLHealth:
 
@@ -10,14 +17,23 @@ class CQLHealth:
         self._nodes = None
         self._hosts = None
 
-    def diagnose(self, print = False, full_detail = False) -> dict:
+    def diagnose(self, level = CQLDiagnosePrint.Short) -> dict:
         status=self._get_status()
 
-        if print:
-            if full_detail:
-                self.print_status_full(status)
-            else:
-                self.print_status_short(status)
+        if level==CQLDiagnosePrint.Short:
+            self.print_status_short(status)
+        elif level==CQLDiagnosePrint.Full:
+            self.print_status_full(status)
+        elif level==CQLDiagnosePrint.Extra:
+            self.print_status_short(status)
+            self.print_status_full(status)
+
+
+        # if print:
+        #     if full_detail:
+        #         self.print_status_full(status)
+        #     else:
+        #         self.print_status_short(status)
         return status
 
     def get_version(self):

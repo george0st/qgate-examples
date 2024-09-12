@@ -19,8 +19,8 @@ single ENV settings (single ENV setting will rewrite global setting).
      (it will generate perf peek). Use zero value, when you need slightly
      increase number of executors (it is without synchronization)
  - **CLUSTER_DIAGNOSE** (opt)
-   - The run cluster diagnose, can be '_0_' off, '_1_' short (as default)
-     or '_2_' full 
+   - The run cluster diagnose, can be '_Off_', '_Short_' (as default),
+     '_Full_' or '_Extra_' 
  - **KEYSPACE** (opt)
    - The name of keyspace for test (default is '_prftest_') 
  - **BULK_LIST** (opt)
