@@ -107,15 +107,6 @@ class CQLConfig:
         # shared params for all providers
         param['keyspace'] = self._inherit_param("KEYSPACE", global_param, CQLConfigSetting.KEYSPACE)
         param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, CQLConfigSetting.BULK_LIST)
-
-        # if self._config.get("BULK_LIST", None):
-        #     param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
-        # else:
-        #     # inheritage of param from global_param
-        #     if global_param:
-        #         if global_param.get('bulk_list', None):
-        #             param['bulk_list'] = global_param['bulk_list']
-
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
 
         if cql_helper.str2bool(self._config.get(adapter, "Off")):
