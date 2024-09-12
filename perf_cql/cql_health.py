@@ -15,6 +15,7 @@ class CQLHealth:
 
         if print:
             if full_detail:
+                self.print_status_short(status)
                 self.print_status_full(status)
             else:
                 self.print_status_short(status)
@@ -57,23 +58,45 @@ class CQLHealth:
     def print_status_short(self, status, prefix_output ="  Cluster check>> "):
 
         node_down = []
+        node_peer_down = []
         schemas = {}
         root_schema = None
+        release_versions = {}
 
         for ip in status.keys():
             node = status[ip]
+
+            # info from metadata
             if node['status'] == "DOWN":
                 node_down.append(ip)
+
+            # info from system.peers
+            if node['peer_status'] == "DOWN":
+                node_peer_down.append(ip)
+
+            # schema of local/root node
             if node['root'] == "x":
                 root_schema=node['schema_version']
-            if schemas.get(node['schema_version'],None):
+
+            # count of different schemas
+            if schemas.get(node['schema_version'], None):
                 schemas[node['schema_version']] += 1
             else:
                 schemas[node['schema_version']] = 1
 
+            # count of different release version
+            if release_versions.get(node['release_version'], None):
+                release_versions[node['release_version']] += 1
+            else:
+                release_versions[node['release_version']] = 1
+
         missing_schemas=len(status)-schemas.get(root_schema,0)
-        down_info=f"({len(node_down)}x Down{'' if len(node_down)==0 else ' '+Fore.RED+str(node_down)+Style.RESET_ALL})"
-        print(f"{prefix_output}Nodes: {len(status)}x [Total] {down_info}, Synch: {'0x' if missing_schemas==0 else Fore.BLUE+str(missing_schemas)+'x'+Style.RESET_ALL} [Missing]")
+        release_versions=str([key for key in release_versions.keys()])
+        down_info=f"{len(node_down)}x Down{'' if len(node_down)==0 else ' '+Fore.RED+str(node_down)+Style.RESET_ALL}"
+        down_peer_info = f"{len(node_peer_down)}x Gossip{'' if len(node_peer_down) == 0 else ' ' + Fore.YELLOW + str(node_peer_down) + Style.RESET_ALL}"
+        print(f"{prefix_output}Nodes: {len(status)}x [Total] ({down_info}, {down_peer_info}),"
+              f" Synch: {'0x' if missing_schemas==0 else Fore.BLUE+str(missing_schemas)+'x'+Style.RESET_ALL} [Missing],"
+              f" Versions: {release_versions}")
 
     def print_status_full(self, status):
         table = PrettyTable()
@@ -82,25 +105,34 @@ class CQLHealth:
         table.header = True
         table.padding_width = 1
 
-        table.field_names = ["State", "IP", "Location", "Ver", "Synch", "Root"]
+        table.field_names = ["State", "Gossip", "IP", "Location", "Ver", "Synch", "Root"]
         table.align = "l"
         table.align["Root"] = "c"
 
         for ip in status.keys():
             node = status[ip]
             color_prefix = ""
+            color_peer_prefix = ""
+            color_status_prefix = ""
+            color_status_suffix = ""
             color_suffix = ""
+            color_peer_suffix = ""
 
             if node['root'] == "x":
                 color_prefix = Fore.BLUE
                 color_suffix = Style.RESET_ALL
 
             if node['status'] == "DOWN":
-                color_prefix = Fore.RED
-                color_suffix = Style.RESET_ALL
+                color_status_prefix = Fore.RED
+                color_status_suffix = Style.RESET_ALL
 
-            row = [f"{color_prefix}{node['status']}{color_suffix}",
-                   f"{color_prefix}{ip}{color_suffix}",
+            if node['peer_status'] == "DOWN":
+                color_peer_prefix = Fore.YELLOW
+                color_peer_suffix = Style.RESET_ALL
+
+            row = [f"{color_status_prefix}{node['status']}{color_status_suffix}",
+                   f"{color_peer_prefix}{node['peer_status']}{color_peer_suffix}",
+                   f"{ip}",
                    node['location'],
                    f"{color_prefix}{node['release_version']}{color_suffix}",
                    f"{color_prefix}{node['schema_version']}{color_suffix}",
@@ -125,7 +157,8 @@ class CQLHealth:
                 state = node_status.get(key, None)
 
                 final_status_info = {
-                    'status': state['status'] if state else "DOWN",
+                    'status': "UP" if node['is_up'] else "DOWN",
+                    'peer_status': state['status'] if state else "DOWN",
                     'location': f"{node['data_center']}/{node['rack']}",
                     'schema_version': state["schema_version"] if state else "n/a",
                     'release_version': node["release_version"],
@@ -159,14 +192,16 @@ class CQLHealth:
         nodes = {}
 
         # Execute a query to get node status information from system.peers
-        query = "SELECT peer, schema_version, rpc_address FROM system.peers"
+        query = "SELECT peer, schema_version, release_version, rpc_address FROM system.peers"
         rows = session.execute(query)
 
         # Process the results
         for row in rows:
             node_info = {
                 'status': 'UP' if row.rpc_address else 'DOWN',
+                #'status': 'UP' if row.peer else 'DOWN',
                 'schema_version': row.schema_version,
+                'release_version': row.release_version,
                 'peer': row.peer,
                 'rpc_address': row.rpc_address,
                 'root': "",
@@ -174,11 +209,12 @@ class CQLHealth:
             nodes[node_info['peer']]=node_info
 
         # Include the local node information
-        local_query = "SELECT schema_version, rpc_address FROM system.local"
+        local_query = "SELECT schema_version, rpc_address, release_version FROM system.local"
         local_row = session.execute(local_query).one()
         local_node_info = {
             'status': 'UP' if local_row.rpc_address else 'DOWN',
             'schema_version': local_row.schema_version,
+            'release_version' : local_row.release_version,
             'peer': '127.0.0.1',  # Local node IP
             'rpc_address': local_row.rpc_address,
             'root': "x",
