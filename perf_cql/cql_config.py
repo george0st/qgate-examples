@@ -45,16 +45,16 @@ class CQLConfigSetting:
 
 class CQLConfig:
 
-    def __init__(self, config):
+    def __init__(self, config = {}):
         self._config = config
 
-    def get_global_params(self):
+    def get_global_params(self, force_default = False):
         import ast
         global_param={}
 
         # shared params for all providers
         global_param['multiple_env'] = self._config.get('MULTIPLE_ENV', None)
-        if global_param['multiple_env']:
+        if global_param['multiple_env'] or force_default:
             # multiple configurations
             global_param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', CQLConfigSetting.MULTIPLE_ENV_DELAY))
             global_param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', CQLConfigSetting.EXECUTOR_DURATION))

@@ -236,6 +236,7 @@ if __name__ == '__main__':
 
     config_dir = "config"
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
+    #config = dotenv_values(os.path.join(config_dir,"local-cass-W1-min.env"))
     global_param = CQLConfig(config).get_global_params()
     if global_param:
         # multiple configurations
@@ -255,11 +256,12 @@ if __name__ == '__main__':
                         executors)
     else:
         # single configuration
-        global_param = {}
-        global_param['executor_duration'] = duration_seconds
-        global_param['executor_start_delay'] = 0
-        global_param['detail_output'] = True
-        global_param['cluster_check'] = True
+        global_param = CQLConfig().get_global_params(True)
+        # global_param = {}
+        # global_param['executor_duration'] = duration_seconds
+        # global_param['executor_start_delay'] = 0
+        # global_param['detail_output'] = True
+        # global_param['cluster_check'] = True
         exec_config(config,
                     "",
                     global_param,
