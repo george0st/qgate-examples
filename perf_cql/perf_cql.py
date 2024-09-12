@@ -231,9 +231,6 @@ if __name__ == '__main__':
 
     executors = [[1, 1, '1x threads'], [2, 1, '1x threads']]
 
-    # performance test duration
-    duration_seconds = 5
-
     config_dir = "config"
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
     #config = dotenv_values(os.path.join(config_dir,"local-cass-W1-min.env"))
