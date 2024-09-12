@@ -31,6 +31,7 @@ class CQLConfigSetting:
     EXECUTOR_START_DELAY = "0"
     KEYSPACE = "prftest"
     BULK_LIST = "[[200, 10]]"
+    EXECUTORS = "[[1, 1, '1x threads'], [2, 1, '1x threads']]"
     TEST_TYPE = "W"
     CLUSTER_DIAGNOSE = "Short"
     REPLICATION_CLASS = "NetworkTopologyStrategy"
@@ -87,6 +88,8 @@ class CQLConfig:
         global_param['multiple_env'] = self._config.get('MULTIPLE_ENV', None)
         if global_param['multiple_env'] or force_default:
             # multiple configurations
+
+            global_param['EXECUTORS'] = ast.literal_eval(self._config.get("EXECUTORS", CQLConfigSetting.EXECUTORS))
             global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', CQLConfigSetting.DETAIL_OUTPUT))
             global_param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', CQLConfigSetting.EXECUTOR_DURATION))
             global_param['executor_start_delay'] = int(self._config.get('EXECUTOR_START_DELAY', CQLConfigSetting.EXECUTOR_START_DELAY))
