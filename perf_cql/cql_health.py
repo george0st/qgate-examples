@@ -5,10 +5,10 @@ from enum import Enum
 
 
 class CQLDiagnosePrint(Enum):
-    Off = 1
-    Short = 2
-    Full = 3
-    Extra = 4
+    off = 1
+    short = 2
+    full = 3
+    extra = 4
 
 class CQLHealth:
 
@@ -17,14 +17,14 @@ class CQLHealth:
         self._nodes = None
         self._hosts = None
 
-    def diagnose(self, level = CQLDiagnosePrint.Short) -> dict:
+    def diagnose(self, level = CQLDiagnosePrint.short) -> dict:
         status=self._get_status()
 
-        if level==CQLDiagnosePrint.Short:
+        if level==CQLDiagnosePrint.short:
             self.print_status_short(status)
-        elif level==CQLDiagnosePrint.Full:
+        elif level==CQLDiagnosePrint.full:
             self.print_status_full(status)
-        elif level==CQLDiagnosePrint.Extra:
+        elif level==CQLDiagnosePrint.extra:
             self.print_status_short(status)
             self.print_status_full(status)
 

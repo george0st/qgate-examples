@@ -10,7 +10,7 @@ from cql_config import CQLConfig, CQLType
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
 import cql_helper
-from cql_health import CQLHealth
+from cql_health import CQLHealth, CQLDiagnosePrint
 
 
 def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
@@ -126,12 +126,18 @@ def prf_write(run_setup: RunSetup) -> ParallelProbe:
 
     return probe
 
-def diagnose(run_setup):
+def diagnose(run_setup, diagnose):
+
+    cql = None
     try:
+        diagnose = CQLDiagnosePrint[diagnose.lower()]
+        if diagnose == CQLDiagnosePrint.off:
+            return
+
         cql = CQLAccess(run_setup)
         cql.open()
         status = CQLHealth(cql.cluster)
-        status.diagnose(True, False)
+        status.diagnose(diagnose)
     finally:
         if cql:
             cql.close()
@@ -169,8 +175,7 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, executor_
                      start_delay = global_param['executor_start_delay'],
                      parameters = parameters)
 
-    if global_param['cluster_diagnose']:
-        diagnose(setup)
+    diagnose(setup, global_param['cluster_diagnose'])
 
     generator.run_bulk_executor(parameters['bulk_list'],
                                 executor_list,
