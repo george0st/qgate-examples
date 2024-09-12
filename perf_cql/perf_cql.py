@@ -257,11 +257,6 @@ if __name__ == '__main__':
     else:
         # single configuration
         global_param = CQLConfig().get_global_params(True)
-        # global_param = {}
-        # global_param['executor_duration'] = duration_seconds
-        # global_param['executor_start_delay'] = 0
-        # global_param['detail_output'] = True
-        # global_param['cluster_check'] = True
         exec_config(config,
                     "",
                     global_param,

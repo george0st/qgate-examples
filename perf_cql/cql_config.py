@@ -1,6 +1,7 @@
 from cassandra import ConsistencyLevel
 from enum import Enum
 import cql_helper
+import ast
 
 
 class CQLType(Enum):
@@ -49,7 +50,7 @@ class CQLConfig:
         self._config = config
 
     def get_global_params(self, force_default = False):
-        import ast
+
         global_param={}
 
         # shared params for all providers
@@ -70,8 +71,6 @@ class CQLConfig:
 
     def _inherit_param_eval(self, param_name, global_param, param_name_default = None, adapter = None):
         """Get adapter from single or from global ENV"""
-        import ast
-
         if adapter:
             param_name=f"{adapter}_{param_name}"
 
@@ -101,7 +100,6 @@ class CQLConfig:
             return param_name_default
 
     def get_params(self, adapter, global_param):
-        import ast
         param={}
 
         # shared params for all providers
