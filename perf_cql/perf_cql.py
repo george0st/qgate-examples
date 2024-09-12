@@ -131,7 +131,7 @@ def diagnose(run_setup):
         cql = CQLAccess(run_setup)
         cql.open()
         status = CQLHealth(cql.cluster)
-        status.diagnose(True, True)
+        status.diagnose(True, False)
     finally:
         if cql:
             cql.close()
