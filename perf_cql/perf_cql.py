@@ -136,14 +136,10 @@ def diagnose(run_setup):
         if cql:
             cql.close()
 
-def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, bulk_list=None, executor_list=None):
+def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, executor_list=None):
 
     lbl = str(cql).split('.')[1]
     lbl_suffix = f"{parameters['label']}" if parameters.get('label', None) else ""
-
-    # FORCE bulk_list from ENV (if the value is defined in ENV file)
-    if parameters['bulk_list']:
-        bulk_list=parameters['bulk_list']
 
     generator = None
     if parameters['test_type']=='w':    # WRITE perf test
@@ -176,10 +172,12 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, bulk_list
     if global_param['cluster_check']:
         diagnose(setup)
 
-    generator.run_bulk_executor(bulk_list, executor_list, run_setup = setup)
+    generator.run_bulk_executor(parameters['bulk_list'],
+                                executor_list,
+                                run_setup = setup)
     generator.create_graph_perf("../output", suppress_error = True)
 
-def exec_config(config, unique_id, global_param, bulks, executors):
+def exec_config(config, unique_id, global_param, executors):
 
     param = CQLConfig(config).get_params('COSMOSDB', global_param)
     if param:
@@ -187,7 +185,6 @@ def exec_config(config, unique_id, global_param, bulks, executors):
                   unique_id,
                   global_param,
                   param,
-                  bulk_list=bulks,
                   executor_list=executors)
 
     param = CQLConfig(config).get_params('SCYLLADB', global_param)
@@ -196,7 +193,6 @@ def exec_config(config, unique_id, global_param, bulks, executors):
                   unique_id,
                   global_param,
                   param,
-                  bulk_list=bulks,
                   executor_list=executors)
 
     param = CQLConfig(config).get_params('CASSANDRA', global_param)
@@ -205,7 +201,6 @@ def exec_config(config, unique_id, global_param, bulks, executors):
                   unique_id,
                   global_param,
                   param,
-                  bulk_list=bulks,
                   executor_list=executors)
 
     param = CQLConfig(config).get_params('ASTRADB', global_param)
@@ -214,13 +209,12 @@ def exec_config(config, unique_id, global_param, bulks, executors):
                   unique_id,
                   global_param,
                   param,
-                  bulk_list=bulks,
                   executor_list=executors)
 
 if __name__ == '__main__':
 
     # size of data bulks, requested format [[rows, columns], ...]
-    bulks = [[10, 10]]
+    # bulks = [[10, 10]]
 
     # list of executors (for application to all bulks)
     # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
@@ -258,7 +252,6 @@ if __name__ == '__main__':
             exec_config(dotenv_values(os.path.join(config_dir,env)),
                         unique_id,
                         global_param,
-                        bulks,
                         executors)
     else:
         # single configuration
@@ -270,5 +263,4 @@ if __name__ == '__main__':
         exec_config(config,
                     "",
                     global_param,
-                    bulks,
                     executors)
