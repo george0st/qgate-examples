@@ -131,7 +131,7 @@ def diagnose(run_setup):
         cql = CQLAccess(run_setup)
         cql.open()
         status = CQLHealth(cql.cluster)
-        status.diagnose(True)
+        status.diagnose(True, False)
     finally:
         if cql:
             cql.close()
@@ -231,9 +231,6 @@ if __name__ == '__main__':
 
     executors = [[1, 1, '1x threads'], [2, 1, '1x threads']]
 
-    # performance test duration
-    duration_seconds = 5
-
     config_dir = "config"
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
     #config = dotenv_values(os.path.join(config_dir,"local-cass-W1-min.env"))
@@ -257,11 +254,6 @@ if __name__ == '__main__':
     else:
         # single configuration
         global_param = CQLConfig().get_global_params(True)
-        # global_param = {}
-        # global_param['executor_duration'] = duration_seconds
-        # global_param['executor_start_delay'] = 0
-        # global_param['detail_output'] = True
-        # global_param['cluster_check'] = True
         exec_config(config,
                     "",
                     global_param,

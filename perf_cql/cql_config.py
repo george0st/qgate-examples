@@ -1,6 +1,7 @@
 from cassandra import ConsistencyLevel
 from enum import Enum
 import cql_helper
+import ast
 
 
 class CQLType(Enum):
@@ -48,30 +49,8 @@ class CQLConfig:
     def __init__(self, config = {}):
         self._config = config
 
-    def get_global_params(self, force_default = False):
-        import ast
-        global_param={}
-
-        # shared params for all providers
-        global_param['multiple_env'] = self._config.get('MULTIPLE_ENV', None)
-        if global_param['multiple_env'] or force_default:
-            # multiple configurations
-            global_param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', CQLConfigSetting.MULTIPLE_ENV_DELAY))
-            global_param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', CQLConfigSetting.EXECUTOR_DURATION))
-            global_param['executor_start_delay'] = int(self._config.get('EXECUTOR_START_DELAY', CQLConfigSetting.EXECUTOR_START_DELAY))
-            global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', CQLConfigSetting.DETAIL_OUTPUT))
-            global_param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
-            global_param['cluster_check'] = cql_helper.str2bool(
-                self._config.get("CLUSTER_CHECK", CQLConfigSetting.CLUSTER_CHECK))
-
-            return global_param
-        else:
-            return None
-
     def _inherit_param_eval(self, param_name, global_param, param_name_default = None, adapter = None):
         """Get adapter from single or from global ENV"""
-        import ast
-
         if adapter:
             param_name=f"{adapter}_{param_name}"
 
@@ -100,23 +79,33 @@ class CQLConfig:
                     return global_param[param_name.lower()]
             return param_name_default
 
+    def get_global_params(self, force_default = False):
+
+        global_param={}
+
+        # shared params for all providers
+        global_param['multiple_env'] = self._config.get('MULTIPLE_ENV', None)
+        if global_param['multiple_env'] or force_default:
+            # multiple configurations
+            global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', CQLConfigSetting.DETAIL_OUTPUT))
+            global_param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', CQLConfigSetting.EXECUTOR_DURATION))
+            global_param['executor_start_delay'] = int(self._config.get('EXECUTOR_START_DELAY', CQLConfigSetting.EXECUTOR_START_DELAY))
+            global_param['cluster_check'] = cql_helper.str2bool(self._config.get("CLUSTER_CHECK", CQLConfigSetting.CLUSTER_CHECK))
+            global_param['keyspace'] = self._config.get("KEYSPACE", CQLConfigSetting.KEYSPACE)
+            global_param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
+            global_param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', CQLConfigSetting.MULTIPLE_ENV_DELAY))
+            return global_param
+        else:
+            return None
+
     def get_params(self, adapter, global_param):
-        import ast
         param={}
 
         # shared params for all providers
-        param['keyspace'] = self._inherit_param("KEYSPACE", global_param, CQLConfigSetting.KEYSPACE)
-        param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, CQLConfigSetting.BULK_LIST)
-
-        # if self._config.get("BULK_LIST", None):
-        #     param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
-        # else:
-        #     # inheritage of param from global_param
-        #     if global_param:
-        #         if global_param.get('bulk_list', None):
-        #             param['bulk_list'] = global_param['bulk_list']
-
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
+        param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, CQLConfigSetting.BULK_LIST)
+        param['keyspace'] = self._inherit_param("KEYSPACE", global_param, CQLConfigSetting.KEYSPACE)
+        param['executor_duration'] = int(self._inherit_param('EXECUTOR_DURATION', global_param, CQLConfigSetting.EXECUTOR_DURATION))
 
         if cql_helper.str2bool(self._config.get(adapter, "Off")):
             # connection setting
