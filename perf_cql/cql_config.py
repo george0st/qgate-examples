@@ -102,7 +102,7 @@ class CQLConfig:
         param={}
 
         # shared params for all providers
-        param['keyspace'] = self._config.get("KEYSPACE", CQLConfigSetting.KEYSPACE)
+        param['keyspace'] = self._inherit_param("KEYSPACE", global_param, CQLConfigSetting.KEYSPACE)
         param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, CQLConfigSetting.BULK_LIST)
 
         # if self._config.get("BULK_LIST", None):
