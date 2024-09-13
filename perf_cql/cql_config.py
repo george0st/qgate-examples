@@ -2,6 +2,7 @@ from cassandra import ConsistencyLevel
 from enum import Enum
 import cql_helper
 import ast
+from os import path
 
 
 class CQLType(Enum):
@@ -125,7 +126,7 @@ class CQLConfig:
             # login setting
             param['username'] = self._config.get(f"{adapter}_USERNAME", CQLConfigSetting.USERNAME)
             if self._config.get(f"{adapter}_PASSWORD", None):
-                param['password'] = cql_helper.read_file(self._config[f"{adapter}_PASSWORD"])
+                param['password'] = cql_helper.read_file(path.join(global_param['perf_dir'], self._config[f"{adapter}_PASSWORD"]))
             else:
                 param['password'] = CQLConfigSetting.PASSWORD
 
