@@ -25,7 +25,7 @@ class CQLHealth:
         elif level==CQLDiagnosePrint.full:
             self.print_status_full(status)
         elif level==CQLDiagnosePrint.extra:
-            self.print_status_short(status)
+            self.print_status_short(status," ")
             self.print_status_full(status)
 
 
