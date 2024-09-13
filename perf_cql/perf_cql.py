@@ -143,7 +143,7 @@ def cluster_diagnose(run_setup, level):
         if cql:
             cql.close()
 
-def perf_test(cql: CQLType, unique_id, global_param, parameters: dict):
+def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_cluster_diagnose = False):
 
     lbl = str(cql).split('.')[1]
     lbl_suffix = f"{parameters['label']}" if parameters.get('label', None) else ""
@@ -177,6 +177,8 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict):
                      parameters = parameters)
 
     cluster_diagnose(setup, global_param['cluster_diagnose'])
+    if global_param['cluster_diagnose_only']:
+        return
 
     generator.run_bulk_executor(parameters['bulk_list'],
                                 global_param['executors'],
@@ -213,8 +215,7 @@ def exec_config(config, unique_id, global_param):
                   global_param,
                   param)
 
-
-def main_execute(env="cass.env", config_dir="config"):
+def main_execute(env="cass.env", config_dir="config", only_cluster_diagnose = False, level = "short"):
 
     global_param = CQLConfig(dotenv_values(os.path.join(config_dir, env))).get_global_params()
     if global_param:
@@ -229,6 +230,9 @@ def main_execute(env="cass.env", config_dir="config"):
             print(Fore.BLUE + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
             if env_count > 1:
                 time.sleep(global_param['multiple_env_delay'])
+            if only_cluster_diagnose:
+                global_param['cluster_diagnose'] = level
+                global_param['cluster_diagnose_only'] = True
             exec_config(dotenv_values(os.path.join(config_dir,env)),
                         unique_id,
                         global_param)
@@ -244,8 +248,8 @@ def diagnose_group():
 @click.option("-d", "--config_dir", help="directory with ENV file(s) (default 'config')", default="config")
 @click.option("-l", "--level", help="level of diagnose, acceptable values 'short', 'full', 'extra' (default 'short')", default="short")
 def diagnose(env, config_dir, level):
-    """Run performance tests based on ENV file."""
-    pass
+    """Run only diagnostic for connection based on ENV file."""
+    main_execute(env, config_dir, True, level)
 
 @click.group()
 def run_group():
@@ -258,59 +262,7 @@ def run(env, config_dir):
     """Run performance tests based on ENV file."""
     main_execute(env, config_dir)
 
-cli = click.CommandCollection(sources=[run_group])
+cli = click.CommandCollection(sources=[run_group, diagnose_group])
 
 if __name__ == '__main__':
-
     cli()
-    # exit(1)
-    # # size of data bulks, requested format [[rows, columns], ...]
-    # # bulks = [[10, 10]]
-    #
-    # # list of executors (for application to all bulks)
-    # # executors = [[2, 1, '1x threads'], [4, 1, '1x threads'], [8, 1, '1x threads'],
-    # #              [2, 2, '2x threads'], [4, 2, '2x threads'], [8, 2, '2x threads']]
-    #
-    # # executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
-    # #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
-    # #              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
-    #
-    #
-    # executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
-    #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
-    #              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
-    #
-    # # executors = [[32, 2, '2x threads'], [64, 2, '2x threads'],
-    # #              [32, 3, '3x threads'], [64, 3, '3x threads']]
-    #
-    # #executors = [[32, 2, '1x threads'], [32, 3, '1x threads']]
-    #
-    # # executors = [[1, 1, '1x threads'], [2, 1, '1x threads']]
-    #
-    # config_dir = "config"
-    # config = dotenv_values(os.path.join(config_dir,"cass.env"))
-    # #config = dotenv_values(os.path.join(config_dir,"local-cass-W1-min.env"))
-    # global_param = CQLConfig(config).get_global_params()
-    # if global_param:
-    #     # multiple configurations
-    #     unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
-    #     envs = [env.strip() for env in global_param['multiple_env'].split(",")]
-    #     env_count = 0
-    #     for env in envs:
-    #         if not env.lower().endswith(".env"):
-    #             env += ".env"
-    #         env_count += 1
-    #         print(Fore.BLUE + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
-    #         if env_count > 1:
-    #             time.sleep(global_param['multiple_env_delay'])
-    #         exec_config(dotenv_values(os.path.join(config_dir,env)),
-    #                     unique_id,
-    #                     global_param,
-    #                     executors)
-    # else:
-    #     # single configuration
-    #     global_param = CQLConfig().get_global_params(True)
-    #     exec_config(config,
-    #                 "",
-    #                 global_param,
-    #                 executors)

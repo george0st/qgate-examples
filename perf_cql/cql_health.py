@@ -25,15 +25,8 @@ class CQLHealth:
         elif level==CQLDiagnosePrint.full:
             self.print_status_full(status)
         elif level==CQLDiagnosePrint.extra:
-            self.print_status_short(status)
+            self.print_status_short(status," ")
             self.print_status_full(status)
-
-
-        # if print:
-        #     if full_detail:
-        #         self.print_status_full(status)
-        #     else:
-        #         self.print_status_short(status)
         return status
 
     def get_version(self):
