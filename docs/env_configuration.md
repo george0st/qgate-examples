@@ -5,36 +5,52 @@
 The configuration define global setting and relation to the many 
 single ENV settings (single ENV setting will rewrite global setting).
 
- - **DETAIL_OUTPUT** (opt)
-   - The detail output can be '_On_' (as default) or '_Off_'. 
-     The detail output is useful for execution graph.
+The main parameters for test execution, are:
+
  - **EXECUTOR_DURATION** (opt)
    - The test duration for run EACH PERFORMANCE TEST (value in seconds, 
      default is _5_)
- - **EXECUTOR_START_DELAY** (opt)
-   - The synch time for run EACH PERFORMANCE TEST (value in seconds, 
-     default is _0_). The value define time for waiting to all executors, 
-     before real start of performance test execution. Use this setting, 
-     when you need ASAP high performance of executors in the same time
-     (it will generate perf peek). Use zero value, when you need slightly
-     increase number of executors (it is without synchronization)
- - **CLUSTER_DIAGNOSE** (opt)
-   - The run cluster diagnose, can be '_Off_', '_Short_' (as default),
-     '_Full_' or '_Extra_' 
- - **KEYSPACE** (opt)
-   - The name of keyspace for test (default is '_prftest_') 
  - **BULK_LIST** (opt)
-   - The size of data bulk in format '_[[rows, columns], ...]_' 
+   - The size of data bulk/bundle in format '_[[rows, columns], ...]_' 
      (default is '_[[200, 10]]_')
    - NOTE: _[[200, 10]]_ means, that table will have 10 columns and will do
      - 200 insert/upsert operation during the test type Write
-     - 200 select operation during the test type Read
+     - 200 select operation during the test type Read 
+       (it is better to use bulk e.g. [1, 10] for read operations)
+ - **EXECUTORS** (opt)
+   - The set of executors in format '_[[processes, threads, label], ...]_' 
+     (default is '_"[[1, 1, '1x threads'], [2, 1, '1x threads']]"_')
+   - NOTE:
+     - The amount of executors is based on formula '_processes * threads_'
+     - The same '_label_' define items visualization as one line in chart 
+ - **MULTIPLE_ENV**
+   - The list of ENV files e.g. '_A.env, B.env, C.env, ..._' for processing
+   - Expected content, see next chapter '_2. Single ENV setting_'
+
+The other parameters with smaller importancy:
+ - **DETAIL_OUTPUT** (opt)
+   - The detail output can be '_On_' (as default) or '_Off_'. 
+     The detail output is useful for visualization of execution graph 
+     (but it is without usage for performance graph)
+ - **EXECUTOR_START_DELAY** (opt)
+   - The synch time for run EACH PERFORMANCE TEST (value in seconds, 
+     default is _0_). 
+   - The value define time for waiting to all executors, before real start
+     of performance test execution. Use this setting, 
+     when you need ASAP high performance of executors in the same time
+     (it will generate performance peek).
+   - Use zero value (default), when you need slightly increase number of
+     executors (it is without synchronization)
+ - **CLUSTER_DIAGNOSE** (opt)
+   - The run cluster diagnose, can be '_Off_', '_Short_' (as default),
+     '_Full_' or '_Extra_'
+   - It is only diagnostic information about the cluster, before 
+     processing each ENV file
+ - **KEYSPACE** (opt)
+   - The name of keyspace for tests (default is '_prftest_') 
  - **MULTIPLE_ENV_DELAY** (opt)
    - The delay before switch to different config file (value in seconds,
      default is _0_)
- - **MULTIPLE_ENV**
-   - The list of single ENV files e.g. '_A.env, B.env, C.env, ..._'
-   - Expected content, see next chapter '_2. Single ENV setting_'
 
 ## 2. Single ENV setting
 
