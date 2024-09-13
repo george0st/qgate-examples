@@ -178,7 +178,7 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, executor_
     diagnose(setup, global_param['cluster_diagnose'])
 
     generator.run_bulk_executor(parameters['bulk_list'],
-                                executor_list,
+                                global_param['executors'],
                                 run_setup = setup)
     generator.create_graph_perf("../output", suppress_error = True)
 
