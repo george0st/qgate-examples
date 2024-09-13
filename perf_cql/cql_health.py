@@ -100,11 +100,12 @@ class CQLHealth:
 
         missing_schemas=len(status)-schemas.get(root_schema,0)
         release_versions=str([key for key in release_versions.keys()])
-        down_info=f"{len(node_down)}x Down{'' if len(node_down)==0 else ' '+Fore.RED+str(node_down)+Style.RESET_ALL}"
+        down_info=f"{len(node_down)}x Down{'' if len(node_down)==0 else ' '+ Fore.LIGHTRED_EX + str(node_down)+Style.RESET_ALL}"
         print(f"{prefix_output}Nodes: {len(status)}x [Total] ({down_info}),"
-              f" Gossip: {'0x' if len(node_peer_down) == 0 else Fore.BLUE + str(len(node_peer_down)) + 'x' + Style.RESET_ALL}{'' if len(node_peer_down) == 0 else ' ' + Fore.BLUE + str(node_peer_down) + Style.RESET_ALL},"             
-              f" Not-synch: {'0x' if missing_schemas == 0 else Fore.BLUE + str(missing_schemas) + 'x' + Style.RESET_ALL},"
-              f" Versions: {release_versions}")
+              f" Gossip: {'0x' if len(node_peer_down) == 0 else Fore.CYAN + str(len(node_peer_down)) + 'x' + Style.RESET_ALL}"
+              f"{'' if len(node_peer_down) == 0 else ' ' + Fore.CYAN + str(node_peer_down) + Style.RESET_ALL},"             
+              f" Not-synch: {'0x' if missing_schemas == 0 else Fore.CYAN + str(missing_schemas) + 'x' + Style.RESET_ALL},"
+              f" Ver: {release_versions}")
 
     def print_status_full(self, status):
         table = PrettyTable()
@@ -127,15 +128,15 @@ class CQLHealth:
             color_peer_suffix = ""
 
             if node['root'] == "x":
-                color_prefix = Fore.BLUE
+                color_prefix = Fore.CYAN
                 color_suffix = Style.RESET_ALL
 
             if node['status'] == "DOWN":
-                color_status_prefix = Fore.RED
+                color_status_prefix = Fore.LIGHTRED_EX
                 color_status_suffix = Style.RESET_ALL
 
             if node['peer_status'] == "DOWN":
-                color_peer_prefix = Fore.BLUE
+                color_peer_prefix = Fore.CYAN
                 color_peer_suffix = Style.RESET_ALL
 
             row = [f"{color_status_prefix}{node['status']}{color_status_suffix}",
