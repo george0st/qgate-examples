@@ -1,0 +1,1 @@
+python perf_cql.py diagnose -e cass.env -l extra
