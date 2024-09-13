@@ -1,1 +1,0 @@
-python perf_cql.py run -e cass.env

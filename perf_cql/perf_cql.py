@@ -153,13 +153,13 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_clus
         generator = ParallelExecutor(prf_write,
                                      label=f"{lbl}{unique_id}-W{lbl_suffix}",
                                      detail_output=global_param['detail_output'],
-                                     output_file=f"../output/prf_{lbl.lower()}-W{lbl_suffix.lower()}-{datetime.date.today()}.txt",
+                                     output_file=os.path.join(global_param['perf_dir'],f"../output/prf_{lbl.lower()}-W{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
                                      init_each_bulk=True)
     elif parameters['test_type']=='r':  # READ perf test
         generator = ParallelExecutor(prf_read,
                                      label=f"{lbl}{unique_id}-R{lbl_suffix}",
                                      detail_output=global_param['detail_output'],
-                                     output_file=f"../output/prf_{lbl.lower()}-R{lbl_suffix.lower()}-{datetime.date.today()}.txt",
+                                     output_file=os.path.join(global_param['perf_dir'],f"../output/prf_{lbl.lower()}-R{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
                                      init_each_bulk=True)
     # TODO: Add read & write
     # elif parameters['test_type']=='rw' or parameters['test_type']=='wr':    # READ & WRITE perf test
@@ -215,13 +215,14 @@ def exec_config(config, unique_id, global_param):
                   global_param,
                   param)
 
-def main_execute(env="cass.env", config_dir="config", only_cluster_diagnose = False, level = "short"):
+def main_execute(env="cass.env", perf_dir=".", only_cluster_diagnose = False, level = "short"):
 
-    global_param = CQLConfig(dotenv_values(os.path.join(config_dir, env))).get_global_params()
+    global_param = CQLConfig(dotenv_values(os.path.join(perf_dir, "config", env))).get_global_params()
     if global_param:
         # multiple configurations
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
         envs = [env.strip() for env in global_param['multiple_env'].split(",")]
+        global_param['perf_dir'] = perf_dir
         env_count = 0
         for env in envs:
             if not env.lower().endswith(".env"):
@@ -233,7 +234,7 @@ def main_execute(env="cass.env", config_dir="config", only_cluster_diagnose = Fa
             if only_cluster_diagnose:
                 global_param['cluster_diagnose'] = level
                 global_param['cluster_diagnose_only'] = True
-            exec_config(dotenv_values(os.path.join(config_dir,env)),
+            exec_config(dotenv_values(os.path.join(perf_dir, "config", env)),
                         unique_id,
                         global_param)
     else:
@@ -245,11 +246,11 @@ def diagnose_group():
 
 @diagnose_group.command()
 @click.option("-e", "--env", help="name of ENV file (default 'cass.env')", default="cass.env")
-@click.option("-d", "--config_dir", help="directory with ENV file(s) (default 'config')", default="config")
+@click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
 @click.option("-l", "--level", help="level of diagnose, acceptable values 'short', 'full', 'extra' (default 'short')", default="short")
-def diagnose(env, config_dir, level):
+def diagnose(env, perf_dir, level):
     """Run only diagnostic for connection based on ENV file."""
-    main_execute(env, config_dir, True, level)
+    main_execute(env, perf_dir, True, level)
 
 @click.group()
 def run_group():
@@ -257,10 +258,10 @@ def run_group():
 
 @run_group.command()
 @click.option("-e", "--env", help="name of ENV file (default 'cass.env')", default="cass.env")
-@click.option("-d", "--config_dir", help="directory with ENV file(s) (default 'config')", default="config")
-def run(env, config_dir):
+@click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
+def run(env, perf_dir):
     """Run performance tests based on ENV file."""
-    main_execute(env, config_dir)
+    main_execute(env, perf_dir)
 
 cli = click.CommandCollection(sources=[run_group, diagnose_group])
 
