@@ -26,19 +26,24 @@ class ConsistencyHelper:
     }
 
 class CQLConfigSetting:
+
+    # The key parameters
     EXECUTOR_DURATION = "5"
-    MULTIPLE_ENV_DELAY = "0"
-    EXECUTOR_START_DELAY = "0"
-    KEYSPACE = "prftest"
     BULK_LIST = "[[200, 10]]"
     EXECUTORS = "[[1, 1, '1x threads'], [2, 1, '1x threads']]"
-    TEST_TYPE = "W"
+
+    # The other tuning
+    EXECUTOR_START_DELAY = "0"
+    DETAIL_OUTPUT = "True"
     CLUSTER_DIAGNOSE = "Short"
+    MULTIPLE_ENV_DELAY = "0"
+
+    KEYSPACE = "prftest"
+    TEST_TYPE = "W"
     REPLICATION_CLASS = "NetworkTopologyStrategy"
     REPLICATION_FACTOR = "3"
     CONSISTENCY_LEVEL = "LOCAL_QUORUM"
     LB_LOCAL_DC = "datacenter1"
-    DETAIL_OUTPUT = "True"
     USERNAME = "cassandra"
     PASSWORD = "cassandra"
     PORT = "9042"
