@@ -13,6 +13,8 @@ qgate-perf==0.4.17
 # https://github.com/theskumar/python-dotenv
 python-dotenv~=1.0
 
+# text as the table
 prettytable==3.11.0
 
+# color in terminal
 colorama==0.4.6
