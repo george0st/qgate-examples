@@ -1,3 +1,6 @@
+# command line
+click~=8.1
+
 cassandra-driver==3.29.1
 
 # numpy>2.0.1 requires higher version of python>=3.10 (not 3.9)
@@ -10,4 +13,8 @@ qgate-perf==0.4.17
 # https://github.com/theskumar/python-dotenv
 python-dotenv~=1.0
 
+# text as the table
 prettytable==3.11.0
+
+# color in terminal
+colorama==0.4.6

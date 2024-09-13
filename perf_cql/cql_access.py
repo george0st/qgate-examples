@@ -32,7 +32,7 @@ class CQLAccess:
                                                  password = self._run_setup["password"])
 
         # load balancing policy
-        if int(self._run_setup['replication_factor'])==1:
+        if int(self._run_setup['replication_factor']) == 1:
             load_balancing_policy = RoundRobinPolicy()
         else:
             load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"])

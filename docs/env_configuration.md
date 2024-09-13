@@ -3,7 +3,7 @@
 ## 1. Multi ENV setting
 
 The configuration define global setting and relation to the many 
-single ENV settings (single ENV setting will rewrite global setting).
+single ENV settings (single ENV setting can rewrite global setting).
 
 The main parameters for test execution, are:
 
@@ -67,9 +67,6 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
      - 200 select operation during the test type Read
  - **KEYSPACE** (opt, inherit)
    - The name of keyspace for test (default is '_prftest_')
- - **EXECUTOR_DURATION** (opt, inherit)
-   - The test duration for run EACH PERFORMANCE TEST (value in seconds, 
-     default is _5_)
  - **XXX** is the value based on system '_SCYLLADB_', 
    '_CASSANDRA_', '_ASTRADB_', '_COSMOSDB_'
    - **XXX_LABEL** (opt)
