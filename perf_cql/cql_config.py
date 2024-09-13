@@ -26,18 +26,24 @@ class ConsistencyHelper:
     }
 
 class CQLConfigSetting:
+
+    # The key parameters
     EXECUTOR_DURATION = "5"
-    MULTIPLE_ENV_DELAY = "0"
-    EXECUTOR_START_DELAY = "0"
-    KEYSPACE = "prftest"
     BULK_LIST = "[[200, 10]]"
-    TEST_TYPE = "W"
+    EXECUTORS = "[[1, 1, '1x threads'], [2, 1, '1x threads']]"
+
+    # The other tuning
+    EXECUTOR_START_DELAY = "0"
+    DETAIL_OUTPUT = "True"
     CLUSTER_DIAGNOSE = "Short"
+    MULTIPLE_ENV_DELAY = "0"
+
+    KEYSPACE = "prftest"
+    TEST_TYPE = "W"
     REPLICATION_CLASS = "NetworkTopologyStrategy"
     REPLICATION_FACTOR = "3"
     CONSISTENCY_LEVEL = "LOCAL_QUORUM"
     LB_LOCAL_DC = "datacenter1"
-    DETAIL_OUTPUT = "True"
     USERNAME = "cassandra"
     PASSWORD = "cassandra"
     PORT = "9042"
@@ -87,6 +93,8 @@ class CQLConfig:
         global_param['multiple_env'] = self._config.get('MULTIPLE_ENV', None)
         if global_param['multiple_env'] or force_default:
             # multiple configurations
+
+            global_param['executors'] = ast.literal_eval(self._config.get("EXECUTORS", CQLConfigSetting.EXECUTORS))
             global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', CQLConfigSetting.DETAIL_OUTPUT))
             global_param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', CQLConfigSetting.EXECUTOR_DURATION))
             global_param['executor_start_delay'] = int(self._config.get('EXECUTOR_START_DELAY', CQLConfigSetting.EXECUTOR_START_DELAY))

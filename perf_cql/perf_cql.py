@@ -178,7 +178,7 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, executor_
     diagnose(setup, global_param['cluster_diagnose'])
 
     generator.run_bulk_executor(parameters['bulk_list'],
-                                executor_list,
+                                global_param['executors'],
                                 run_setup = setup)
     generator.create_graph_perf("../output", suppress_error = True)
 
@@ -229,12 +229,17 @@ if __name__ == '__main__':
     #              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
     #              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
 
+
+    executors = [[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
+                 [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
+                 [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]
+
     # executors = [[32, 2, '2x threads'], [64, 2, '2x threads'],
     #              [32, 3, '3x threads'], [64, 3, '3x threads']]
 
     #executors = [[32, 2, '1x threads'], [32, 3, '1x threads']]
 
-    executors = [[1, 1, '1x threads'], [2, 1, '1x threads']]
+    # executors = [[1, 1, '1x threads'], [2, 1, '1x threads']]
 
     config_dir = "config"
     config = dotenv_values(os.path.join(config_dir,"cass.env"))
