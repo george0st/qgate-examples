@@ -109,7 +109,8 @@ class CQLHealth:
         release_versions=str([key for key in release_versions.keys()])
         down_info=f"{len(node_down)}x Down{'' if len(node_down)==0 else ' '+Fore.RED+str(node_down)+Style.RESET_ALL}"
         print(f"{prefix_output}Nodes: {len(status)}x [Total] ({down_info}),"
-              f" Not-synch: {'0x' if missing_schemas == 0 else Fore.BLUE + str(missing_schemas) + 'x' + Style.RESET_ALL}{'' if len(node_peer_down) == 0 else ' ' + Fore.BLUE + str(node_peer_down) + Style.RESET_ALL},"             
+              f" Gossip: {'0x' if len(node_peer_down) == 0 else Fore.BLUE + str(len(node_peer_down)) + 'x' + Style.RESET_ALL}{'' if len(node_peer_down) == 0 else ' ' + Fore.BLUE + str(node_peer_down) + Style.RESET_ALL},"             
+              f" Not-synch: {'0x' if missing_schemas == 0 else Fore.BLUE + str(missing_schemas) + 'x' + Style.RESET_ALL},"
               f" Versions: {release_versions}")
 
     def print_status_full(self, status):

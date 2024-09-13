@@ -14,3 +14,5 @@ qgate-perf==0.4.17
 python-dotenv~=1.0
 
 prettytable==3.11.0
+
+colorama==0.4.6

@@ -216,8 +216,7 @@ def exec_config(config, unique_id, global_param):
 
 def main_execute(env="cass.env", config_dir="config"):
 
-    config = dotenv_values(os.path.join(config_dir, env))
-    global_param = CQLConfig(config).get_global_params()
+    global_param = CQLConfig(dotenv_values(os.path.join(config_dir, env))).get_global_params()
     if global_param:
         # multiple configurations
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
@@ -237,20 +236,16 @@ def main_execute(env="cass.env", config_dir="config"):
         print("Missing 'MULTIPLE_ENV' configuration")
 
 @click.group()
-def diagnostic():
+def diagnose_group():
     pass
 
-@diagnostic.command()
+@diagnose_group.command()
 @click.option("-e", "--env", help="name of ENV file (default 'cass.env')", default="cass.env")
 @click.option("-d", "--config_dir", help="directory with ENV file(s) (default 'config')", default="config")
-@click.option("-l", "--level", help="diagnose level, possible values 'short', 'full, 'extra' (default 'short')", default="short")
+@click.option("-l", "--level", help="level of diagnose, acceptable values 'short', 'full', 'extra' (default 'short')", default="short")
 def diagnose(env, config_dir, level):
-    print("diagnose:", env, config_dir, level)
-    # setup = RunSetup(duration_second = 0,
-    #                  start_delay = 0,
-    #                  parameters = parameters)
-    #
-    # cluster_diagnose(setup, level)
+    """Run performance tests based on ENV file."""
+    pass
 
 @click.group()
 def run_group():
@@ -263,7 +258,7 @@ def run(env, config_dir):
     """Run performance tests based on ENV file."""
     main_execute(env, config_dir)
 
-cli = click.CommandCollection(sources=[run_group, diagnostic])
+cli = click.CommandCollection(sources=[run_group])
 
 if __name__ == '__main__':
 
