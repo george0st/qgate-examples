@@ -227,7 +227,7 @@ def main_execute(env="cass.env", config_dir="config", only_cluster_diagnose = Fa
             if not env.lower().endswith(".env"):
                 env += ".env"
             env_count += 1
-            print(Fore.BLUE + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
+            print(Fore.LIGHTGREEN_EX + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
             if env_count > 1:
                 time.sleep(global_param['multiple_env_delay'])
             if only_cluster_diagnose:
