@@ -127,18 +127,18 @@ def prf_write(run_setup: RunSetup) -> ParallelProbe:
 
     return probe
 
-def diagnose(run_setup, diagnose):
+def cluster_diagnose(run_setup, level):
 
     cql = None
     try:
-        diagnose = CQLDiagnosePrint[diagnose.lower()]
-        if diagnose == CQLDiagnosePrint.off:
+        level = CQLDiagnosePrint[level.lower()]
+        if level == CQLDiagnosePrint.off:
             return
 
         cql = CQLAccess(run_setup)
         cql.open()
         status = CQLHealth(cql.cluster)
-        status.diagnose(diagnose)
+        status.diagnose(level)
     finally:
         if cql:
             cql.close()
@@ -176,7 +176,7 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict):
                      start_delay = global_param['executor_start_delay'],
                      parameters = parameters)
 
-    diagnose(setup, global_param['cluster_diagnose'])
+    cluster_diagnose(setup, global_param['cluster_diagnose'])
 
     generator.run_bulk_executor(parameters['bulk_list'],
                                 global_param['executors'],
