@@ -113,7 +113,6 @@ class CQLConfig:
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
         param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, CQLConfigSetting.BULK_LIST)
         param['keyspace'] = self._inherit_param("KEYSPACE", global_param, CQLConfigSetting.KEYSPACE)
-        param['executor_duration'] = int(self._inherit_param('EXECUTOR_DURATION', global_param, CQLConfigSetting.EXECUTOR_DURATION))
 
         if cql_helper.str2bool(self._config.get(adapter, "Off")):
             # connection setting

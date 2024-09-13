@@ -213,10 +213,10 @@ def exec_config(config, unique_id, global_param):
                   global_param,
                   param)
 
+
 def main_execute(env="cass.env", config_dir="config"):
 
     config = dotenv_values(os.path.join(config_dir, env))
-    #config = dotenv_values(os.path.join(config_dir,"local-cass-W1-min.env"))
     global_param = CQLConfig(config).get_global_params()
     if global_param:
         # multiple configurations
@@ -234,12 +234,7 @@ def main_execute(env="cass.env", config_dir="config"):
                         unique_id,
                         global_param)
     else:
-        # single configuration
-        global_param = CQLConfig().get_global_params(True)
-        exec_config(config,
-                    "",
-                    global_param)
-
+        print("Missing 'MULTIPLE_ENV' configuration")
 
 @click.group()
 def diagnostic():
@@ -251,6 +246,11 @@ def diagnostic():
 @click.option("-l", "--level", help="diagnose level, possible values 'short', 'full, 'extra' (default 'short')", default="short")
 def diagnose(env, config_dir, level):
     print("diagnose:", env, config_dir, level)
+    # setup = RunSetup(duration_second = 0,
+    #                  start_delay = 0,
+    #                  parameters = parameters)
+    #
+    # cluster_diagnose(setup, level)
 
 @click.group()
 def run_group():
