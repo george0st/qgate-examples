@@ -1,9 +1,9 @@
 import time
-import numpy as np
+from numpy import random
 import string
 
 
-def get_rng_generator(complex_init = True) -> np.random._generator.Generator:
+def get_rng_generator(complex_init = True) -> random._generator.Generator:
     """Create generator of random values with initiation"""
 
     # now and now_ms (as detail about miliseconds)
@@ -17,9 +17,9 @@ def get_rng_generator(complex_init = True) -> np.random._generator.Generator:
         ns_stop = time.perf_counter_ns()
 
         # create generator with more random seed (now, now_ms, cpu speed)
-        return np.random.default_rng([int(now), int(now_ms), ns_stop - ns_start, ns_stop])
+        return random.default_rng([int(now), int(now_ms), ns_stop - ns_start, ns_stop])
     else:
-        return np.random.default_rng([int(now), int(now_ms), ns_start])
+        return random.default_rng([int(now), int(now_ms), ns_start])
 
 
 def generate_id(id_size = 4):

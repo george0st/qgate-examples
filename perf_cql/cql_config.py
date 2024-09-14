@@ -1,8 +1,8 @@
 from cassandra import ConsistencyLevel
+from ast import literal_eval
 from enum import Enum
-import cql_helper
-import ast
 from os import path
+import cql_helper
 
 
 class CQLGraph(Enum):
@@ -69,7 +69,7 @@ class CQLConfig:
             param_name=f"{adapter}_{param_name}"
 
         if self._config.get(param_name, None):
-            return ast.literal_eval(self._config[param_name])
+            return literal_eval(self._config[param_name])
         else:
             # inheritage of param from global_param
             if global_param:
@@ -102,7 +102,7 @@ class CQLConfig:
         if global_param['multiple_env'] or force_default:
             # multiple configurations
 
-            global_param['executors'] = ast.literal_eval(self._config.get("EXECUTORS", CQLConfigSetting.EXECUTORS))
+            global_param['executors'] = literal_eval(self._config.get("EXECUTORS", CQLConfigSetting.EXECUTORS))
             global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', CQLConfigSetting.DETAIL_OUTPUT))
             global_param['generate_graph'] = self._config.get('GENERATE_GRAPH', CQLConfigSetting.GENERATE_GRAPH)
             global_param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', CQLConfigSetting.EXECUTOR_DURATION))
@@ -110,7 +110,7 @@ class CQLConfig:
             global_param['cluster_diagnose'] = self._config.get("CLUSTER_DIAGNOSE", CQLConfigSetting.CLUSTER_DIAGNOSE)
             global_param['cluster_diagnose_only'] = False
             global_param['keyspace'] = self._config.get("KEYSPACE", CQLConfigSetting.KEYSPACE)
-            global_param['bulk_list'] = ast.literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
+            global_param['bulk_list'] = literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
             global_param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', CQLConfigSetting.MULTIPLE_ENV_DELAY))
             return global_param
         else:
