@@ -6,7 +6,7 @@ from qgate_perf.parallel_executor import ParallelExecutor
 from qgate_perf.parallel_probe import ParallelProbe
 from qgate_perf.run_setup import RunSetup
 from dotenv import dotenv_values
-from cql_config import CQLConfig, CQLType
+from cql_config import CQLConfig, CQLType, CQLGraph
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
 import cql_helper
@@ -143,6 +143,17 @@ def cluster_diagnose(run_setup, level):
         if cql:
             cql.close()
 
+def generate_graphs(generator:ParallelExecutor, global_param):
+    """Generate graph based on setting"""
+    if global_param['generate_graph']==CQLGraph.perf:
+        generator.create_graph_perf(os.path.join(global_param['perf_dir'],"../output"), suppress_error = True)
+    elif global_param['generate_graph']==CQLGraph.exe:
+        generator.create_graph_exec(os.path.join(global_param['perf_dir'],"../output"), suppress_error = True)
+    elif global_param['generate_graph']==CQLGraph.all:
+        generator.create_graph(os.path.join(global_param['perf_dir'], "../output"), suppress_error=True)
+
+
+
 def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_cluster_diagnose = False):
 
     lbl = str(cql).split('.')[1]
@@ -184,7 +195,8 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_clus
                                 global_param['executors'],
                                 run_setup = setup)
 
-    generator.create_graph_perf(os.path.join(global_param['perf_dir'],"../output"), suppress_error = True)
+    generate_graphs(generator,global_param)
+    #generator.create_graph_perf(os.path.join(global_param['perf_dir'],"../output"), suppress_error = True)
 
 def exec_config(config, unique_id, global_param):
 
