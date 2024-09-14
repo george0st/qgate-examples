@@ -32,6 +32,15 @@ The other parameters with smaller importancy:
    - The detail output can be '_On_' (as default) or '_Off_'. 
      The detail output is useful for visualization of execution graph 
      (but it is without usage for performance graph)
+ - **GENERATE_GRAPH** (opt)
+   - The setting for graph generator can be '_Off_', '_Perf_' (as default),
+     '_Exe_' or '_All_'
+   - Note:
+     - '_Off_' it is without generation of graphs
+     - '_Perf_' generates graph about performances (operations/second and response times) 
+     - '_Exe_' generates graph about change of executors in time (it is useful 
+       visualization for tuning of value for '_EXECUTOR_START_DELAY_')
+     - '_All_' generates performance and executor graphs
  - **EXECUTOR_START_DELAY** (opt)
    - The synch time for run EACH PERFORMANCE TEST (value in seconds, 
      default is _0_). 
