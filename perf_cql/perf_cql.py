@@ -260,6 +260,42 @@ def main_execute(env="cass.env", perf_dir=".", only_cluster_diagnose = False, le
         print("Missing 'MULTIPLE_ENV' configuration")
 
 @click.group()
+def version_group():
+    pass
+
+@version_group.command()
+def version():
+    from qgate_perf import __version__ as perf_version
+    from qgate_graph import __version__ as graph_version
+    from numpy import __version__ as numpy_version
+    from prettytable import PrettyTable
+    from cassandra import __version__ as cassandra_version
+    from matplotlib import __version__ as matplotlibe_version
+    import version
+    import sys
+
+    table = PrettyTable()
+    table.border = True
+    table.header = True
+    table.padding_width = 1
+
+    table.field_names = ["Component", "Version"]
+    table.align = "l"
+
+    table.add_row(["perf_cql:", version.__version__])
+    table.add_row(["qgate_perf:", perf_version])
+    table.add_row(["qgate_graph:", graph_version])
+    table.add_row(["numpy:", numpy_version])
+    table.add_row(["cassandra-driver:", cassandra_version])
+    table.add_row(["matplotlib:", matplotlibe_version])
+    table.add_row(["python:", sys.version])
+
+#    table.sortby = "Component"
+    print(table)
+
+
+
+@click.group()
 def diagnose_group():
     pass
 
@@ -282,7 +318,7 @@ def run(env, perf_dir):
     """Run performance tests based on ENV file."""
     main_execute(env, perf_dir)
 
-cli = click.CommandCollection(sources=[run_group, diagnose_group])
+cli = click.CommandCollection(sources=[run_group, diagnose_group, version_group])
 
 if __name__ == '__main__':
     cli()
