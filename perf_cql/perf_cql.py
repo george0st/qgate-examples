@@ -290,11 +290,7 @@ def version():
     table.add_row(["cassandra-driver", cassandra_version])
     table.add_row(["matplotlib", matplotlibe_version])
     table.add_row(["python", sys.version])
-
-#    table.sortby = "Component"
     print(table)
-
-
 
 @click.group()
 def diagnose_group():
