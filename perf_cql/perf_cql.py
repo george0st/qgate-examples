@@ -155,9 +155,6 @@ def generate_graphs(generator:ParallelExecutor, global_param):
     elif level == CQLGraph.all:
         print("Generate graph: performance & execution...")
         generator.create_graph(path.join(global_param['perf_dir'], "../output"), suppress_error=True)
-    else:
-        print("Generate graph: Off")
-
 
 def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_cluster_diagnose = False):
 
@@ -263,6 +260,7 @@ def version_group():
 
 @version_group.command()
 def version():
+    """Show version of key components"""
     from qgate_perf import __version__ as perf_version
     from qgate_graph import __version__ as graph_version
     from numpy import __version__ as numpy_version
