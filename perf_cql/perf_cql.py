@@ -268,9 +268,10 @@ def version():
     from qgate_perf import __version__ as perf_version
     from qgate_graph import __version__ as graph_version
     from numpy import __version__ as numpy_version
-    from prettytable import PrettyTable
     from cassandra import __version__ as cassandra_version
     from matplotlib import __version__ as matplotlibe_version
+    from prettytable import PrettyTable
+    from colorama import Fore, Style
     import version
     import sys
 
@@ -282,13 +283,13 @@ def version():
     table.field_names = ["Component", "Version"]
     table.align = "l"
 
-    table.add_row(["perf_cql:", version.__version__])
-    table.add_row(["qgate_perf:", perf_version])
-    table.add_row(["qgate_graph:", graph_version])
-    table.add_row(["numpy:", numpy_version])
-    table.add_row(["cassandra-driver:", cassandra_version])
-    table.add_row(["matplotlib:", matplotlibe_version])
-    table.add_row(["python:", sys.version])
+    table.add_row([Fore.LIGHTRED_EX + "perf_cql"+ Style.RESET_ALL, Fore.LIGHTRED_EX + version.__version__+Style.RESET_ALL])
+    table.add_row(["qgate_perf", perf_version])
+    table.add_row(["qgate_graph", graph_version])
+    table.add_row(["numpy", numpy_version])
+    table.add_row(["cassandra-driver", cassandra_version])
+    table.add_row(["matplotlib", matplotlibe_version])
+    table.add_row(["python", sys.version])
 
 #    table.sortby = "Component"
     print(table)
