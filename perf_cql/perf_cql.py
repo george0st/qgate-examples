@@ -183,6 +183,7 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_clus
     generator.run_bulk_executor(parameters['bulk_list'],
                                 global_param['executors'],
                                 run_setup = setup)
+
     generator.create_graph_perf(os.path.join(global_param['perf_dir'],"../output"), suppress_error = True)
 
 def exec_config(config, unique_id, global_param):
