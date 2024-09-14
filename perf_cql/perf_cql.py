@@ -145,13 +145,19 @@ def cluster_diagnose(run_setup, level):
 
 def generate_graphs(generator:ParallelExecutor, global_param):
     """Generate graph based on setting"""
-    if global_param['generate_graph']==CQLGraph.perf:
-        generator.create_graph_perf(os.path.join(global_param['perf_dir'],"../output"), suppress_error = True)
-    elif global_param['generate_graph']==CQLGraph.exe:
-        generator.create_graph_exec(os.path.join(global_param['perf_dir'],"../output"), suppress_error = True)
-    elif global_param['generate_graph']==CQLGraph.all:
-        generator.create_graph(os.path.join(global_param['perf_dir'], "../output"), suppress_error=True)
 
+    level = CQLGraph[global_param['generate_graph'].lower()]
+    if level == CQLGraph.perf:
+        print("Generate graph: performance...")
+        generator.create_graph_perf(os.path.join(global_param['perf_dir'],"../output"), suppress_error = True)
+    elif level == CQLGraph.exe:
+        print("Generate graph: execution...")
+        generator.create_graph_exec(os.path.join(global_param['perf_dir'],"../output"), suppress_error = True)
+    elif level == CQLGraph.all:
+        print("Generate graph: performance & execution...")
+        generator.create_graph(os.path.join(global_param['perf_dir'], "../output"), suppress_error=True)
+    else:
+        print("Generate graph: Off")
 
 
 def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_cluster_diagnose = False):
@@ -195,7 +201,7 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_clus
                                 global_param['executors'],
                                 run_setup = setup)
 
-    generate_graphs(generator,global_param)
+    generate_graphs(generator, global_param)
     #generator.create_graph_perf(os.path.join(global_param['perf_dir'],"../output"), suppress_error = True)
 
 def exec_config(config, unique_id, global_param):

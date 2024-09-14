@@ -6,9 +6,10 @@ from os import path
 
 
 class CQLGraph(Enum):
-    perf = 1
-    exe = 2
-    all = 3
+    off = 1
+    perf = 2
+    exe = 3
+    all = 4
 
 class CQLType(Enum):
     ScyllaDB = 1
@@ -103,7 +104,7 @@ class CQLConfig:
 
             global_param['executors'] = ast.literal_eval(self._config.get("EXECUTORS", CQLConfigSetting.EXECUTORS))
             global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', CQLConfigSetting.DETAIL_OUTPUT))
-            global_param['generate_graph'] = self._config.get('GENERATE_GRAPH', CQLConfigSetting.GENERATE_GRAPH).lower()
+            global_param['generate_graph'] = self._config.get('GENERATE_GRAPH', CQLConfigSetting.GENERATE_GRAPH)
             global_param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', CQLConfigSetting.EXECUTOR_DURATION))
             global_param['executor_start_delay'] = int(self._config.get('EXECUTOR_START_DELAY', CQLConfigSetting.EXECUTOR_START_DELAY))
             global_param['cluster_diagnose'] = self._config.get("CLUSTER_DIAGNOSE", CQLConfigSetting.CLUSTER_DIAGNOSE)
