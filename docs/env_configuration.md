@@ -27,7 +27,7 @@ The main parameters for test execution, are:
    - The list of ENV files e.g. '_A.env, B.env, C.env, ..._' for processing
    - Expected content, see next chapter '_2. Single ENV setting_'
 
-The other parameters with smaller importancy:
+The other parameters with smaller importance:
  - **DETAIL_OUTPUT** (opt)
    - The detail output can be '_On_' (as default) or '_Off_'. 
      The detail output is useful for visualization of execution graph 
@@ -39,7 +39,7 @@ The other parameters with smaller importancy:
      - '_Off_' it is without generation of graphs
      - '_Perf_' generates graph about performances (operations/second and response times) 
      - '_Exe_' generates graph about change of executors in time (it is useful 
-       visualization for tuning of value for '_EXECUTOR_START_DELAY_')
+       visualization for tuning of value for parameter '_EXECUTOR_START_DELAY_')
      - '_All_' generates performance and executor graphs
  - **EXECUTOR_START_DELAY** (opt)
    - The synch time for run EACH PERFORMANCE TEST (value in seconds, 
@@ -132,7 +132,6 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
          [TWCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/twcs.html#twcs_options)
        - relevant setting for Write TEST_TYPE
 
- 
 ## NOTEs
 
  - The **network routing** will be used based on setting of 
