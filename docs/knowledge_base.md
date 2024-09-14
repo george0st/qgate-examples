@@ -8,8 +8,10 @@
    
 
  - **ReadTimeout**: Error from server: code=1200 [Coordinator node timed out waiting for replica nodes' responses]
-   - **Info**: Long execution time is needed, typically complex CQL which expected more execution time
-   - **Solution**: Change CQL or tune schema (tune where conditions, add indexes, etc.)
+   - **Info**: Long execution time on server side is needed, typically complex CQL which expected more execution time or network issue between nodes
+   - **Solution**: 
+     - Change CQL or tune schema (tune where conditions, add indexes, etc.)
+     - or focus on network quality
 
 
  - **OperationTimedOut**: errors={<Host: 10.117.19.5:9042 datacenter2>: ConnectionShutdown('Connection to 10.117.19.5:9042 was closed')}, last_host=10.117.19.6:9042
@@ -18,3 +20,12 @@
 
  - **OperationTimedOut**: errors={'10.129.53.154:9042': 'Client request timeout. See Session.execute[_async](timeout)'}, last_host=10.129.53.154:9042
    - TBD.
+
+
+ - **Unavailable**: Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ONE\" info={'consistency': 'ONE', 'required_replicas': 1, 'alive_replicas': 0}
+   - **Info**: Issue with cluster consistency
+
+
+
+ - **NoHostAvailable**: ('Unable to complete the operation against any hosts', {<Host: 10.117.19.5:9042 datacenter2>: ConnectionException('Host has been marked down or removed')})
+   - **Info**: Issue with cluster consistency
