@@ -37,6 +37,8 @@ class CQLConfigSetting:
     # The key parameters
     EXECUTOR_DURATION = "5"
     BULK_LIST = "[[200, 10]]"
+    BULK_LIST_W = "[[200, 10]]"
+    BULK_LIST_R = "[[1, 10]]"
     EXECUTORS = "[[1, 1, '1x threads'], [2, 1, '1x threads']]"
 
     # The other tuning
@@ -63,7 +65,7 @@ class CQLConfig:
     def __init__(self, config = {}):
         self._config = config
 
-    def _inherit_param_eval(self, param_name, global_param, param_name_default = None, adapter = None):
+    def _inherit_param_eval(self, param_name, global_param, global_param_name, param_name_default = None, adapter = None):
         """Get adapter from single or from global ENV"""
         if adapter:
             param_name=f"{adapter}_{param_name}"
@@ -71,14 +73,14 @@ class CQLConfig:
         if self._config.get(param_name, None):
             return literal_eval(self._config[param_name])
         else:
-            # inheritage of param from global_param
+            # inheritance of param from global_param
             if global_param:
-                if global_param.get(param_name.lower(), None):
-                    return global_param[param_name.lower()]
+                if global_param.get(global_param_name, None):
+                    return global_param[global_param_name]
             return param_name_default
 
 
-    def _inherit_param(self, param_name, global_param, param_name_default = None, adapter = None):
+    def _inherit_param(self, param_name, global_param, global_param_name, param_name_default = None, adapter = None):
         """Get adapter from single or from global ENV"""
 
         if adapter:
@@ -87,10 +89,10 @@ class CQLConfig:
         if self._config.get(param_name, None):
             return self._config[param_name]
         else:
-            # inheritage of param from global_param
+            # inheritance of param from global_param
             if global_param:
-                if global_param.get(param_name.lower(), None):
-                    return global_param[param_name.lower()]
+                if global_param.get(global_param_name, None):
+                    return global_param[global_param_name]
             return param_name_default
 
     def get_global_params(self, force_default = False):
@@ -110,7 +112,9 @@ class CQLConfig:
             global_param['cluster_diagnose'] = self._config.get("CLUSTER_DIAGNOSE", CQLConfigSetting.CLUSTER_DIAGNOSE)
             global_param['cluster_diagnose_only'] = False
             global_param['keyspace'] = self._config.get("KEYSPACE", CQLConfigSetting.KEYSPACE)
-            global_param['bulk_list'] = literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
+            #global_param['bulk_list'] = literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
+            global_param['bulk_list_r'] = literal_eval(self._config.get("BULK_LIST_R", CQLConfigSetting.BULK_LIST_R))
+            global_param['bulk_list_w'] = literal_eval(self._config.get("BULK_LIST_W", CQLConfigSetting.BULK_LIST_W))
             global_param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', CQLConfigSetting.MULTIPLE_ENV_DELAY))
             return global_param
         else:
@@ -121,8 +125,17 @@ class CQLConfig:
 
         # shared params for all providers
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
-        param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, CQLConfigSetting.BULK_LIST)
-        param['keyspace'] = self._inherit_param("KEYSPACE", global_param, CQLConfigSetting.KEYSPACE)
+        if param['test_type'] == "r":
+            param['bulk_list'] = self._inherit_param_eval("BULK_LIST",
+                                                          global_param,
+                                                          'bulk_list_r',
+                                                          CQLConfigSetting.BULK_LIST_R)
+        else:
+            param['bulk_list'] = self._inherit_param_eval("BULK_LIST",
+                                                          global_param,
+                                                          'bulk_list_w',
+                                                          CQLConfigSetting.BULK_LIST_W)
+        param['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
 
         if cql_helper.str2bool(self._config.get(adapter, "Off")):
             # connection setting

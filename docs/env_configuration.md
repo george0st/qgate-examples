@@ -10,9 +10,11 @@ The main parameters for test execution, are:
  - **EXECUTOR_DURATION** (opt)
    - The test duration for run EACH PERFORMANCE TEST (value in seconds, 
      default is _5_)
- - **BULK_LIST** (opt)
-   - The size of data bulk/bundle in format '_[[rows, columns], ...]_' 
-     (default is '_[[200, 10]]_')
+ - **BULK_LIST_R** (opt) and
+ - **BULK_LIST_W** (opt)
+   - The size of data bulk/bundle for READ and WRITE in format
+     '_[[rows, columns], ...]_' (default for READ '_[[200, 10]]_',
+     for WRITE '_[[1,10]]_')
    - NOTE: _[[200, 10]]_ means, that table will have 10 columns and will do
      - 200 insert/upsert operation during the test type Write
      - 200 select operation during the test type Read 
@@ -74,6 +76,10 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
    - NOTE: _[[200, 10]]_ means, that table will have 10 columns and will do
      - 200 insert/upsert operation during the test type Write
      - 200 select operation during the test type Read
+   - NOTE:
+     - if the value is not defined, the value will be used from multi ENV
+       (as global setting), from setting '_BULK_LIST_R_' for
+       '_TEST_TYPE = R_' or '_BULK_LIST_W_' for '_TEST_TYPE = W_' 
  - **KEYSPACE** (opt, inherit)
    - The name of keyspace for test (default is '_prftest_')
  - **XXX** is the value based on system '_SCYLLADB_', 
