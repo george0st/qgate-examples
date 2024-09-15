@@ -112,7 +112,6 @@ class CQLConfig:
             global_param['cluster_diagnose'] = self._config.get("CLUSTER_DIAGNOSE", CQLConfigSetting.CLUSTER_DIAGNOSE)
             global_param['cluster_diagnose_only'] = False
             global_param['keyspace'] = self._config.get("KEYSPACE", CQLConfigSetting.KEYSPACE)
-            #global_param['bulk_list'] = literal_eval(self._config.get("BULK_LIST", CQLConfigSetting.BULK_LIST))
             global_param['bulk_list_r'] = literal_eval(self._config.get("BULK_LIST_R", CQLConfigSetting.BULK_LIST_R))
             global_param['bulk_list_w'] = literal_eval(self._config.get("BULK_LIST_W", CQLConfigSetting.BULK_LIST_W))
             global_param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', CQLConfigSetting.MULTIPLE_ENV_DELAY))
@@ -123,21 +122,15 @@ class CQLConfig:
     def get_params(self, adapter, global_param):
         param={}
 
-        # shared params for all providers
-        param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
-        if param['test_type'] == "r":
-            param['bulk_list'] = self._inherit_param_eval("BULK_LIST",
-                                                          global_param,
-                                                          'bulk_list_r',
-                                                          CQLConfigSetting.BULK_LIST_R)
-        else:
-            param['bulk_list'] = self._inherit_param_eval("BULK_LIST",
-                                                          global_param,
-                                                          'bulk_list_w',
-                                                          CQLConfigSetting.BULK_LIST_W)
-        param['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
-
         if cql_helper.str2bool(self._config.get(adapter, "Off")):
+            # shared params for all providers
+            param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
+            if param['test_type'] == "r":
+                param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_r', CQLConfigSetting.BULK_LIST_R)
+            else:
+                param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_w', CQLConfigSetting.BULK_LIST_W)
+            param['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
+
             # connection setting
             param["ip"] = self._config.get(f"{adapter}_IP", CQLConfigSetting.IP).split(",")
             param["port"] = self._config.get(f"{adapter}_PORT", CQLConfigSetting.PORT)
@@ -165,7 +158,7 @@ class CQLConfig:
             param['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get(f"{adapter}_CONSISTENCY_LEVEL",
                                                                                           CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
 
-            # local data center for correct setting of balancing (RoundRobinPolicy or DCAwareRoundRobinPolicy)
+            # network balancing, local data center for correct setting of balancing (RoundRobinPolicy or DCAwareRoundRobinPolicy)
             param['local_dc'] = self._config.get(f"{adapter}_LB_LOCAL_DC", CQLConfigSetting.LB_LOCAL_DC)
 
             # label
