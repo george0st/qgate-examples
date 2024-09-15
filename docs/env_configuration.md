@@ -171,7 +171,7 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
 
 ### 2.1 Examples
 
-The example with two providers, Cassandra (is On) and ScyllaDB (is Off):
+The example with two providers, Cassandra (is On) and ScyllaDB (is On):
 ```
 TEST_TYPE = W
 BULK_LIST = [[100, 20]]
@@ -192,8 +192,8 @@ CASSANDRA_COMPACTION = UnifiedCompactionStrategy
 #CASSANDRA_COMPACTION_PARAMS = "'max_threshold': 32, 'min_threshold': 4"
 
 # ScyllaDB
-SCYLLADB = Off
-SCYLLADB_IP = localhost
+SCYLLADB = On
+SCYLLADB_IP = 10.124.0.18
 SCYLLADB_PORT= 9042
 SCYLLADB_REPLICATION_CLASS = SimpleStrategy
 SCYLLADB_REPLICATION_FACTOR = 1
