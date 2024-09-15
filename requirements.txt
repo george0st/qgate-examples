@@ -1,7 +1,7 @@
 # command line
 click~=8.1
 
-cassandra-driver==3.29.1
+cassandra-driver==3.29.2
 
 # numpy>2.0.1 requires higher version of python>=3.10 (not 3.9)
 numpy>=2.0.0,<=2.1.1
