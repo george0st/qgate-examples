@@ -252,7 +252,7 @@ def main_execute(env="cass.env", perf_dir=".", only_cluster_diagnose = False, le
                         unique_id,
                         global_param)
     else:
-        print("Missing 'MULTIPLE_ENV' configuration")
+        print("!!! Missing 'MULTIPLE_ENV' configuration !!!")
 
 @click.group()
 def version_group():
@@ -276,6 +276,7 @@ def version():
     table.border = True
     table.header = True
     table.padding_width = 1
+    #table.max_table_width=50
 
     table.field_names = ["Component", "Version"]
     table.align = "l"

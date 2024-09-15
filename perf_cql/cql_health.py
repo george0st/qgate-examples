@@ -25,7 +25,7 @@ class CQLHealth:
         elif level==CQLDiagnosePrint.full:
             self.print_status_full(status)
         elif level==CQLDiagnosePrint.extra:
-            self.print_status_short(status," ")
+            self.print_status_short(status)
             self.print_status_full(status)
         return status
 
@@ -63,7 +63,7 @@ class CQLHealth:
 
     #region DIAGNOSE private functions
 
-    def print_status_short(self, status, prefix_output ="  Cluster diagnose>> "):
+    def print_status_short(self, status, prefix_output = " "):
 
         node_down = []
         node_peer_down = []
