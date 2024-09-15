@@ -63,8 +63,9 @@ The other parameters with smaller importance:
    - The delay before switch to different config file (value in seconds,
      default is _0_)
 
-### 1.1 Example
+### 1.1 Examples
 
+The example with full setting:
 ```
 EXECUTOR_DURATION = 5
 BULK_LIST_W = [[200, 10]]
@@ -82,7 +83,7 @@ KEYSPACE = perftest
 MULTIPLE_ENV = cass-W1-low, cass-R1-low
 ```
 
-or minimalistic variant
+The minimalistic example (other values use default values):
 
 ```
 MULTIPLE_ENV = cass-W1-low, cass-R1-low
@@ -153,8 +154,11 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
        - relevant setting for Write TEST_TYPE
    - **XXX_COMPACTION_PARAMS** (opt)
      - The parameters for the compaction (without default as optional), value must be 
-       in **quotation marks** e.g _"'max_threshold': 32, 'min_threshold': 4"_ for
-       COMPACTION '_SizeTieredCompactionStrategy_' 
+       in **quotation marks** 
+     - Sample:
+       - _"'max_threshold': 32, 'min_threshold': 4"_ for
+         COMPACTION '_SizeTieredCompactionStrategy_'
+       - "TBD." for COMPACTION '_UnifiedCompactionStrategy_'
      - NOTE: 
        - detailed description see params
          [UCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/ucs.html#ucs_options), 
@@ -162,6 +166,50 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
          [LCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/lcs.html#lcs_options),
          [TWCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/twcs.html#twcs_options)
        - relevant setting for Write TEST_TYPE
+
+### 2.1 Examples
+
+The example with two providers, Cassandra (is On) and ScyllaDB (is Off):
+```
+TEST_TYPE = W
+BULK_LIST = [[100, 20]]
+
+# Cassandra
+CASSANDRA = On
+CASSANDRA_LABEL = local-1-low
+CASSANDRA_IP = localhost
+CASSANDRA_PORT = 9042
+CASSANDRA_USERNAME = cassandra
+CASSANDRA_PASSWORD = ../secrets/cassandra.txt
+CASSANDRA_REPLICATION_CLASS = SimpleStrategy
+CASSANDRA_REPLICATION_FACTOR = 1
+CASSANDRA_CONSISTENCY_LEVEL = ONE
+CASSANDRA_LB_LOCAL_DC = datacenter1
+CASSANDRA_COMPACTION = UnifiedCompactionStrategy
+#CASSANDRA_COMPACTION = SizeTieredCompactionStrategy
+#CASSANDRA_COMPACTION_PARAMS = "'max_threshold': 32, 'min_threshold': 4"
+
+# ScyllaDB
+SCYLLADB = Off
+SCYLLADB_IP = localhost
+SCYLLADB_PORT= 9042
+SCYLLADB_REPLICATION_CLASS = SimpleStrategy
+SCYLLADB_REPLICATION_FACTOR = 1
+SCYLLADB_CONSISTENCY_LEVEL = ONE
+```
+The shorter example with one provider:
+
+```
+TEST_TYPE = W
+
+# Cassandra
+CASSANDRA = On
+CASSANDRA_LABEL = local-1-low
+CASSANDRA_IP = localhost
+CASSANDRA_REPLICATION_CLASS = SimpleStrategy
+CASSANDRA_REPLICATION_FACTOR = 1
+CASSANDRA_CONSISTENCY_LEVEL = ONE
+```
 
 ## NOTEs
 
