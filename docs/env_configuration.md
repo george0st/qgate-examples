@@ -156,9 +156,11 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
      - The parameters for the compaction (without default as optional), value must be 
        in **quotation marks** 
      - Sample:
-       - _"'max_threshold': 32, 'min_threshold': 4"_ for
-         COMPACTION '_SizeTieredCompactionStrategy_'
-       - "TBD." for COMPACTION '_UnifiedCompactionStrategy_'
+       - The parameters for COMPACTION '_SizeTieredCompactionStrategy_'
+         - _"'max_threshold': 32, 'min_threshold': 4"_ for
+           COMPACTION '_SizeTieredCompactionStrategy_'
+       - The parameters for COMPACTION '_UnifiedCompactionStrategy_'
+         - _"'scaling_parameters': L4, L10"_
      - NOTE: 
        - detailed description see params
          [UCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/ucs.html#ucs_options), 
