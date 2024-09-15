@@ -276,7 +276,7 @@ def version():
     table.border = True
     table.header = True
     table.padding_width = 1
-    #table.max_table_width=50
+    table.max_table_width = 75
 
     table.field_names = ["Component", "Version"]
     table.align = "l"
