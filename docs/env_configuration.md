@@ -63,6 +63,31 @@ The other parameters with smaller importance:
    - The delay before switch to different config file (value in seconds,
      default is _0_)
 
+### 1.1 Example
+
+```
+EXECUTOR_DURATION = 5
+BULK_LIST_W = [[200, 10]]
+BULK_LIST_R = [[1, 10]]
+EXECUTORS = "[[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
+              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
+              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]"
+
+DETAIL_OUTPUT = True
+GENERATE_GRAPH = all
+EXECUTOR_START_DELAY = 0
+CLUSTER_DIAGNOSE = extra
+KEYSPACE = perftest
+
+MULTIPLE_ENV = cass-W1-low, cass-R1-low
+```
+
+or minimalistic variant
+
+```
+MULTIPLE_ENV = cass-W1-low, cass-R1-low
+```
+
 ## 2. Single ENV setting
 
 The configuration for connection to the specific CQL solution such as
