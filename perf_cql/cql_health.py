@@ -167,9 +167,7 @@ class CQLHealth:
                 if not node['schema_version'] == 'n/a':
                     if not short_schema.get(node['schema_version'], None):
                         short_schema[node['schema_version']] = generate_id(5, generator)
-                        continue
-                    else:
-                        continue
+                    continue
             short_schema[node['schema_version']] = "n/a"
         return short_schema
 
