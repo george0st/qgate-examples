@@ -6,7 +6,7 @@ import string
 def get_rng_generator(complex_init = True) -> random._generator.Generator:
     """Create generator of random values with initiation"""
 
-    # now and now_ms (as detail about miliseconds)
+    # now and now_ms (as detail about milliseconds)
     now = time.time()
     now_ms = (now - int(now)) * 1000000000
 
@@ -22,9 +22,14 @@ def get_rng_generator(complex_init = True) -> random._generator.Generator:
         return random.default_rng([int(now), int(now_ms), ns_start])
 
 
-def generate_id(id_size = 4):
-    """Generate random text sequence"""
-    generator = get_rng_generator(False)
+def generate_id(id_size = 4, generator: random._generator.Generator = None):
+    """Generate random text sequence
+
+    :param id_size:     size of generated id in charts (default is 4)
+    :param generator:   generator for usage, in case of None the new generator will be created
+    """
+    if not generator:
+        generator = get_rng_generator(False)
 
     sequence = list(string.ascii_lowercase + string.digits)
     return ''.join(generator.choice(sequence) for _ in range(id_size))

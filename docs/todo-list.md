@@ -1,3 +1,3 @@
  # TODO list
  
-1. Create shorter Synch for CQL Health
+1. Tracking network issue

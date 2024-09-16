@@ -2,6 +2,7 @@ from cassandra.cluster import Cluster
 from prettytable import PrettyTable
 from colorama import Fore, Style
 from enum import Enum
+from cql_helper import generate_id, get_rng_generator
 
 
 class CQLDiagnosePrint(Enum):
@@ -118,6 +119,10 @@ class CQLHealth:
         table.align = "l"
         table.align["Root"] = "c"
 
+        # use short schema version
+        shorter_schema = self._build_shorter_schema_version(status)
+
+        # create output
         for ip in status.keys():
             node = status[ip]
             color_prefix = ""
@@ -144,11 +149,27 @@ class CQLHealth:
                    f"{ip}",
                    node['location'],
                    f"{node['release_version']}",
-                   f"{color_prefix}{node['schema_version']}{color_suffix}",
+                   f"{color_prefix}{shorter_schema[node['schema_version']]}{color_suffix}",
                    f"{color_prefix}{node['root']}{color_suffix}"]
             table.add_row(row)
         table.sortby = "Location"
         print(table)
+
+    def _build_shorter_schema_version(self, status):
+        """Generate shorter schema version for better visualization
+        (in terminal 80 columns and 40 rows)"""
+        generator = get_rng_generator(False)
+        short_schema = {}
+
+        for ip in status.keys():
+            node = status[ip]
+            if node.get('schema_version', None):
+                if not node['schema_version'] == 'n/a':
+                    if not short_schema.get(node['schema_version'], None):
+                        short_schema[node['schema_version']] = generate_id(5, generator)
+                    continue
+            short_schema[node['schema_version']] = "n/a"
+        return short_schema
 
     def _get_status(self) -> dict:
         final_status = {}
