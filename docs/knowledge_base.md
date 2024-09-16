@@ -29,3 +29,6 @@
 
  - **NoHostAvailable**: ('Unable to complete the operation against any hosts', {<Host: 10.117.19.5:9042 datacenter2>: ConnectionException('Host has been marked down or removed')})
    - **Info**: Issue with cluster consistency
+
+
+NoHostAvailable: ('Unable to connect to any servers', {'10.129.53.159:9042': ConnectionShutdown('CRC mismatch on header 22f840. Received 85\", computed e3d12c.')})
