@@ -59,8 +59,9 @@ class CQLAccess:
                                     control_connection_timeout = Setting.TIMEOUT,
                                     idle_heartbeat_interval = Setting.TIMEOUT,
                                     connect_timeout = Setting.TIMEOUT,
-                                    #protocol_version = ProtocolVersion.V4)
-                                    protocol_version=ProtocolVersion.V5)
+                                    protocol_version = ProtocolVersion.V4)
+                                    # issue with 'CRC mismatch on header ...', not use protocol V5
+                                    # protocol_version = ProtocolVersion.V5)
 
     def create_session(self, timeout = Setting.TIMEOUT) -> Session:
         """Create new session"""
