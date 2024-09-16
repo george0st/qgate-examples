@@ -142,7 +142,7 @@ def cluster_diagnose(run_setup, level):
         if cql:
             cql.close()
 
-def generate_graphs(generator:ParallelExecutor, generate_graph_level, output_dir):
+def generate_graphs(generator: ParallelExecutor, generate_graph_level, output_dir):
     """Generate graph based on setting"""
 
     level = CQLGraph[generate_graph_level.lower()]
@@ -198,7 +198,9 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_clus
                                 run_setup = setup)
 
     # generate graphs
-    generate_graphs(generator, global_param['generate_graph'], path.join(global_param['perf_dir'], "../output"))
+    generate_graphs(generator,
+                    global_param['generate_graph'],
+                    path.join(global_param['perf_dir'], "../output"))
 
 def exec_config(config, unique_id, global_param):
 
@@ -261,10 +263,11 @@ def graph_group():
 
 @graph_group.command()
 @click.option("-l", "--level", help="can be 'Perf' (as default), 'Exe' or 'All'", default="perf")
-@click.option("-i", "--input_dir", help="input directory with *.txt files (default '.')", default=".")
-@click.option("-o", "--output_dir", help="output directory (default '../output')", default="../output")
-def graph(level, input_dir, output_dir):
-    #generate_graphs(generator, global_param['generate_graph'], path.join(global_param['perf_dir'], "../output"))
+@click.option("-d", "--dir", help="directory with *.txt file(s) (default '../output')", default="../output")
+def graph(level, dir):
+
+    # generator = ParallelExecutor(None,output_file=)
+    # generate_graphs(generator, level, dir)
     pass
 
 
