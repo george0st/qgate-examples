@@ -158,6 +158,7 @@ class CQLHealth:
     def _build_shorter_schema_version(self, status):
         """Generate shorter schema version for better visualization
         (in terminal 80 columns and 40 rows)"""
+
         generator = get_rng_generator(False)
         short_schema = {}
 

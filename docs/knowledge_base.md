@@ -29,3 +29,10 @@
 
  - **NoHostAvailable**: ('Unable to complete the operation against any hosts', {<Host: 10.117.19.5:9042 datacenter2>: ConnectionException('Host has been marked down or removed')})
    - **Info**: Issue with cluster consistency
+
+
+ - **NoHostAvailable**: ('Unable to connect to any servers', {'10.129.53.159:9042': ConnectionShutdown('CRC mismatch on header 22f840. Received 85\", computed e3d12c.')})
+ - **NoHostAvailable**: ('Unable to connect to any servers', {'10.129.53.159:9042': ConnectionShutdown('CRC mismatch on header 718a02. Received 85a8\", computed a7811f.')})
+   - **Info**: I got the issue during heavy performance tests. It is issue with CRC validation
+     (it has relation to consistency). I got the issue with _ProtocolVersion.V5_ under _Cassandra 5.0.0_
+   - **Solution**: Use lower and more stable protocol version e.g. _ProtocolVersion.V4_
