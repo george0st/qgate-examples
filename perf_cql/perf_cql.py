@@ -142,19 +142,19 @@ def cluster_diagnose(run_setup, level):
         if cql:
             cql.close()
 
-def generate_graphs(generator:ParallelExecutor, global_param):
+def generate_graphs(generator:ParallelExecutor, generate_graph_level, output_dir):
     """Generate graph based on setting"""
 
-    level = CQLGraph[global_param['generate_graph'].lower()]
+    level = CQLGraph[generate_graph_level.lower()]
     if level == CQLGraph.perf:
         print("Generate graph: performance...")
-        generator.create_graph_perf(path.join(global_param['perf_dir'],"../output"), suppress_error = True)
+        generator.create_graph_perf(output_dir, suppress_error = True)
     elif level == CQLGraph.exe:
         print("Generate graph: execution...")
-        generator.create_graph_exec(path.join(global_param['perf_dir'],"../output"), suppress_error = True)
+        generator.create_graph_exec(output_dir, suppress_error = True)
     elif level == CQLGraph.all:
         print("Generate graph: performance & execution...")
-        generator.create_graph(path.join(global_param['perf_dir'], "../output"), suppress_error=True)
+        generator.create_graph(output_dir, suppress_error=True)
 
 def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_cluster_diagnose = False):
 
@@ -197,7 +197,8 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_clus
                                 global_param['executors'],
                                 run_setup = setup)
 
-    generate_graphs(generator, global_param)
+    # generate graphs
+    generate_graphs(generator, global_param['generate_graph'], path.join(global_param['perf_dir'], "../output"))
 
 def exec_config(config, unique_id, global_param):
 
@@ -253,6 +254,19 @@ def main_execute(env="cass.env", perf_dir=".", only_cluster_diagnose = False, le
                         global_param)
     else:
         print("!!! Missing 'MULTIPLE_ENV' configuration !!!")
+
+@click.group()
+def graph_group():
+    pass
+
+@graph_group.command()
+@click.option("-l", "--level", help="can be 'Perf' (as default), 'Exe' or 'All'", default="perf")
+@click.option("-i", "--input_dir", help="input directory with *.txt files (default '.')", default=".")
+@click.option("-o", "--output_dir", help="output directory (default '../output')", default="../output")
+def graph(level, input_dir, output_dir):
+    #generate_graphs(generator, global_param['generate_graph'], path.join(global_param['perf_dir'], "../output"))
+    pass
+
 
 @click.group()
 def version_group():
@@ -313,7 +327,7 @@ def run(env, perf_dir):
     """Run performance tests based on ENV file."""
     main_execute(env, perf_dir)
 
-cli = click.CommandCollection(sources=[run_group, diagnose_group, version_group])
+cli = click.CommandCollection(sources=[run_group, diagnose_group, graph_group, version_group])
 
 if __name__ == '__main__':
     cli()
