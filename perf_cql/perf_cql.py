@@ -144,15 +144,15 @@ def cluster_diagnose(run_setup, level):
         if cql:
             cql.close()
 
-def generate_graphs(generator: ParallelExecutor, generate_graph_level, output_dir):
+def generate_graphs(generator: ParallelExecutor, generate_graph_scope, output_dir):
     """Generate graph based on setting"""
 
-    level = GraphScope[generate_graph_level.lower()]
-    if GraphScope.perf in level:
+    scope = GraphScope[generate_graph_scope.lower()]
+    if GraphScope.perf in scope:
         print("Generate graph: performance...")
         generator.create_graph_perf(output_dir, suppress_error = True)
 
-    if GraphScope.exe in level:
+    if GraphScope.exe in scope:
         print("Generate graph: execution...")
         generator.create_graph_exec(output_dir, suppress_error = True)
 
