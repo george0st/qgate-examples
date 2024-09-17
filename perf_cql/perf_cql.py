@@ -200,7 +200,7 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_clus
     # generate graphs
     generate_graphs(generator,
                     global_param['generate_graph'],
-                    path.join(global_param['perf_dir'], "../output"))
+                    path.join(global_param['perf_dir'], "..", "output"))
 
 def exec_config(config, unique_id, global_param):
 
