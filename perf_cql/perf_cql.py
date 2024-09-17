@@ -11,6 +11,7 @@ from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
 from cql_helper import get_rng_generator
 from cql_health import CQLHealth, CQLDiagnosePrint
+from glob import glob
 import click
 
 
@@ -150,6 +151,7 @@ def generate_graphs(generator: ParallelExecutor, generate_graph_level, output_di
     if GraphScope.perf in level:
         print("Generate graph: performance...")
         generator.create_graph_perf(output_dir, suppress_error = True)
+
     if GraphScope.exe in level:
         print("Generate graph: execution...")
         generator.create_graph_exec(output_dir, suppress_error = True)
@@ -260,20 +262,18 @@ def graph_group():
     pass
 
 @graph_group.command()
-@click.option("-l", "--level", help="can be 'Perf' (as default), 'Exe' or 'All'", default="perf")
+@click.option("-s", "--scope", help="scope of generation, can be 'Perf' (as default), 'Exe' or 'All'", default="perf")
 @click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
-def graph(level, perf_dir):
-    # iteration cross whole directory, focus on prf_*.txt
-
-    # for each file
-    # generator = ParallelExecutor(None,output_file=)
-    # ParallelExecutor.generate_graphs(generator, level, dir)
-
-    # or (static method)
-    # ParallelExecutor.generate_graphs(file, level, dir)
-
-    pass
-
+@click.option("-i", "--input_files", help="filter for performance files (default 'prf_*.txt')", default="prf_*.txt")
+def graph(scope, perf_dir, input_files):
+    """Generate graphs based on performance files"""
+    for file in glob(path.join(perf_dir, "..", "output", input_files)):
+        print(file)
+        for output in ParallelExecutor.create_graph_static(file,
+                                             path.join(perf_dir, "..", "output"),
+                                             GraphScope[scope.lower()],
+                                             suppress_error=True):
+            print("  ", output)
 
 @click.group()
 def version_group():
