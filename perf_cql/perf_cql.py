@@ -144,15 +144,15 @@ def cluster_diagnose(run_setup, level):
         if cql:
             cql.close()
 
-def generate_graphs(generator: ParallelExecutor, generate_graph_level, output_dir):
+def generate_graphs(generator: ParallelExecutor, generate_graph_scope, output_dir):
     """Generate graph based on setting"""
 
-    level = GraphScope[generate_graph_level.lower()]
-    if GraphScope.perf in level:
+    scope = GraphScope[generate_graph_scope.lower()]
+    if GraphScope.perf in scope:
         print("Generate graph: performance...")
         generator.create_graph_perf(output_dir, suppress_error = True)
 
-    if GraphScope.exe in level:
+    if GraphScope.exe in scope:
         print("Generate graph: execution...")
         generator.create_graph_exec(output_dir, suppress_error = True)
 
@@ -166,13 +166,13 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_clus
         generator = ParallelExecutor(prf_write,
                                      label=f"{lbl}{unique_id}-W{lbl_suffix}",
                                      detail_output=global_param['detail_output'],
-                                     output_file=path.join(global_param['perf_dir'],f"../output/prf_{lbl.lower()}-W{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
+                                     output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-W{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
                                      init_each_bulk=True)
     elif parameters['test_type']=='r':  # READ perf test
         generator = ParallelExecutor(prf_read,
                                      label=f"{lbl}{unique_id}-R{lbl_suffix}",
                                      detail_output=global_param['detail_output'],
-                                     output_file=path.join(global_param['perf_dir'],f"../output/prf_{lbl.lower()}-R{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
+                                     output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-R{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
                                      init_each_bulk=True)
     # TODO: Add read & write
     # elif parameters['test_type']=='rw' or parameters['test_type']=='wr':    # READ & WRITE perf test
@@ -200,7 +200,7 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_clus
     # generate graphs
     generate_graphs(generator,
                     global_param['generate_graph'],
-                    path.join(global_param['perf_dir'], "../output"))
+                    path.join(global_param['perf_dir'], "..", "output"))
 
 def exec_config(config, unique_id, global_param):
 
