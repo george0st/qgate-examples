@@ -166,13 +166,13 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_clus
         generator = ParallelExecutor(prf_write,
                                      label=f"{lbl}{unique_id}-W{lbl_suffix}",
                                      detail_output=global_param['detail_output'],
-                                     output_file=path.join(global_param['perf_dir'],f"../output/prf_{lbl.lower()}-W{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
+                                     output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-W{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
                                      init_each_bulk=True)
     elif parameters['test_type']=='r':  # READ perf test
         generator = ParallelExecutor(prf_read,
                                      label=f"{lbl}{unique_id}-R{lbl_suffix}",
                                      detail_output=global_param['detail_output'],
-                                     output_file=path.join(global_param['perf_dir'],f"../output/prf_{lbl.lower()}-R{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
+                                     output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-R{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
                                      init_each_bulk=True)
     # TODO: Add read & write
     # elif parameters['test_type']=='rw' or parameters['test_type']=='wr':    # READ & WRITE perf test
