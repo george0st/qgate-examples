@@ -160,7 +160,7 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
          - _"'max_threshold': 32, 'min_threshold': 4"_ for
            COMPACTION '_SizeTieredCompactionStrategy_'
        - The parameters for COMPACTION '_UnifiedCompactionStrategy_'
-         - _"'scaling_parameters': L4, L10"_
+         - _"'scaling_parameters': 'L4, L10'"_ or _"'scaling_parameters': 'T8, T4, N, L4'"_
      - NOTE: 
        - detailed description see params
          [UCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/ucs.html#ucs_options), 

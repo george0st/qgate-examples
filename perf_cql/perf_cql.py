@@ -3,13 +3,15 @@ from os import path
 from cassandra.query import BatchStatement, BoundStatement
 from qgate_perf.parallel_executor import ParallelExecutor
 from qgate_perf.parallel_probe import ParallelProbe
+from qgate_perf.executor_helper import GraphScope
 from qgate_perf.run_setup import RunSetup
 from dotenv import dotenv_values
-from cql_config import CQLConfig, CQLType, CQLGraph
+from cql_config import CQLConfig, CQLType
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
 from cql_helper import get_rng_generator
 from cql_health import CQLHealth, CQLDiagnosePrint
+from glob import glob
 import click
 
 
@@ -142,19 +144,17 @@ def cluster_diagnose(run_setup, level):
         if cql:
             cql.close()
 
-def generate_graphs(generator:ParallelExecutor, global_param):
+def generate_graphs(generator: ParallelExecutor, generate_graph_level, output_dir):
     """Generate graph based on setting"""
 
-    level = CQLGraph[global_param['generate_graph'].lower()]
-    if level == CQLGraph.perf:
+    level = GraphScope[generate_graph_level.lower()]
+    if GraphScope.perf in level:
         print("Generate graph: performance...")
-        generator.create_graph_perf(path.join(global_param['perf_dir'],"../output"), suppress_error = True)
-    elif level == CQLGraph.exe:
+        generator.create_graph_perf(output_dir, suppress_error = True)
+
+    if GraphScope.exe in level:
         print("Generate graph: execution...")
-        generator.create_graph_exec(path.join(global_param['perf_dir'],"../output"), suppress_error = True)
-    elif level == CQLGraph.all:
-        print("Generate graph: performance & execution...")
-        generator.create_graph(path.join(global_param['perf_dir'], "../output"), suppress_error=True)
+        generator.create_graph_exec(output_dir, suppress_error = True)
 
 def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_cluster_diagnose = False):
 
@@ -197,7 +197,10 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_clus
                                 global_param['executors'],
                                 run_setup = setup)
 
-    generate_graphs(generator, global_param)
+    # generate graphs
+    generate_graphs(generator,
+                    global_param['generate_graph'],
+                    path.join(global_param['perf_dir'], "../output"))
 
 def exec_config(config, unique_id, global_param):
 
@@ -255,13 +258,30 @@ def main_execute(env="cass.env", perf_dir=".", only_cluster_diagnose = False, le
         print("!!! Missing 'MULTIPLE_ENV' configuration !!!")
 
 @click.group()
+def graph_group():
+    pass
+
+@graph_group.command()
+@click.option("-s", "--scope", help="scope of generation, can be 'Perf' (as default), 'Exe' or 'All'", default="perf")
+@click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
+@click.option("-i", "--input_files", help="filter for performance files (default 'prf_*.txt')", default="prf_*.txt")
+def graph(scope, perf_dir, input_files):
+    """Generate graphs based on performance files"""
+    for file in glob(path.join(perf_dir, "..", "output", input_files)):
+        print(file)
+        for output in ParallelExecutor.create_graph_static(file,
+                                             path.join(perf_dir, "..", "output"),
+                                             GraphScope[scope.lower()],
+                                             suppress_error=True):
+            print(" ", output)
+
+@click.group()
 def version_group():
     pass
 
 @version_group.command()
 def version():
     """Show versions of key components"""
-
     from qgate_perf import __version__ as perf_version
     from qgate_graph import __version__ as graph_version
     from numpy import __version__ as numpy_version
@@ -313,7 +333,7 @@ def run(env, perf_dir):
     """Run performance tests based on ENV file."""
     main_execute(env, perf_dir)
 
-cli = click.CommandCollection(sources=[run_group, diagnose_group, version_group])
+cli = click.CommandCollection(sources=[run_group, diagnose_group, graph_group, version_group])
 
 if __name__ == '__main__':
     cli()
