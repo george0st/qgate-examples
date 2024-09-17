@@ -273,7 +273,7 @@ def graph(scope, perf_dir, input_files):
                                              path.join(perf_dir, "..", "output"),
                                              GraphScope[scope.lower()],
                                              suppress_error=True):
-            print("  ", output)
+            print(" ", output)
 
 @click.group()
 def version_group():
@@ -282,7 +282,6 @@ def version_group():
 @version_group.command()
 def version():
     """Show versions of key components"""
-
     from qgate_perf import __version__ as perf_version
     from qgate_graph import __version__ as graph_version
     from numpy import __version__ as numpy_version
