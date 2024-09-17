@@ -5,11 +5,11 @@ from os import path
 import cql_helper
 
 
-class CQLGraph(Enum):
-    off = 1
-    perf = 2
-    exe = 3
-    all = 4
+# class CQLGraph(Enum):
+#     off = 1
+#     perf = 2
+#     exe = 3
+#     all = 4
 
 class CQLType(Enum):
     ScyllaDB = 1

@@ -3,9 +3,10 @@ from os import path
 from cassandra.query import BatchStatement, BoundStatement
 from qgate_perf.parallel_executor import ParallelExecutor
 from qgate_perf.parallel_probe import ParallelProbe
+from qgate_perf.executor_helper import GraphScope
 from qgate_perf.run_setup import RunSetup
 from dotenv import dotenv_values
-from cql_config import CQLConfig, CQLType, CQLGraph
+from cql_config import CQLConfig, CQLType
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
 from cql_helper import get_rng_generator
@@ -145,16 +146,13 @@ def cluster_diagnose(run_setup, level):
 def generate_graphs(generator: ParallelExecutor, generate_graph_level, output_dir):
     """Generate graph based on setting"""
 
-    level = CQLGraph[generate_graph_level.lower()]
-    if level == CQLGraph.perf:
+    level = GraphScope[generate_graph_level.lower()]
+    if GraphScope.perf in level:
         print("Generate graph: performance...")
         generator.create_graph_perf(output_dir, suppress_error = True)
-    elif level == CQLGraph.exe:
+    if GraphScope.exe in level:
         print("Generate graph: execution...")
         generator.create_graph_exec(output_dir, suppress_error = True)
-    elif level == CQLGraph.all:
-        print("Generate graph: performance & execution...")
-        generator.create_graph(output_dir, suppress_error=True)
 
 def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_cluster_diagnose = False):
 
