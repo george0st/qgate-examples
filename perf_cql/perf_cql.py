@@ -263,11 +263,17 @@ def graph_group():
 
 @graph_group.command()
 @click.option("-l", "--level", help="can be 'Perf' (as default), 'Exe' or 'All'", default="perf")
-@click.option("-d", "--dir", help="directory with *.txt file(s) (default '../output')", default="../output")
-def graph(level, dir):
+@click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
+def graph(level, perf_dir):
+    # iteration cross whole directory, focus on prf_*.txt
 
+    # for each file
     # generator = ParallelExecutor(None,output_file=)
-    # generate_graphs(generator, level, dir)
+    # ParallelExecutor.generate_graphs(generator, level, dir)
+
+    # or (static method)
+    # ParallelExecutor.generate_graphs(file, level, dir)
+
     pass
 
 
