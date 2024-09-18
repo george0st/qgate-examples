@@ -1,7 +1,6 @@
  # TODO list
  
-2. Add to the outputs also samples from PERF and EXE graphs
-  - update README.md
+
 3. Implementation of 99 percentile, 95 percentile
 4. Time measurement with better precision
   - improvement on side of qgate-perf
