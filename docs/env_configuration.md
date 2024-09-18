@@ -136,7 +136,7 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
          (e.g. if replication factor is 3 in 2 data centers, it means, that we
          have totally 6 copies of data in cluster)
    - **XXX_CONSISTENCY_LEVEL** (opt)
-     - The consistency level can be cross
+     - The consistency level for application (valid for Read/Write operations) can be:
        - Only local data center: '_LOCAL_ONE_', '_LOCAL_QUORUM_' (as default), '_LOCAL_SERIAL_' 
        - All data centers: '_EACH_QUORUM_', '_QUORUM_', '_SERIAL_', '_ALL_'
        - Some data center:  '_ONE_', '_TWO_', '_THREE_', '_ANY_'

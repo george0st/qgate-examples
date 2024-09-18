@@ -43,7 +43,8 @@ def prf_read(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_row):
             items+="?,"
 
-        select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0 IN ({items[:-1]}) and fn1 IN ({items[:-1]})")
+        select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0 IN ({items[:-1]}) and fn1 IN ({items[:-1]})",
+                                           keyspace=run_setup['keyspace'])
         bound = BoundStatement(select_statement, consistency_level=run_setup['consistency_level'])
 
         while True:
@@ -99,7 +100,8 @@ def prf_write(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
             items+="?,"
-        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]})")
+        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]})",
+                                           keyspace=run_setup['keyspace'])
         batch = BatchStatement(consistency_level=run_setup['consistency_level'])
 
         while True:
@@ -266,7 +268,7 @@ def graph_group():
 @click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
 @click.option("-i", "--input_files", help="filter for performance files (default 'prf_*.txt')", default="prf_*.txt")
 def graph(scope, perf_dir, input_files):
-    """Generate graphs based on performance files"""
+    """Generate graphs based on performance file(s)."""
     for file in glob(path.join(perf_dir, "..", "output", input_files)):
         print(file)
         for output in ParallelExecutor.create_graph_static(file,
@@ -281,7 +283,7 @@ def version_group():
 
 @version_group.command()
 def version():
-    """Show versions of key components"""
+    """Versions of key components."""
     from qgate_perf import __version__ as perf_version
     from qgate_graph import __version__ as graph_version
     from numpy import __version__ as numpy_version
@@ -319,7 +321,7 @@ def diagnose_group():
 @click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
 @click.option("-l", "--level", help="level of diagnose, acceptable values 'short', 'full', 'extra' (default 'short')", default="short")
 def diagnose(env, perf_dir, level):
-    """Run only diagnostic for connection based on ENV file."""
+    """Diagnostic for cluster based on ENV file(s)."""
     main_execute(env, perf_dir, True, level)
 
 @click.group()
@@ -330,7 +332,7 @@ def run_group():
 @click.option("-e", "--env", help="name of ENV file (default 'cass.env')", default="cass.env")
 @click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
 def run(env, perf_dir):
-    """Run performance tests based on ENV file."""
+    """Run performance tests based on ENV file(s)."""
     main_execute(env, perf_dir)
 
 cli = click.CommandCollection(sources=[run_group, diagnose_group, graph_group, version_group])

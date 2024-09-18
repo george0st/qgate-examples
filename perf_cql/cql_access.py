@@ -47,7 +47,7 @@ class CQLAccess:
                                     auth_provider = auth_provider,
                                     load_balancing_policy = load_balancing_policy,
                                     control_connection_timeout = Setting.TIMEOUT,
-                                    idle_heartbeat_interval = Setting.TIMEOUT,
+                                    #idle_heartbeat_interval = Setting.TIMEOUT,
                                     connect_timeout = Setting.TIMEOUT,
                                     protocol_version = ProtocolVersion.V4)
         else:
@@ -57,7 +57,7 @@ class CQLAccess:
                                     auth_provider = auth_provider,
                                     load_balancing_policy = load_balancing_policy,
                                     control_connection_timeout = Setting.TIMEOUT,
-                                    idle_heartbeat_interval = Setting.TIMEOUT,
+                                    #idle_heartbeat_interval = Setting.TIMEOUT,
                                     connect_timeout = Setting.TIMEOUT,
                                     protocol_version = ProtocolVersion.V4)
                                     # issue with 'CRC mismatch on header ...', not use protocol V5
