@@ -43,7 +43,7 @@ def prf_read(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_row):
             items+="?,"
 
-        select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0 IN ({items[:-1]}) and fn1 IN ({items[:-1]})",
+        select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0 IN ({items[:-1]}) and fn1 IN ({items[:-1]});",
                                            keyspace=run_setup['keyspace'])
         bound = BoundStatement(select_statement, consistency_level=run_setup['consistency_level'])
 
@@ -100,7 +100,7 @@ def prf_write(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
             items+="?,"
-        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]})",
+        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]});",
                                            keyspace=run_setup['keyspace'])
         batch = BatchStatement(consistency_level=run_setup['consistency_level'])
 
