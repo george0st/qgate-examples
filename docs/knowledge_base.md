@@ -25,8 +25,7 @@
  - **Unavailable**: Error from server: code=1000 [Unavailable exception] message=\"Cannot achieve consistency level ONE\" info={'consistency': 'ONE', 'required_replicas': 1, 'alive_replicas': 0}
    - **Info**: Issue with cluster consistency
 
-
-
+    
  - **NoHostAvailable**: ('Unable to complete the operation against any hosts', {<Host: 10.117.19.5:9042 datacenter2>: ConnectionException('Host has been marked down or removed')})
    - **Info**: Issue with cluster consistency
 
