@@ -2,7 +2,7 @@ from cassandra.cluster import Cluster
 from prettytable import PrettyTable
 from colorama import Fore, Style
 from enum import Enum
-from cql_helper import generate_id, get_rng_generator
+from cql_helper import generate_id, get_rng_generator, bool2str
 
 
 class CQLDiagnosePrint(Enum):
@@ -188,7 +188,7 @@ class CQLHealth:
                 state = node_status.get(key, None)
 
                 final_status_info = {
-                    'status': "UP" if node['is_up'] else "DOWN",
+                    'status': bool2str(node['is_up'], "UP", "DOWN", "??"),
                     'peer_status': state['status'] if state else "DOWN",
                     'location': f"{node['data_center']}/{node['rack']}",
                     'schema_version': state["schema_version"] if state else "n/a",
