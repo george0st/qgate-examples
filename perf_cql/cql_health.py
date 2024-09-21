@@ -106,11 +106,11 @@ class CQLHealth:
         release_versions = str([key for key in release_versions.keys()])
         down_info = unclear_info = node_info = ""
         if len(node_down) > 0:
-            node_info = f"{len(node_down)}x Down{'' if len(node_down)==0 else ' '+ Fore.LIGHTRED_EX + str(node_down)+Style.RESET_ALL}"
+            node_info = f"{Fore.LIGHTRED_EX}{len(node_down)}x Down{'' if len(node_down)==0 else ' '+ str(node_down)+Style.RESET_ALL}"
         if len(node_unclear) > 0:
             if len(node_info) > 0:
                 node_info+=", "
-            node_info += f"{len(node_unclear)}x ?{'' if len(node_unclear)==0 else ' '+ Fore.CYAN + str(node_unclear)+Style.RESET_ALL}"
+            node_info += f"{Fore.CYAN}{len(node_unclear)}x ?{'' if len(node_unclear)==0 else ' '+ str(node_unclear)+Style.RESET_ALL}"
         if len(node_info)>0:
             node_info = f"({node_info})"
         print(f"{prefix_output}Nodes: {len(status)}x {node_info},"
