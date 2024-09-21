@@ -1,6 +1,5 @@
  # TODO list
  
-
 3. Implementation of 99 percentile, 95 percentile
 4. Time measurement with better precision
   - improvement on side of qgate-perf

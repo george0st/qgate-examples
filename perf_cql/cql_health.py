@@ -67,6 +67,7 @@ class CQLHealth:
     def print_status_short(self, status, prefix_output = " "):
 
         node_down = []
+        node_unclear = []
         node_peer_down = []
         schemas = {}
         root_schema = None
@@ -78,6 +79,8 @@ class CQLHealth:
             # info from metadata
             if node['status'] == "DOWN":
                 node_down.append(ip)
+            elif node['status'] == "?":
+                node_unclear.append(ip)
 
             # info from system.peers
             if node['peer_status'] == "DOWN":
@@ -99,10 +102,18 @@ class CQLHealth:
             else:
                 release_versions[node['release_version']] = 1
 
-        missing_schemas=len(status)-schemas.get(root_schema,0)
-        release_versions=str([key for key in release_versions.keys()])
-        down_info=f"{len(node_down)}x Down{'' if len(node_down)==0 else ' '+ Fore.LIGHTRED_EX + str(node_down)+Style.RESET_ALL}"
-        print(f"{prefix_output}Nodes: {len(status)}x ({down_info}),"
+        missing_schemas = len(status)-schemas.get(root_schema,0)
+        release_versions = str([key for key in release_versions.keys()])
+        node_info = ""
+        if len(node_down) > 0:
+            node_info = f"{Fore.LIGHTRED_EX}{len(node_down)}x Down{'' if len(node_down)==0 else ' ' + str(node_down) + Style.RESET_ALL}"
+        if len(node_unclear) > 0:
+            if len(node_info) > 0:
+                node_info += ", "
+            node_info += f"{Fore.CYAN}{len(node_unclear)}x ?{'' if len(node_unclear)==0 else ' ' + str(node_unclear) + Style.RESET_ALL}"
+        if len(node_info) > 0:
+            node_info = f"({node_info})"
+        print(f"{prefix_output}Nodes: {len(status)}x {node_info},"
               f" Gossip: {'0x' if len(node_peer_down) == 0 else Fore.CYAN + str(len(node_peer_down)) + 'x' + Style.RESET_ALL}"
               f"{'' if len(node_peer_down) == 0 else ' ' + Fore.CYAN + str(node_peer_down) + Style.RESET_ALL},"             
               f" Not-synch: {'0x' if missing_schemas == 0 else Fore.CYAN + str(missing_schemas) + 'x' + Style.RESET_ALL},"
@@ -138,6 +149,9 @@ class CQLHealth:
 
             if node['status'] == "DOWN":
                 color_status_prefix = Fore.LIGHTRED_EX
+                color_status_suffix = Style.RESET_ALL
+            elif node['status'] == "?":
+                color_status_prefix = Fore.CYAN
                 color_status_suffix = Style.RESET_ALL
 
             if node['peer_status'] == "DOWN":
@@ -188,7 +202,7 @@ class CQLHealth:
                 state = node_status.get(key, None)
 
                 final_status_info = {
-                    'status': bool2str(node['is_up'], "UP", "DOWN", "??"),
+                    'status': bool2str(node['is_up'], "UP", "DOWN", "?"),
                     'peer_status': state['status'] if state else "DOWN",
                     'location': f"{node['data_center']}/{node['rack']}",
                     'schema_version': state["schema_version"] if state else "n/a",
