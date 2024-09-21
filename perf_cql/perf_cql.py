@@ -265,7 +265,7 @@ def graph_group():
 @graph_group.command()
 @click.option("-s", "--scope", help="scope of generation, can be 'Perf' (as default), 'Exe' or 'All'", default="perf")
 @click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
-@click.option("-i", "--input_files", help="filter for performance files (default 'prf_*.txt')", default="prf_*.txt")
+@click.option("-i", "--input_files", help="filter for performance files in '--perf_dir' (default 'prf_*.txt')", default="prf_*.txt")
 def graph(scope, perf_dir, input_files):
     """Generate graphs based on performance file(s)."""
     for file in glob(path.join(perf_dir, "..", "output", input_files)):
