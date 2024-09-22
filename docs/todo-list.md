@@ -6,3 +6,4 @@
 5. Console output with shorter readable form (number precision 
    4 places, datetime only with time)
 7. Add CLI for check size of all or specific keyspaces
+8. Add variable precision for numbers in graph
