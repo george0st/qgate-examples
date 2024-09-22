@@ -15,9 +15,9 @@ The sample outputs:
 
  - **PRF-\*1-low-\*.png**
    - CASSANDRA_LABEL = 1-low
-   - CASSANDRA_REPLICATION_CLASS = **SimpleStrategy** 
-   - CASSANDRA_REPLICATION_FACTOR = **1** 
-   - CASSANDRA_CONSISTENCY_LEVEL = **ONE**
+   - CASSANDRA_REPLICATION_CLASS = **NetworkTopologyStrategy** 
+   - CASSANDRA_REPLICATION_FACTOR = **2** 
+   - CASSANDRA_CONSISTENCY_LEVEL = **LOCAL_ONE**
 
  - **PRF-\*2-med-\*.png**
    - CASSANDRA_LABEL = 2-med
