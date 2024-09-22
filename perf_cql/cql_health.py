@@ -240,7 +240,7 @@ class CQLHealth:
         query = "SELECT peer, schema_version, release_version, rpc_address FROM system.peers;"
         rows = session.execute(query)
 
-        # Process the results
+        # Info from other nodes
         for row in rows:
             node_info = {
                 'status': 'UP' if row.rpc_address else 'DOWN',
@@ -253,7 +253,7 @@ class CQLHealth:
             }
             nodes[node_info['peer']]=node_info
 
-        # Include the local node information
+        # Info from local node also
         local_query = "SELECT schema_version, rpc_address, release_version FROM system.local;"
         local_row = session.execute(local_query).one()
         local_node_info = {
