@@ -31,17 +31,17 @@ single ENV settings (single ENV setting can rewrite global setting).
 
 ### 1.2 Global setting about connection 
 
-It is not necessity to specify these setting in each 
-single ENV file):
+It is possible to specify these settings as global (and will
+be applied to each single ENV file):
 
-   - **XXX_IP** (opt)
+   - **IP** (opt)
      - The list of IP addresses separated by a comma, 
        e.g. '_10.129.53.159, 10.129.53.153, ..._' (default is '_localhost_')
-   - **XXX_PORT** (opt)
+   - **PORT** (opt)
      - The port name (default is _9042_)
-   - **XXX_USERNAME** (opt)
+   - **USERNAME** (opt)
       - The username for login (default is '_cassandra_')
-   - **XXX_PASSWORD** (opt)
+   - **PASSWORD** (opt)
       - The path to the file with password for login 
         (default is password value '_cassandra_')
 

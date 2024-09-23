@@ -109,6 +109,20 @@ class CQLConfig:
             global_param['bulk_list_r'] = literal_eval(self._config.get("BULK_LIST_R", CQLConfigSetting.BULK_LIST_R))
             global_param['bulk_list_w'] = literal_eval(self._config.get("BULK_LIST_W", CQLConfigSetting.BULK_LIST_W))
             global_param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', CQLConfigSetting.MULTIPLE_ENV_DELAY))
+
+            # global connection & login
+            global_param["ip"] = self._config.get("IP", CQLConfigSetting.IP).split(",")
+            global_param["port"] = self._config.get("PORT", CQLConfigSetting.PORT)
+
+            # login setting
+            if self._config.get("SECURE_CONNECT_BUNDLE", None):
+                global_param["secure_connect_bundle"] = self._config["SECURE_CONNECT_BUNDLE"]
+            global_param['username'] = self._config.get("USERNAME", CQLConfigSetting.USERNAME)
+            if self._config.get("PASSWORD", None):
+                global_param['password'] = cql_helper.read_file(path.join(global_param['perf_dir'], self._config["PASSWORD"]))
+            else:
+                global_param['password'] = CQLConfigSetting.PASSWORD
+
             return global_param
         else:
             return None
@@ -128,10 +142,10 @@ class CQLConfig:
             # connection setting
             param["ip"] = self._config.get(f"{adapter}_IP", CQLConfigSetting.IP).split(",")
             param["port"] = self._config.get(f"{adapter}_PORT", CQLConfigSetting.PORT)
-            if self._config.get(f"{adapter}_SECURE_CONNECT_BUNDLE", None):
-                param["secure_connect_bundle"] = self._config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
 
             # login setting
+            if self._config.get(f"{adapter}_SECURE_CONNECT_BUNDLE", None):
+                param["secure_connect_bundle"] = self._config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
             param['username'] = self._config.get(f"{adapter}_USERNAME", CQLConfigSetting.USERNAME)
             if self._config.get(f"{adapter}_PASSWORD", None):
                 param['password'] = cql_helper.read_file(path.join(global_param['perf_dir'], self._config[f"{adapter}_PASSWORD"]))
