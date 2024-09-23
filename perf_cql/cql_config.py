@@ -89,7 +89,7 @@ class CQLConfig:
                     return global_param[global_param_name]
             return param_name_default
 
-    def get_global_params(self, force_default = False):
+    def get_global_params(self, force_default = False, perf_dir = None):
 
         global_param={}
 
@@ -109,6 +109,19 @@ class CQLConfig:
             global_param['bulk_list_r'] = literal_eval(self._config.get("BULK_LIST_R", CQLConfigSetting.BULK_LIST_R))
             global_param['bulk_list_w'] = literal_eval(self._config.get("BULK_LIST_W", CQLConfigSetting.BULK_LIST_W))
             global_param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', CQLConfigSetting.MULTIPLE_ENV_DELAY))
+
+            # global connection & login
+            if self._config.get("IP", None):
+                global_param["ip"] = self._config["IP"]
+            if self._config.get("PORT", None):
+                global_param["port"] = self._config["PORT"]
+            if self._config.get("SECURE_CONNECT_BUNDLE", None):
+                global_param["secure_connect_bundle"] = self._config["SECURE_CONNECT_BUNDLE"]
+            if self._config.get("USERNAME", None):
+                global_param['username'] = self._config["USERNAME"]
+            if self._config.get("PASSWORD", None):
+                global_param['password'] = self._config["PASSWORD"]
+
             return global_param
         else:
             return None
@@ -125,18 +138,19 @@ class CQLConfig:
                 param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_w', CQLConfigSetting.BULK_LIST_W)
             param['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
 
-            # connection setting
-            param["ip"] = self._config.get(f"{adapter}_IP", CQLConfigSetting.IP).split(",")
-            param["port"] = self._config.get(f"{adapter}_PORT", CQLConfigSetting.PORT)
-            if self._config.get(f"{adapter}_SECURE_CONNECT_BUNDLE", None):
-                param["secure_connect_bundle"] = self._config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
+            # connection setting (relation to global_param)
+            param["ip"] = self._inherit_param(f"{adapter}_IP", global_param, 'ip', CQLConfigSetting.IP).split(",")
+            param["port"] = self._inherit_param(f"{adapter}_PORT", global_param, 'port', CQLConfigSetting.PORT)
 
-            # login setting
-            param['username'] = self._config.get(f"{adapter}_USERNAME", CQLConfigSetting.USERNAME)
-            if self._config.get(f"{adapter}_PASSWORD", None):
-                param['password'] = cql_helper.read_file(path.join(global_param['perf_dir'], self._config[f"{adapter}_PASSWORD"]))
-            else:
-                param['password'] = CQLConfigSetting.PASSWORD
+            # login setting (relation to global_param)
+            secure_connect_bundle = self._inherit_param(f"{adapter}_SECURE_CONNECT_BUNDLE", global_param, 'secure_connect_bundle')
+            if secure_connect_bundle:
+                param['secure_connect_bundle'] = secure_connect_bundle
+            username = self._inherit_param(f"{adapter}_USERNAME", global_param,'username', CQLConfigSetting.USERNAME)
+            if username:
+                param['username'] = username
+            password_path = self._inherit_param(f"{adapter}_PASSWORD", global_param, 'password')
+            param['password'] = cql_helper.read_file(password_path) if password_path else CQLConfigSetting.PASSWORD
 
             # replication setting
             param['replication_class'] = self._config.get(f"{adapter}_REPLICATION_CLASS", CQLConfigSetting.REPLICATION_CLASS)

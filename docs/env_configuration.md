@@ -5,7 +5,7 @@
 The configuration define global setting and relation to the many 
 single ENV settings (single ENV setting can rewrite global setting).
 
-The main parameters for test execution, are:
+### 1.1 The main parameters for test execution
 
  - **EXECUTOR_DURATION** (opt)
    - The test duration for run EACH PERFORMANCE TEST (value in seconds, 
@@ -29,7 +29,24 @@ The main parameters for test execution, are:
    - The list of ENV files e.g. '_A.env, B.env, C.env, ..._' for processing
    - Expected content, see next chapter '_2. Single ENV setting_'
 
-The other parameters with smaller importance:
+### 1.2 Global setting about connection 
+
+It is possible to specify these settings as global (and it will
+be applied to each single ENV file):
+
+   - **IP** (opt)
+     - The list of IP addresses separated by a comma, 
+       e.g. '_10.129.53.159, 10.129.53.153, ..._' (default is '_localhost_')
+   - **PORT** (opt)
+     - The port name (default is _9042_)
+   - **USERNAME** (opt)
+      - The username for login (default is '_cassandra_')
+   - **PASSWORD** (opt)
+      - The path to the file with password for login 
+        (default is password value '_cassandra_')
+
+### 1.3 The other parameters with smaller importance
+
  - **DETAIL_OUTPUT** (opt)
    - The detail output can be '_On_' (as default) or '_Off_'. 
      The detail output is useful for visualization of execution graph 
