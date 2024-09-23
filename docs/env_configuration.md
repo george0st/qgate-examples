@@ -129,14 +129,14 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
    '_CASSANDRA_', '_ASTRADB_', '_COSMOSDB_'
    - **XXX_LABEL** (opt)
      - The label used in output file name (default is '_local_')
-   - **XXX_IP** (opt)
+   - **XXX_IP** (opt, inherit)
      - The list of IP addresses separated by a comma, 
        e.g. '_10.129.53.159, 10.129.53.153, ..._' (default is '_localhost_')
-   - **XXX_PORT** (opt)
+   - **XXX_PORT** (opt, inherit)
      - The port value (default is _9042_)
-   - **XXX_USERNAME** (opt)
+   - **XXX_USERNAME** (opt, inherit)
       - The username for login (default is '_cassandra_')
-   - **XXX_PASSWORD** (opt)
+   - **XXX_PASSWORD** (opt, inherit)
       - The path to the file with password for login 
         (default is password value '_cassandra_')
    - **XXX_REPLICATION_CLASS** (opt)
