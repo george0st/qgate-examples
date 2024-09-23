@@ -113,8 +113,6 @@ class CQLConfig:
             # global connection & login
             global_param["ip"] = self._config.get("IP", CQLConfigSetting.IP).split(",")
             global_param["port"] = self._config.get("PORT", CQLConfigSetting.PORT)
-
-            # login setting
             if self._config.get("SECURE_CONNECT_BUNDLE", None):
                 global_param["secure_connect_bundle"] = self._config["SECURE_CONNECT_BUNDLE"]
             global_param['username'] = self._config.get("USERNAME", CQLConfigSetting.USERNAME)
