@@ -31,7 +31,7 @@ single ENV settings (single ENV setting can rewrite global setting).
 
 ### 1.2 Global setting about connection 
 
-It is possible to specify these settings as global (and will
+It is possible to specify these settings as global (and it will
 be applied to each single ENV file):
 
    - **IP** (opt)
