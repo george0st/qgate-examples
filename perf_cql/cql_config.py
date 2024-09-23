@@ -112,7 +112,7 @@ class CQLConfig:
 
             # global connection & login
             if self._config.get("IP", None):
-                global_param["ip"] = self._config["IP"].split(",")
+                global_param["ip"] = self._config["IP"]
             if self._config.get("PORT", None):
                 global_param["port"] = self._config["PORT"]
             if self._config.get("SECURE_CONNECT_BUNDLE", None):
@@ -145,10 +145,14 @@ class CQLConfig:
             #param["port"] = self._config.get(f"{adapter}_PORT", CQLConfigSetting.PORT)
 
             # login setting
-            param["secure_connect_bundle"] = self._inherit_param(f"{adapter}_SECURE_CONNECT_BUNDLE", global_param, 'secure_connect_bundle')
+            secure_connect_bundle = self._inherit_param(f"{adapter}_SECURE_CONNECT_BUNDLE", global_param, 'secure_connect_bundle')
+            if secure_connect_bundle:
+                param['secure_connect_bundle'] = secure_connect_bundle
             #if self._config.get(f"{adapter}_SECURE_CONNECT_BUNDLE", None):
                 #param["secure_connect_bundle"] = self._config[f"{adapter}_SECURE_CONNECT_BUNDLE"]
-            param["username"] = self._inherit_param(f"{adapter}_USERNAME", global_param,'username', CQLConfigSetting.USERNAME)
+            username = self._inherit_param(f"{adapter}_USERNAME", global_param,'username', CQLConfigSetting.USERNAME)
+            if username:
+                param['username'] = username
             #param['username'] = self._config.get(f"{adapter}_USERNAME", CQLConfigSetting.USERNAME)
             # if self._config.get(f"{adapter}_PASSWORD", None):
             #     param['password'] = cql_helper.read_file(path.join(global_param['perf_dir'], self._config[f"{adapter}_PASSWORD"]))
