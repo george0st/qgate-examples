@@ -235,7 +235,7 @@ def exec_config(config, unique_id, global_param):
 
 def main_execute(env="cass.env", perf_dir=".", only_cluster_diagnose = False, level = "short"):
 
-    global_param = CQLConfig(dotenv_values(path.join(perf_dir, "config", env))).get_global_params()
+    global_param = CQLConfig(dotenv_values(path.join(perf_dir, "config", env))).get_global_params(perf_dir=perf_dir)
     if global_param:
         # multiple configurations
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
