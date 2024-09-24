@@ -1,15 +1,16 @@
 from cassandra import ConsistencyLevel
 from ast import literal_eval
-from enum import Enum
+from enum import Enum, Flag
 from os import path
+from colorama import Fore, Style
 import cql_helper
 
 
-class CQLType(Enum):
-    ScyllaDB = 1
-    Cassandra = 2
-    AstraDB = 3
-    CosmosDB = 4
+class CQLAdapter(Flag):
+    scylladb = 1
+    cassandra = 2
+    astradb = 4
+    cosmosdb = 8
 
 class ConsistencyHelper:
     name_to_value = {
@@ -29,6 +30,7 @@ class ConsistencyHelper:
 class CQLConfigSetting:
 
     # The key parameters
+    ADAPTER = "Cassandra"
     EXECUTOR_DURATION = "5"
     BULK_LIST = "[[200, 10]]"
     BULK_LIST_W = "[[200, 10]]"
@@ -57,6 +59,7 @@ class CQLConfigSetting:
 class CQLConfig:
 
     def __init__(self, config = {}):
+        """Processing/Parsing of dictionary parameters from config/ENV files"""
         self._config = config
 
     def _inherit_param_eval(self, param_name, global_param, global_param_name, param_name_default = None, adapter = None):
@@ -89,6 +92,14 @@ class CQLConfig:
                     return global_param[global_param_name]
             return param_name_default
 
+    def _get_adapter(self, global_param) -> str:
+        """Get adapter type or setup default adapter (in case of unsupported adapter)"""
+        adapter = self._inherit_param("ADAPTER", global_param, 'adapter')
+        if not adapter in CQLAdapter.__members__:
+            print(Fore.LIGHTRED_EX, f"!!! Unsupported ADAPTER '{adapter}', we switched to the default adapter 'Cassandra' (please, repair your ENV file) !!!", Style.RESET_ALL)
+            return CQLAdapter[CQLConfigSetting.ADAPTER.lower()]
+        return CQLAdapter[adapter.lower()]
+
     def get_global_params(self, force_default = False, perf_dir = None):
 
         global_param={}
@@ -98,6 +109,7 @@ class CQLConfig:
         if global_param['multiple_env'] or force_default:
             # multiple configurations
 
+            global_param['adapter'] = self._config.get("ADAPTER", None)
             global_param['executors'] = literal_eval(self._config.get("EXECUTORS", CQLConfigSetting.EXECUTORS))
             global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', CQLConfigSetting.DETAIL_OUTPUT))
             global_param['generate_graph'] = self._config.get('GENERATE_GRAPH', CQLConfigSetting.GENERATE_GRAPH)
@@ -126,52 +138,48 @@ class CQLConfig:
         else:
             return None
 
-    def get_params(self, adapter, global_param):
+    def get_params(self, global_param) -> dict:
         param={}
-
-        if cql_helper.str2bool(self._config.get(adapter, "Off")):
-            # shared params for all providers
-            param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
-            if param['test_type'] == "r":
-                param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_r', CQLConfigSetting.BULK_LIST_R)
-            else:
-                param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_w', CQLConfigSetting.BULK_LIST_W)
-            param['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
-
-            # connection setting (relation to global_param)
-            param["ip"] = self._inherit_param(f"{adapter}_IP", global_param, 'ip', CQLConfigSetting.IP).split(",")
-            param["port"] = self._inherit_param(f"{adapter}_PORT", global_param, 'port', CQLConfigSetting.PORT)
-
-            # login setting (relation to global_param)
-            secure_connect_bundle = self._inherit_param(f"{adapter}_SECURE_CONNECT_BUNDLE", global_param, 'secure_connect_bundle')
-            if secure_connect_bundle:
-                param['secure_connect_bundle'] = secure_connect_bundle
-            username = self._inherit_param(f"{adapter}_USERNAME", global_param,'username', CQLConfigSetting.USERNAME)
-            if username:
-                param['username'] = username
-            password_path = self._inherit_param(f"{adapter}_PASSWORD", global_param, 'password')
-            param['password'] = cql_helper.read_file(password_path) if password_path else CQLConfigSetting.PASSWORD
-
-            # replication setting
-            param['replication_class'] = self._config.get(f"{adapter}_REPLICATION_CLASS", CQLConfigSetting.REPLICATION_CLASS)
-            param['replication_factor'] = self._config.get(f"{adapter}_REPLICATION_FACTOR", CQLConfigSetting.REPLICATION_FACTOR)
-
-            # compaction
-            if self._config.get(f"{adapter}_COMPACTION", None):
-                param['compaction'] = self._config[f"{adapter}_COMPACTION"]
-            if self._config.get(f"{adapter}_COMPACTION_PARAMS", None):
-                param['compaction_params'] = self._config[f"{adapter}_COMPACTION_PARAMS"]
-
-            # consistency level
-            param['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get(f"{adapter}_CONSISTENCY_LEVEL",
-                                                                                          CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
-
-            # network balancing, local data center for correct setting of balancing (RoundRobinPolicy or DCAwareRoundRobinPolicy)
-            param['local_dc'] = self._config.get(f"{adapter}_LB_LOCAL_DC", CQLConfigSetting.LB_LOCAL_DC)
-
-            # label
-            param['label'] = self._config.get(f"{adapter}_LABEL", CQLConfigSetting.LABEL)
-
-            return param
+        param['adapter'] = self._get_adapter(global_param)
+        param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
+        if param['test_type'] == "r":
+            param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_r', CQLConfigSetting.BULK_LIST_R)
         else:
-            return None
+            param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_w', CQLConfigSetting.BULK_LIST_W)
+        param['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
+
+        # connection setting (relation to global_param)
+        param["ip"] = self._inherit_param("IP", global_param, 'ip', CQLConfigSetting.IP).split(",")
+        param["port"] = self._inherit_param("PORT", global_param, 'port', CQLConfigSetting.PORT)
+
+        # login setting (relation to global_param)
+        secure_connect_bundle = self._inherit_param("SECURE_CONNECT_BUNDLE", global_param,'secure_connect_bundle')
+        if secure_connect_bundle:
+            param['secure_connect_bundle'] = secure_connect_bundle
+        username = self._inherit_param("USERNAME", global_param, 'username', CQLConfigSetting.USERNAME)
+        if username:
+            param['username'] = username
+        password_path = self._inherit_param("PASSWORD", global_param, 'password')
+        param['password'] = cql_helper.read_file(password_path) if password_path else CQLConfigSetting.PASSWORD
+
+        # replication setting
+        param['replication_class'] = self._config.get("REPLICATION_CLASS", CQLConfigSetting.REPLICATION_CLASS)
+        param['replication_factor'] = self._config.get("REPLICATION_FACTOR", CQLConfigSetting.REPLICATION_FACTOR)
+
+        # compaction
+        if self._config.get("COMPACTION", None):
+            param['compaction'] = self._config["COMPACTION"]
+        if self._config.get("COMPACTION_PARAMS", None):
+            param['compaction_params'] = self._config["COMPACTION_PARAMS"]
+
+        # consistency level
+        param['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get("CONSISTENCY_LEVEL",
+                                                                                      CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
+
+        # network balancing, local data center for correct setting of balancing (RoundRobinPolicy or DCAwareRoundRobinPolicy)
+        param['local_dc'] = self._config.get("LB_LOCAL_DC", CQLConfigSetting.LB_LOCAL_DC)
+
+        # label
+        param['label'] = self._config.get("LABEL", CQLConfigSetting.LABEL)
+
+        return param

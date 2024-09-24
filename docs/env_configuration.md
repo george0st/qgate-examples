@@ -141,114 +141,98 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
        '_TEST_TYPE = R_' or '_BULK_LIST_W_' for '_TEST_TYPE = W_' 
  - **KEYSPACE** (opt, inherit)
    - The name of keyspace for test (default is '_prftest_')
- - **XXX** is the value based on system '_SCYLLADB_', 
-   '_CASSANDRA_', '_ASTRADB_', '_COSMOSDB_'
-   - **XXX_LABEL** (opt)
-     - The label used in output file name (default is '_local_')
-   - **XXX_IP** (opt, inherit)
-     - The list of IP addresses separated by a comma, 
-       e.g. '_10.129.53.159, 10.129.53.153, ..._' (default is '_localhost_')
-   - **XXX_PORT** (opt, inherit)
-     - The port value (default is _9042_)
-   - **XXX_SECURE_CONNECT_BUNDLE** (opt, inherit)
-     - The connection based on SECURE_CONNECT_BUNDLE, it is a useful
-       way for AstraDB.
-     - NOTE: It is typically used instead of IP and PORT definition
-   - **XXX_USERNAME** (opt, inherit)
-      - The username for login (default is '_cassandra_')
-   - **XXX_PASSWORD** (opt, inherit)
-      - The path to the file with password for login 
-        (default is password value '_cassandra_')
-   - **XXX_REPLICATION_CLASS** (opt)
-     - The replication class can be '_SimpleStrategy_' or 
-       '_NetworkTopologyStrategy_' (as default)
-     - NOTE: 
-       - detailed description see [DataStax Replication](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeReplication.html)
-       - relevant setting for Write TEST_TYPE
-   - **XXX_REPLICATION_FACTOR** (opt)
-     - The amount of replicas (default is _3_)
-     - NOTE:
-       - relevant setting for Write TEST_TYPE
-       - replication factor is applied for each data center under the cluster
-         (e.g. if replication factor is 3 in 2 data centers, it means, that we
-         have totally 6 copies of data in cluster)
-   - **XXX_CONSISTENCY_LEVEL** (opt)
-     - The consistency level for application (valid for Read/Write operations) can be:
-       - Only local data center: '_LOCAL_ONE_', '_LOCAL_QUORUM_' (as default), '_LOCAL_SERIAL_' 
-       - All data centers: '_EACH_QUORUM_', '_QUORUM_', '_SERIAL_', '_ALL_'
-       - Some data center:  '_ONE_', '_TWO_', '_THREE_', '_ANY_'
-     - NOTE: detailed description see [DataStax Consistency](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
-   - **XXX_LB_LOCAL_DC** (opt)
-     - The name of local data center for correct balancing 
-       (default is '_datacenter1_')
-   - **XXX_COMPACTION** (opt)
-     - The type of compaction (without default as optional), expected values
-       '_UnifiedCompactionStrategy_', '_SizeTieredCompactionStrategy_',
-       '_LeveledCompactionStrategy_', '_TimeWindowCompactionStrategy_'
-     - NOTE: 
-       - detailed description see [Apache Compaction](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/index.html),
-         [DataStax Compaction](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/operations/opsConfigureCompaction.html)
-       - relevant setting for Write TEST_TYPE
-   - **XXX_COMPACTION_PARAMS** (opt)
-     - The parameters for the compaction (without default as optional), value must be 
-       in **quotation marks** 
-     - Sample:
-       - The parameters for COMPACTION '_SizeTieredCompactionStrategy_'
-         - _"'max_threshold': 32, 'min_threshold': 4"_ for
-           COMPACTION '_SizeTieredCompactionStrategy_'
-       - The parameters for COMPACTION '_UnifiedCompactionStrategy_'
-         - _"'scaling_parameters': 'L4, L10'"_ or _"'scaling_parameters': 'T8, T4, N, L4'"_
-     - NOTE: 
-       - detailed description see params
-         [UCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/ucs.html#ucs_options), 
-         [STCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/stcs.html#stcs_options),
-         [LCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/lcs.html#lcs_options),
-         [TWCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/twcs.html#twcs_options)
-       - relevant setting for Write TEST_TYPE
+ - **LABEL** (opt)
+   - The label used in output file name (default is '_local_')
+ - **IP** (opt, inherit)
+   - The list of IP addresses separated by a comma, 
+     e.g. '_10.129.53.159, 10.129.53.153, ..._' (default is '_localhost_')
+ - **PORT** (opt, inherit)
+   - The port value (default is _9042_)
+ - **SECURE_CONNECT_BUNDLE** (opt, inherit)
+   - The connection based on SECURE_CONNECT_BUNDLE, it is a useful
+     way for AstraDB.
+   - NOTE: It is typically used instead of IP and PORT definition
+ - **USERNAME** (opt, inherit)
+    - The username for login (default is '_cassandra_')
+ - **PASSWORD** (opt, inherit)
+    - The path to the file with password for login 
+      (default is password value '_cassandra_')
+ - **REPLICATION_CLASS** (opt)
+   - The replication class can be '_SimpleStrategy_' or 
+     '_NetworkTopologyStrategy_' (as default)
+   - NOTE: 
+     - detailed description see [DataStax Replication](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeReplication.html)
+     - relevant setting for Write TEST_TYPE
+ - **REPLICATION_FACTOR** (opt)
+   - The amount of replicas (default is _3_)
+   - NOTE:
+     - relevant setting for Write TEST_TYPE
+     - replication factor is applied for each data center under the cluster
+       (e.g. if replication factor is 3 in 2 data centers, it means, that we
+       have totally 6 copies of data in cluster)
+ - **CONSISTENCY_LEVEL** (opt)
+   - The consistency level for application (valid for Read/Write operations) can be:
+     - Only local data center: '_LOCAL_ONE_', '_LOCAL_QUORUM_' (as default), '_LOCAL_SERIAL_' 
+     - All data centers: '_EACH_QUORUM_', '_QUORUM_', '_SERIAL_', '_ALL_'
+     - Some data center:  '_ONE_', '_TWO_', '_THREE_', '_ANY_'
+   - NOTE: detailed description see [DataStax Consistency](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
+ - **LB_LOCAL_DC** (opt)
+   - The name of local data center for correct balancing 
+     (default is '_datacenter1_')
+ - **COMPACTION** (opt)
+   - The type of compaction (without default as optional), expected values
+     '_UnifiedCompactionStrategy_', '_SizeTieredCompactionStrategy_',
+     '_LeveledCompactionStrategy_', '_TimeWindowCompactionStrategy_'
+   - NOTE: 
+     - detailed description see [Apache Compaction](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/index.html),
+       [DataStax Compaction](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/operations/opsConfigureCompaction.html)
+     - relevant setting for Write TEST_TYPE
+ - **COMPACTION_PARAMS** (opt)
+   - The parameters for the compaction (without default as optional), value must be 
+     in **quotation marks** 
+   - Sample:
+     - The parameters for COMPACTION '_SizeTieredCompactionStrategy_'
+       - _"'max_threshold': 32, 'min_threshold': 4"_ for
+         COMPACTION '_SizeTieredCompactionStrategy_'
+     - The parameters for COMPACTION '_UnifiedCompactionStrategy_'
+       - _"'scaling_parameters': 'L4, L10'"_ or _"'scaling_parameters': 'T8, T4, N, L4'"_
+   - NOTE: 
+     - detailed description see params
+       [UCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/ucs.html#ucs_options), 
+       [STCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/stcs.html#stcs_options),
+       [LCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/lcs.html#lcs_options),
+       [TWCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/twcs.html#twcs_options)
+     - relevant setting for Write TEST_TYPE
 
 ### 2.1 Examples
 
-The example with two providers, Cassandra (is On) and ScyllaDB (is On):
+The example of configuration (focus on setting in single ENV file):
 ```
 TEST_TYPE = W
 BULK_LIST = [[100, 20]]
 
-# Cassandra
-CASSANDRA = On
-CASSANDRA_LABEL = local-1-low
-CASSANDRA_IP = localhost
-CASSANDRA_PORT = 9042
-CASSANDRA_USERNAME = cassandra
-CASSANDRA_PASSWORD = ../secrets/cassandra.txt
-CASSANDRA_REPLICATION_CLASS = SimpleStrategy
-CASSANDRA_REPLICATION_FACTOR = 1
-CASSANDRA_CONSISTENCY_LEVEL = ONE
-CASSANDRA_LB_LOCAL_DC = datacenter1
-CASSANDRA_COMPACTION = UnifiedCompactionStrategy
-#CASSANDRA_COMPACTION = SizeTieredCompactionStrategy
-#CASSANDRA_COMPACTION_PARAMS = "'max_threshold': 32, 'min_threshold': 4"
-
-# ScyllaDB
-SCYLLADB = On
-SCYLLADB_IP = 10.124.0.18
-SCYLLADB_PORT= 9042
-SCYLLADB_REPLICATION_CLASS = SimpleStrategy
-SCYLLADB_REPLICATION_FACTOR = 1
-SCYLLADB_CONSISTENCY_LEVEL = ONE
+LABEL = local-1-low
+IP = localhost
+PORT = 9042
+USERNAME = cassandra
+PASSWORD = ../secrets/cassandra.txt
+REPLICATION_CLASS = SimpleStrategy
+REPLICATION_FACTOR = 1
+CONSISTENCY_LEVEL = ONE
+LB_LOCAL_DC = datacenter1
+COMPACTION = UnifiedCompactionStrategy
 ```
-The shorter example with one provider (used global setting for connection):
+The shorter example (with usage global setting for connection):
 
 ```
 TEST_TYPE = W
 
-# Cassandra
-CASSANDRA = On
-CASSANDRA_LABEL = 1-low
-CASSANDRA_REPLICATION_CLASS = NetworkTopologyStrategy
-CASSANDRA_REPLICATION_FACTOR = 2
-CASSANDRA_CONSISTENCY_LEVEL = LOCAL_ONE
-CASSANDRA_LB_LOCAL_DC = datacenter1
-CASSANDRA_COMPACTION = UnifiedCompactionStrategy
+LABEL = 1-low
+REPLICATION_CLASS = NetworkTopologyStrategy
+REPLICATION_FACTOR = 2
+CONSISTENCY_LEVEL = LOCAL_ONE
+LB_LOCAL_DC = datacenter1
+COMPACTION = UnifiedCompactionStrategy
 ```
 
 ## NOTEs
@@ -257,4 +241,4 @@ CASSANDRA_COMPACTION = UnifiedCompactionStrategy
    replication factor 
    - _RoundRobinPolicy_ (for REPLICATION_FACTOR = 1)
    - _DCAwareRoundRobinPolicy_ (for CASSANDRA_REPLICATION_FACTOR > 1) 
-     with local data center based on value XXX_LB_LOCAL_DC
+     with local data center based on value LB_LOCAL_DC

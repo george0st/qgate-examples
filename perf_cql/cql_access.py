@@ -3,7 +3,7 @@ from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster, Session
 from cassandra import ProtocolVersion
 from cassandra.policies import DCAwareRoundRobinPolicy, RoundRobinPolicy
-from cql_config import CQLType
+from cql_config import CQLAdapter
 
 
 class Setting:
@@ -74,7 +74,7 @@ class CQLAccess:
         session = None
         try:
             session = self.create_session(Setting.TIMEOUT_CREATE_MODEL)
-            if self._run_setup["cql"] != CQLType.AstraDB:
+            if self._run_setup["adapter"] != CQLAdapter.astradb:
                 if self._run_setup['replication_factor']:
                     # Drop key space
                     session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']};")

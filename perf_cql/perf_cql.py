@@ -6,7 +6,7 @@ from qgate_perf.parallel_probe import ParallelProbe
 from qgate_perf.executor_helper import GraphScope
 from qgate_perf.run_setup import RunSetup
 from dotenv import dotenv_values
-from cql_config import CQLConfig, CQLType
+from cql_config import CQLConfig, CQLAdapter
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
 from cql_helper import get_rng_generator
@@ -157,9 +157,9 @@ def generate_graphs(generator: ParallelExecutor, generate_graph_scope, output_di
         print("Generate graph: execution...")
         generator.create_graph_exec(output_dir, suppress_error = True)
 
-def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_cluster_diagnose = False):
+def perf_test(unique_id, global_param, parameters: dict):
 
-    lbl = str(cql).split('.')[1]
+    lbl = parameters['adapter'].name
     lbl_suffix = f"{parameters['label']}" if parameters.get('label', None) else ""
 
     generator = None
@@ -183,17 +183,17 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_clus
     #                                  output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
     #                                  init_each_bulk=True)
 
-    parameters["cql"] = cql
-
-    # run tests & generate graphs
+    # define setup
     setup = RunSetup(duration_second = global_param['executor_duration'],
                      start_delay = global_param['executor_start_delay'],
                      parameters = parameters)
 
+    # run diagnose
     cluster_diagnose(setup, global_param['cluster_diagnose'])
     if global_param['cluster_diagnose_only']:
         return
 
+    # performance execution
     generator.run_bulk_executor(parameters['bulk_list'],
                                 global_param['executors'],
                                 run_setup = setup)
@@ -202,36 +202,6 @@ def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_clus
     generate_graphs(generator,
                     global_param['generate_graph'],
                     path.join(global_param['perf_dir'], "..", "output"))
-
-def exec_config(config, unique_id, global_param):
-
-    param = CQLConfig(config).get_params('COSMOSDB', global_param)
-    if param:
-        perf_test(CQLType.CosmosDB,
-                  unique_id,
-                  global_param,
-                  param)
-
-    param = CQLConfig(config).get_params('SCYLLADB', global_param)
-    if param:
-        perf_test(CQLType.ScyllaDB,
-                  unique_id,
-                  global_param,
-                  param)
-
-    param = CQLConfig(config).get_params('CASSANDRA', global_param)
-    if param:
-        perf_test(CQLType.Cassandra,
-                  unique_id,
-                  global_param,
-                  param)
-
-    param = CQLConfig(config).get_params('ASTRADB', global_param)
-    if param:
-        perf_test(CQLType.AstraDB,
-                  unique_id,
-                  global_param,
-                  param)
 
 def main_execute(env="cass.env", perf_dir=".", only_cluster_diagnose = False, level = "short"):
 
@@ -252,9 +222,11 @@ def main_execute(env="cass.env", perf_dir=".", only_cluster_diagnose = False, le
             if only_cluster_diagnose:
                 global_param['cluster_diagnose'] = level
                 global_param['cluster_diagnose_only'] = True
-            exec_config(dotenv_values(path.join(perf_dir, "config", env)),
-                        unique_id,
-                        global_param)
+
+            config = dotenv_values(path.join(perf_dir, "config", env))
+            perf_test(unique_id,
+                      global_param,
+                      CQLConfig(config).get_params(global_param))
     else:
         print("!!! Missing 'MULTIPLE_ENV' configuration !!!")
 
