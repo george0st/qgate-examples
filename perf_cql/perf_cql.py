@@ -207,20 +207,6 @@ def perf_test(cql: CQLAdapter, unique_id, global_param, parameters: dict, only_c
 
 def exec_config(config, unique_id, global_param):
 
-    param = CQLConfig(config).get_params('COSMOSDB', global_param)
-    if param:
-        perf_test(CQLAdapter.cosmosdb,
-                  unique_id,
-                  global_param,
-                  param)
-
-    param = CQLConfig(config).get_params('SCYLLADB', global_param)
-    if param:
-        perf_test(CQLAdapter.scylladb,
-                  unique_id,
-                  global_param,
-                  param)
-
     param = CQLConfig(config).get_params('CASSANDRA', global_param)
     if param:
         perf_test(CQLAdapter.cassandra,
@@ -228,12 +214,33 @@ def exec_config(config, unique_id, global_param):
                   global_param,
                   param)
 
-    param = CQLConfig(config).get_params('ASTRADB', global_param)
-    if param:
-        perf_test(CQLAdapter.astradb,
-                  unique_id,
-                  global_param,
-                  param)
+    # param = CQLConfig(config).get_params('COSMOSDB', global_param)
+    # if param:
+    #     perf_test(CQLAdapter.cosmosdb,
+    #               unique_id,
+    #               global_param,
+    #               param)
+    #
+    # param = CQLConfig(config).get_params('SCYLLADB', global_param)
+    # if param:
+    #     perf_test(CQLAdapter.scylladb,
+    #               unique_id,
+    #               global_param,
+    #               param)
+    #
+    # param = CQLConfig(config).get_params('CASSANDRA', global_param)
+    # if param:
+    #     perf_test(CQLAdapter.cassandra,
+    #               unique_id,
+    #               global_param,
+    #               param)
+    #
+    # param = CQLConfig(config).get_params('ASTRADB', global_param)
+    # if param:
+    #     perf_test(CQLAdapter.astradb,
+    #               unique_id,
+    #               global_param,
+    #               param)
 
 def main_execute(env="cass.env", perf_dir=".", only_cluster_diagnose = False, level = "short"):
 
