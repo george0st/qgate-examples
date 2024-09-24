@@ -5,8 +5,9 @@
 The configuration define global setting and relation to the many 
 single ENV settings (single ENV setting can rewrite global setting).
 
-Multi ENV files have typically prefix '**_**' 
-(as the first files in case of default file ordering in directory)
+Multi ENV files have typically **prefix underscore** (e.g. _cass.env, 
+_cass-perf.env, etc.). You will see these files as first in case of
+default ASC ordering).
 
 ### 1.1 The main parameters for test execution
 
