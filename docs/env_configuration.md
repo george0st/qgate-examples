@@ -5,6 +5,10 @@
 The configuration define global setting and relation to the many 
 single ENV settings (single ENV setting can rewrite global setting).
 
+Multi ENV files have typically **prefix underscore** (e.g. _cass.env, 
+_cass-perf.env, etc.). You will see these files as first in case of
+default ASC ordering).
+
 ### 1.1 The main parameters for test execution
 
  - **EXECUTOR_DURATION** (opt)
@@ -34,11 +38,15 @@ single ENV settings (single ENV setting can rewrite global setting).
 It is possible to specify these settings as global (and it will
 be applied to each single ENV file):
 
-   - **IP**
+   - **IP** (opt)
      - The list of IP addresses separated by a comma, 
        e.g. '_10.129.53.159, 10.129.53.153, ..._' (default is '_localhost_')
    - **PORT** (opt)
      - The port value (default is _9042_)
+   - **SECURE_CONNECT_BUNDLE** (opt)
+     - The connection based on SECURE_CONNECT_BUNDLE, it is a useful
+       way for AstraDB.
+     - NOTE: It is typically used instead of IP and PORT definition
    - **USERNAME** (opt)
       - The username for login (default is '_cassandra_')
    - **PASSWORD** (opt)
@@ -84,20 +92,28 @@ be applied to each single ENV file):
 
 The example with full setting:
 ```
-EXECUTOR_DURATION = 5
+# 1.1 Main params
+########################
+EXECUTOR_DURATION = 60
 BULK_LIST_W = [[200, 10]]
 BULK_LIST_R = [[1, 10]]
-EXECUTORS = "[[8, 1, '1x threads'], [16, 1, '1x threads'], [32, 1, '1x threads'],
-              [8, 2, '2x threads'], [16, 2, '2x threads'], [32, 2, '2x threads'],
-              [8, 3, '3x threads'], [16, 3, '3x threads'], [32, 3, '3x threads']]"
+EXECUTORS = [[1, 1, '1x threads'], [2, 1, '1x threads']]
+MULTIPLE_ENV = cass-W1-low, cass-R1-low, cass-W2-med, cass-R2-med, cass-W3-hgh, cass-R3-hgh
 
+# 1.2 Global connection
+########################
+IP = 10.129.53.159, 10.129.53.153, 10.129.53.154, 10.117.19.6, 10.117.19.4, 10.117.19.5
+PORT = 9042
+USERNAME = cassandra
+PASSWORD = ../secrets/cassandra.txt
+
+# 1.3 Other params
+########################
 DETAIL_OUTPUT = True
 GENERATE_GRAPH = all
 EXECUTOR_START_DELAY = 0
 CLUSTER_DIAGNOSE = extra
-KEYSPACE = perftest
-
-MULTIPLE_ENV = cass-W1-low, cass-R1-low
+MULTIPLE_ENV_DELAY = 0
 ```
 
 The minimalistic example (other values use default values):
@@ -134,6 +150,10 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
        e.g. '_10.129.53.159, 10.129.53.153, ..._' (default is '_localhost_')
    - **XXX_PORT** (opt, inherit)
      - The port value (default is _9042_)
+   - **XXX_SECURE_CONNECT_BUNDLE** (opt, inherit)
+     - The connection based on SECURE_CONNECT_BUNDLE, it is a useful
+       way for AstraDB.
+     - NOTE: It is typically used instead of IP and PORT definition
    - **XXX_USERNAME** (opt, inherit)
       - The username for login (default is '_cassandra_')
    - **XXX_PASSWORD** (opt, inherit)
@@ -216,18 +236,19 @@ SCYLLADB_REPLICATION_CLASS = SimpleStrategy
 SCYLLADB_REPLICATION_FACTOR = 1
 SCYLLADB_CONSISTENCY_LEVEL = ONE
 ```
-The shorter example with one provider:
+The shorter example with one provider (used global setting for connection):
 
 ```
 TEST_TYPE = W
 
 # Cassandra
 CASSANDRA = On
-CASSANDRA_LABEL = local-1-low
-CASSANDRA_IP = localhost
-CASSANDRA_REPLICATION_CLASS = SimpleStrategy
-CASSANDRA_REPLICATION_FACTOR = 1
-CASSANDRA_CONSISTENCY_LEVEL = ONE
+CASSANDRA_LABEL = 1-low
+CASSANDRA_REPLICATION_CLASS = NetworkTopologyStrategy
+CASSANDRA_REPLICATION_FACTOR = 2
+CASSANDRA_CONSISTENCY_LEVEL = LOCAL_ONE
+CASSANDRA_LB_LOCAL_DC = datacenter1
+CASSANDRA_COMPACTION = UnifiedCompactionStrategy
 ```
 
 ## NOTEs
