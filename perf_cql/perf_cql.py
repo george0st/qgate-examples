@@ -183,15 +183,17 @@ def perf_test(unique_id, global_param, parameters: dict):
     #                                  output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
     #                                  init_each_bulk=True)
 
-    # run tests & generate graphs
+    # define setup
     setup = RunSetup(duration_second = global_param['executor_duration'],
                      start_delay = global_param['executor_start_delay'],
                      parameters = parameters)
 
+    # run diagnose
     cluster_diagnose(setup, global_param['cluster_diagnose'])
     if global_param['cluster_diagnose_only']:
         return
 
+    # performance execution
     generator.run_bulk_executor(parameters['bulk_list'],
                                 global_param['executors'],
                                 run_setup = setup)

@@ -74,7 +74,6 @@ class CQLAccess:
         session = None
         try:
             session = self.create_session(Setting.TIMEOUT_CREATE_MODEL)
-            #if self._run_setup["cql"] != CQLAdapter.astradb:
             if self._run_setup["adapter"] != CQLAdapter.astradb:
                 if self._run_setup['replication_factor']:
                     # Drop key space
