@@ -157,7 +157,7 @@ def generate_graphs(generator: ParallelExecutor, generate_graph_scope, output_di
         print("Generate graph: execution...")
         generator.create_graph_exec(output_dir, suppress_error = True)
 
-def perf_test(unique_id, global_param, parameters: dict, only_cluster_diagnose = False):
+def perf_test(unique_id, global_param, parameters: dict):
 
     lbl = parameters['adapter'].name
     lbl_suffix = f"{parameters['label']}" if parameters.get('label', None) else ""
@@ -183,9 +183,6 @@ def perf_test(unique_id, global_param, parameters: dict, only_cluster_diagnose =
     #                                  output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
     #                                  init_each_bulk=True)
 
-    # TODO: remove
-    #parameters["cql"] = cql
-
     # run tests & generate graphs
     setup = RunSetup(duration_second = global_param['executor_duration'],
                      start_delay = global_param['executor_start_delay'],
@@ -203,40 +200,6 @@ def perf_test(unique_id, global_param, parameters: dict, only_cluster_diagnose =
     generate_graphs(generator,
                     global_param['generate_graph'],
                     path.join(global_param['perf_dir'], "..", "output"))
-
-def exec_config(config, unique_id, global_param):
-
-    perf_test(unique_id,
-              global_param,
-              CQLConfig(config).get_params(global_param))
-
-    # param = CQLConfig(config).get_params('COSMOSDB', global_param)
-    # if param:
-    #     perf_test(CQLAdapter.cosmosdb,
-    #               unique_id,
-    #               global_param,
-    #               param)
-    #
-    # param = CQLConfig(config).get_params('SCYLLADB', global_param)
-    # if param:
-    #     perf_test(CQLAdapter.scylladb,
-    #               unique_id,
-    #               global_param,
-    #               param)
-    #
-    # param = CQLConfig(config).get_params('CASSANDRA', global_param)
-    # if param:
-    #     perf_test(CQLAdapter.cassandra,
-    #               unique_id,
-    #               global_param,
-    #               param)
-    #
-    # param = CQLConfig(config).get_params('ASTRADB', global_param)
-    # if param:
-    #     perf_test(CQLAdapter.astradb,
-    #               unique_id,
-    #               global_param,
-    #               param)
 
 def main_execute(env="cass.env", perf_dir=".", only_cluster_diagnose = False, level = "short"):
 
