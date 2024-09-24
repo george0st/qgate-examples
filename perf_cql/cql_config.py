@@ -100,7 +100,7 @@ class CQLConfig:
             return CQLAdapter[CQLConfigSetting.ADAPTER.lower()]
         return CQLAdapter[adapter.lower()]
 
-    def get_global_params(self, force_default = False, perf_dir = None):
+    def get_global_params(self, force_default = False):
 
         global_param={}
 
@@ -138,7 +138,7 @@ class CQLConfig:
         else:
             return None
 
-    def get_params(self, global_param) -> dict:
+    def get_params(self, global_param, perf_dir) -> dict:
         param={}
         param['adapter'] = self._get_adapter(global_param)
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
@@ -160,7 +160,7 @@ class CQLConfig:
         if username:
             param['username'] = username
         password_path = self._inherit_param("PASSWORD", global_param, 'password')
-        param['password'] = cql_helper.read_file(password_path) if password_path else CQLConfigSetting.PASSWORD
+        param['password'] = cql_helper.read_file(path.join(perf_dir, password_path)) if password_path else CQLConfigSetting.PASSWORD
 
         # replication setting
         param['replication_class'] = self._config.get("REPLICATION_CLASS", CQLConfigSetting.REPLICATION_CLASS)
