@@ -91,6 +91,14 @@ class CQLConfig:
                     return global_param[global_param_name]
             return param_name_default
 
+    def _get_adapter(self, global_param) -> str:
+        """Get adapter type or setup default adapter"""
+        adapter = self._inherit_param("ADAPTER", global_param, 'adapter')
+        if not adapter in CQLAdapter.__members__:
+            print(Fore.LIGHTRED_EX, f"!!! Unsupported ADAPTER '{adapter}', we switched to the default adapter 'Cassandra' (please, repair your ENV file) !!!", Style.RESET_ALL)
+            return CQLAdapter[CQLConfigSetting.ADAPTER.lower()]
+        return CQLAdapter[adapter.lower()]
+
     def get_global_params(self, force_default = False, perf_dir = None):
 
         global_param={}
@@ -128,13 +136,6 @@ class CQLConfig:
             return global_param
         else:
             return None
-
-    def _get_adapter(self, global_param) -> str:
-        adapter = self._inherit_param("ADAPTER", global_param, 'adapter')
-        if not adapter in CQLAdapter.__members__:
-            print(Fore.LIGHTRED_EX, f"!!! Unsupported ADAPTER name '{adapter}', we switched to the default adapter 'Cassandra' !!!", Style.RESET_ALL)
-            return CQLAdapter[CQLConfigSetting.ADAPTER.lower()]
-        return CQLAdapter[adapter.lower()]
 
     def get_params(self, adapter, global_param) -> dict:
         param={}

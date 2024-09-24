@@ -159,7 +159,8 @@ def generate_graphs(generator: ParallelExecutor, generate_graph_scope, output_di
 
 def perf_test(cql: CQLAdapter, unique_id, global_param, parameters: dict, only_cluster_diagnose = False):
 
-    lbl = str(cql).split('.')[1]
+#    lbl = str(cql).split('.')[1]
+    lbl = parameters['adapter'].name
     lbl_suffix = f"{parameters['label']}" if parameters.get('label', None) else ""
 
     generator = None
@@ -183,7 +184,8 @@ def perf_test(cql: CQLAdapter, unique_id, global_param, parameters: dict, only_c
     #                                  output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
     #                                  init_each_bulk=True)
 
-    parameters["cql"] = cql
+    # TODO: remove
+    #parameters["cql"] = cql
 
     # run tests & generate graphs
     setup = RunSetup(duration_second = global_param['executor_duration'],
