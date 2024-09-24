@@ -203,9 +203,9 @@ def perf_test(unique_id, global_param, parameters: dict):
                     global_param['generate_graph'],
                     path.join(global_param['perf_dir'], "..", "output"))
 
-def main_execute(env="cass.env", perf_dir=".", only_cluster_diagnose = False, level = "short"):
+def main_execute(env="cass.env", perf_dir = ".", only_cluster_diagnose = False, level = "short"):
 
-    global_param = CQLConfig(dotenv_values(path.join(perf_dir, "config", env))).get_global_params(perf_dir=perf_dir)
+    global_param = CQLConfig(dotenv_values(path.join(perf_dir, "config", env))).get_global_params()
     if global_param:
         # multiple configurations
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
@@ -226,7 +226,7 @@ def main_execute(env="cass.env", perf_dir=".", only_cluster_diagnose = False, le
             config = dotenv_values(path.join(perf_dir, "config", env))
             perf_test(unique_id,
                       global_param,
-                      CQLConfig(config).get_params(global_param))
+                      CQLConfig(config).get_params(global_param, perf_dir))
     else:
         print("!!! Missing 'MULTIPLE_ENV' configuration !!!")
 

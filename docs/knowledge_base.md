@@ -35,3 +35,9 @@
    - **Info**: I got the issue during heavy performance tests. It is issue with CRC validation
      (it has relation to consistency). I got the issue with _ProtocolVersion.V5_ under _Cassandra 5.0.0_
    - **Solution**: Use lower and more stable protocol version e.g. _ProtocolVersion.V4_
+
+
+ - **InvalidRequest**: Error from server: code=2200 [Invalid query] message=\"unconfigured table t01\"
+   - **Info**: It was not possible to build expected table
+   - **Solution**: Please, check compaction level (e.g. Cassandra support
+       **UnifiedCompactionStrategy** but ScyllaDB not
