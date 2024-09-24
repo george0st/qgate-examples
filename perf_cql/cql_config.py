@@ -59,6 +59,7 @@ class CQLConfigSetting:
 class CQLConfig:
 
     def __init__(self, config = {}):
+        """Processing/Parsing of dictionary parameters from config/ENV files"""
         self._config = config
 
     def _inherit_param_eval(self, param_name, global_param, global_param_name, param_name_default = None, adapter = None):
@@ -137,7 +138,7 @@ class CQLConfig:
         else:
             return None
 
-    def get_params(self, adapter, global_param) -> dict:
+    def get_params(self, global_param) -> dict:
         param={}
 
         #if cql_helper.str2bool(self._config.get(adapter, "Off")):
