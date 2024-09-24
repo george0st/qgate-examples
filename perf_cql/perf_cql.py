@@ -6,7 +6,7 @@ from qgate_perf.parallel_probe import ParallelProbe
 from qgate_perf.executor_helper import GraphScope
 from qgate_perf.run_setup import RunSetup
 from dotenv import dotenv_values
-from cql_config import CQLConfig, CQLType
+from cql_config import CQLConfig, CQLAdapter
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
 from cql_helper import get_rng_generator
@@ -157,7 +157,7 @@ def generate_graphs(generator: ParallelExecutor, generate_graph_scope, output_di
         print("Generate graph: execution...")
         generator.create_graph_exec(output_dir, suppress_error = True)
 
-def perf_test(cql: CQLType, unique_id, global_param, parameters: dict, only_cluster_diagnose = False):
+def perf_test(cql: CQLAdapter, unique_id, global_param, parameters: dict, only_cluster_diagnose = False):
 
     lbl = str(cql).split('.')[1]
     lbl_suffix = f"{parameters['label']}" if parameters.get('label', None) else ""
@@ -207,28 +207,28 @@ def exec_config(config, unique_id, global_param):
 
     param = CQLConfig(config).get_params('COSMOSDB', global_param)
     if param:
-        perf_test(CQLType.CosmosDB,
+        perf_test(CQLAdapter.cosmosdb,
                   unique_id,
                   global_param,
                   param)
 
     param = CQLConfig(config).get_params('SCYLLADB', global_param)
     if param:
-        perf_test(CQLType.ScyllaDB,
+        perf_test(CQLAdapter.scylladb,
                   unique_id,
                   global_param,
                   param)
 
     param = CQLConfig(config).get_params('CASSANDRA', global_param)
     if param:
-        perf_test(CQLType.Cassandra,
+        perf_test(CQLAdapter.cassandra,
                   unique_id,
                   global_param,
                   param)
 
     param = CQLConfig(config).get_params('ASTRADB', global_param)
     if param:
-        perf_test(CQLType.AstraDB,
+        perf_test(CQLAdapter.astradb,
                   unique_id,
                   global_param,
                   param)

@@ -1,15 +1,16 @@
 from cassandra import ConsistencyLevel
 from ast import literal_eval
-from enum import Enum
+from enum import Enum, Flag
 from os import path
+from colorama import Fore, Style
 import cql_helper
 
 
-class CQLType(Enum):
-    ScyllaDB = 1
-    Cassandra = 2
-    AstraDB = 3
-    CosmosDB = 4
+class CQLAdapter(Flag):
+    scylladb = 1
+    cassandra = 2
+    astradb = 4
+    cosmosdb = 8
 
 class ConsistencyHelper:
     name_to_value = {
@@ -29,6 +30,7 @@ class ConsistencyHelper:
 class CQLConfigSetting:
 
     # The key parameters
+    ADAPTER = "Cassandra"
     EXECUTOR_DURATION = "5"
     BULK_LIST = "[[200, 10]]"
     BULK_LIST_W = "[[200, 10]]"
@@ -98,6 +100,7 @@ class CQLConfig:
         if global_param['multiple_env'] or force_default:
             # multiple configurations
 
+            global_param['adapter'] = self._config.get("ADAPTER", None)
             global_param['executors'] = literal_eval(self._config.get("EXECUTORS", CQLConfigSetting.EXECUTORS))
             global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', CQLConfigSetting.DETAIL_OUTPUT))
             global_param['generate_graph'] = self._config.get('GENERATE_GRAPH', CQLConfigSetting.GENERATE_GRAPH)
@@ -126,11 +129,20 @@ class CQLConfig:
         else:
             return None
 
-    def get_params(self, adapter, global_param):
+    def _get_adapter(self, global_param) -> str:
+        adapter = self._inherit_param("ADAPTER", global_param, 'adapter')
+        if not adapter in CQLAdapter.__members__:
+            print(Fore.LIGHTRED_EX, f"!!! Unsupported ADAPTER name '{adapter}', we switched to the default adapter 'Cassandra' !!!", Style.RESET_ALL)
+            return CQLAdapter[CQLConfigSetting.ADAPTER.lower()]
+        return CQLAdapter[adapter.lower()]
+
+    def get_params(self, adapter, global_param) -> dict:
         param={}
 
         if cql_helper.str2bool(self._config.get(adapter, "Off")):
             # shared params for all providers
+
+            param['adapter'] = self._get_adapter(global_param)
             param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
             if param['test_type'] == "r":
                 param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_r', CQLConfigSetting.BULK_LIST_R)
