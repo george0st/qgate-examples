@@ -1,1 +1,1 @@
-python perf_cql/perf_cql.py run -e 0-local-cass.env -d perf_cql
+python perf_cql/perf_cql.py run -e _local-cass.env -d perf_cql
