@@ -34,11 +34,15 @@ single ENV settings (single ENV setting can rewrite global setting).
 It is possible to specify these settings as global (and it will
 be applied to each single ENV file):
 
-   - **IP**
+   - **IP** (opt)
      - The list of IP addresses separated by a comma, 
        e.g. '_10.129.53.159, 10.129.53.153, ..._' (default is '_localhost_')
    - **PORT** (opt)
      - The port value (default is _9042_)
+   - **SECURE_CONNECT_BUNDLE** (opt)
+     - The connection based on SECURE_CONNECT_BUNDLE, it is a useful
+       way for AstraDB.
+     - NOTE: It is typically used instead of IP and PORT definition
    - **USERNAME** (opt)
       - The username for login (default is '_cassandra_')
    - **PASSWORD** (opt)
@@ -134,6 +138,10 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
        e.g. '_10.129.53.159, 10.129.53.153, ..._' (default is '_localhost_')
    - **XXX_PORT** (opt, inherit)
      - The port value (default is _9042_)
+   - **XXX_SECURE_CONNECT_BUNDLE** (opt, inherit)
+     - The connection based on SECURE_CONNECT_BUNDLE, it is a useful
+       way for AstraDB.
+     - NOTE: It is typically used instead of IP and PORT definition
    - **XXX_USERNAME** (opt, inherit)
       - The username for login (default is '_cassandra_')
    - **XXX_PASSWORD** (opt, inherit)
