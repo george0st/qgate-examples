@@ -1,9 +1,9 @@
-# run cass.env
+# run _cass.env
 python3.11 perf_cql/perf_cql.py run -e _cass.env -d perf_cql
 
-# run cass-hgh.env
+# run _cass-quick.env
 python3.11 perf_cql/perf_cql.py run -e _cass-quick.env -d perf_cql
 
-# run cass.env & cass-hgh.env without terminal
+# run _cass.env & cass-quick.env without terminal
 nohup python3.11 perf_cql/perf_cql.py run -e _cass.env -d perf_cql
 nohup python3.11 perf_cql/perf_cql.py run -e _cass-quick.env -d perf_cql
