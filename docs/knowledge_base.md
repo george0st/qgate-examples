@@ -39,5 +39,6 @@
 
  - **InvalidRequest**: Error from server: code=2200 [Invalid query] message=\"unconfigured table t01\"
    - **Info**: It was not possible to build expected table
-   - **Solution**: Please, check compaction level (e.g. Cassandra support
-       **UnifiedCompactionStrategy** but ScyllaDB not
+   - **Solution**: Please, check compaction level, typical issue is that Cassandra support **UnifiedCompactionStrategy** 
+     but ScyllaDB not and from these reasons, you have to modify single ENV file 
+     with compaction setting

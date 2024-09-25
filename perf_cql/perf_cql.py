@@ -207,7 +207,6 @@ def main_execute(env="cass.env", perf_dir = ".", only_cluster_diagnose = False, 
 
     global_param = CQLConfig(dotenv_values(path.join(perf_dir, "config", env))).get_global_params()
     if global_param:
-        # multiple configurations
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
         envs = [env.strip() for env in global_param['multiple_env'].split(",")]
         global_param['perf_dir'] = perf_dir
