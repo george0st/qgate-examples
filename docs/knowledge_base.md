@@ -42,3 +42,13 @@
    - **Solution**: Please, check compaction level, typical issue is that Cassandra support **UnifiedCompactionStrategy** 
      but ScyllaDB not and from these reasons, you have to modify single ENV file 
      with compaction setting
+
+
+ - **AuthenticationFailed**('Failed to authenticate to 10.117.19.6:9042: Error from server: code=0100 [Bad credentials] message="Unable to perform authentication: Cannot achieve consistency level QUORUM"')
+   - **Info**: the connection is using CL QUORUM
+   - **Solution**: Use different account than 'cassandra', this account has setting to CL QUORUM.
+     see full clarification https://docs.datastax.com/en/archived/datastax_enterprise/4.8/datastax_enterprise/sec/secConfiguringInternalAuthentication.html
+     see citation 
+     - Logins for the cassandra user are performed with QUORUM consistency. 
+     - Do not use the default cassandra user in production, because QUORUM consistency has significant performance degradation for multiple data centers. 
+     - Logins for all other users are performed with LOCAL_ONE consistency.

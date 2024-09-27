@@ -211,6 +211,9 @@ class CQLHealth:
                 }
                 final_status[key] = final_status_info
 
+        # except Exception as ex:
+        #     print(ex)
+
         finally:
             if session:
                 session.shutdown()

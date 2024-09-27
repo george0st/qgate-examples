@@ -3,6 +3,7 @@ from ast import literal_eval
 from enum import Enum, Flag
 from os import path
 from colorama import Fore, Style
+from dotenv import dotenv_values
 import cql_helper
 
 
@@ -58,14 +59,13 @@ class CQLConfigSetting:
 
 class CQLConfig:
 
-    def __init__(self, config = {}):
+    def __init__(self, perf_dir = "."):
         """Processing/Parsing of dictionary parameters from config/ENV files"""
-        self._config = config
+        self._perf_dir = perf_dir
+        self._config = {}
 
-    def _inherit_param_eval(self, param_name, global_param, global_param_name, param_name_default = None, adapter = None):
+    def _inherit_param_eval(self, param_name, global_param, global_param_name, param_name_default = None):
         """Get adapter from single or from global ENV"""
-        if adapter:
-            param_name=f"{adapter}_{param_name}"
 
         if self._config.get(param_name, None):
             return literal_eval(self._config[param_name])
@@ -76,12 +76,8 @@ class CQLConfig:
                     return global_param[global_param_name]
             return param_name_default
 
-
-    def _inherit_param(self, param_name, global_param, global_param_name, param_name_default = None, adapter = None):
+    def _inherit_param(self, param_name, global_param, global_param_name, param_name_default = None):
         """Get adapter from single or from global ENV"""
-
-        if adapter:
-            param_name=f"{adapter}_{param_name}"
 
         if self._config.get(param_name, None):
             return self._config[param_name]
@@ -100,23 +96,29 @@ class CQLConfig:
             return CQLAdapter[CQLConfigSetting.ADAPTER.lower()]
         return CQLAdapter[adapter.lower()]
 
-    def get_global_params(self, force_default = False):
+    def get_global_params(self, env_file, only_cluster_diagnose = False, level = "short") -> dict:
 
-        global_param={}
+        global_param = {}
+        self._config = dotenv_values(path.join(self._perf_dir, "config", env_file))
 
         # shared params for all providers
         global_param['multiple_env'] = self._config.get('MULTIPLE_ENV', None)
-        if global_param['multiple_env'] or force_default:
+        if global_param['multiple_env']:
             # multiple configurations
 
+            global_param['perf_dir'] = self._perf_dir
             global_param['adapter'] = self._config.get("ADAPTER", None)
             global_param['executors'] = literal_eval(self._config.get("EXECUTORS", CQLConfigSetting.EXECUTORS))
             global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', CQLConfigSetting.DETAIL_OUTPUT))
             global_param['generate_graph'] = self._config.get('GENERATE_GRAPH', CQLConfigSetting.GENERATE_GRAPH)
             global_param['executor_duration'] = int(self._config.get('EXECUTOR_DURATION', CQLConfigSetting.EXECUTOR_DURATION))
             global_param['executor_start_delay'] = int(self._config.get('EXECUTOR_START_DELAY', CQLConfigSetting.EXECUTOR_START_DELAY))
-            global_param['cluster_diagnose'] = self._config.get("CLUSTER_DIAGNOSE", CQLConfigSetting.CLUSTER_DIAGNOSE)
-            global_param['cluster_diagnose_only'] = False
+            if only_cluster_diagnose:
+                global_param['cluster_diagnose'] = level
+                global_param['cluster_diagnose_only'] = True
+            else:
+                global_param['cluster_diagnose'] = self._config.get("CLUSTER_DIAGNOSE", CQLConfigSetting.CLUSTER_DIAGNOSE)
+                global_param['cluster_diagnose_only'] = False
             global_param['keyspace'] = self._config.get("KEYSPACE", CQLConfigSetting.KEYSPACE)
             global_param['bulk_list_r'] = literal_eval(self._config.get("BULK_LIST_R", CQLConfigSetting.BULK_LIST_R))
             global_param['bulk_list_w'] = literal_eval(self._config.get("BULK_LIST_W", CQLConfigSetting.BULK_LIST_W))
@@ -138,8 +140,11 @@ class CQLConfig:
         else:
             return None
 
-    def get_params(self, global_param, perf_dir) -> dict:
-        param={}
+    def get_params(self, env_file, global_param) -> dict:
+
+        param = {}
+        self._config = dotenv_values(path.join(self._perf_dir, "config", env_file))
+
         param['adapter'] = self._get_adapter(global_param)
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
         if param['test_type'] == "r":
@@ -160,7 +165,7 @@ class CQLConfig:
         if username:
             param['username'] = username
         password_path = self._inherit_param("PASSWORD", global_param, 'password')
-        param['password'] = cql_helper.read_file(path.join(perf_dir, password_path)) if password_path else CQLConfigSetting.PASSWORD
+        param['password'] = cql_helper.read_file(path.join(global_param['perf_dir'], password_path)) if password_path else CQLConfigSetting.PASSWORD
 
         # replication setting
         param['replication_class'] = self._config.get("REPLICATION_CLASS", CQLConfigSetting.REPLICATION_CLASS)

@@ -203,31 +203,54 @@ def perf_test(unique_id, global_param, parameters: dict):
                     global_param['generate_graph'],
                     path.join(global_param['perf_dir'], "..", "output"))
 
-def main_execute(env="cass.env", perf_dir = ".", only_cluster_diagnose = False, level = "short"):
+def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = False, level = "short"):
 
-    global_param = CQLConfig(dotenv_values(path.join(perf_dir, "config", env))).get_global_params()
+    global_param = CQLConfig(perf_dir).get_global_params(multi_env, only_cluster_diagnose, level)
     if global_param:
+        env_count = 0
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
         envs = [env.strip() for env in global_param['multiple_env'].split(",")]
-        global_param['perf_dir'] = perf_dir
-        env_count = 0
         for env in envs:
             if not env.lower().endswith(".env"):
                 env += ".env"
             env_count += 1
             print(Fore.LIGHTGREEN_EX + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
-            if env_count > 1:
-                time.sleep(global_param['multiple_env_delay'])
-            if only_cluster_diagnose:
-                global_param['cluster_diagnose'] = level
-                global_param['cluster_diagnose_only'] = True
 
-            config = dotenv_values(path.join(perf_dir, "config", env))
+            # delay before other processing
+            if not only_cluster_diagnose:
+                if env_count > 1 :
+                    time.sleep(global_param['multiple_env_delay'])
+
             perf_test(unique_id,
                       global_param,
-                      CQLConfig(config).get_params(global_param, perf_dir))
+                      CQLConfig(perf_dir).get_params(env, global_param))
     else:
         print("!!! Missing 'MULTIPLE_ENV' configuration !!!")
+
+def test_cluster(env, perf_dir):
+
+    global_param = CQLConfig(perf_dir).get_global_params(env)
+    if global_param:
+        multi_env = [env.strip() for env in global_param['multiple_env'].split(",")]
+        if len(multi_env) > 1:
+            # we will use connection from first env file
+            single_env = multi_env[0]
+            if not single_env.lower().endswith(".env"):
+                single_env += ".env"
+            params = CQLConfig(perf_dir).get_params(single_env, global_param)
+
+            try:
+                # Cluster connection
+                setup = RunSetup(parameters=params)
+                access = CQLAccess(setup)
+
+                # Queries
+
+            except Exception as ex:
+                pass
+            finally:
+                pass
+
 
 @click.group()
 def graph_group():
@@ -246,6 +269,18 @@ def graph(scope, perf_dir, input_files):
                                              GraphScope[scope.lower()],
                                              suppress_error=True):
             print(" ", output)
+
+
+@click.group()
+def test_group():
+    pass
+
+@test_group.command()
+@click.option("-e", "--env", help="name of ENV file (default 'cass.env')", default="cass.env")
+@click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
+def test(env, perf_dir):
+    """Test connection to Cluster and access to system tables"""
+    test_cluster(env, perf_dir)
 
 @click.group()
 def version_group():
@@ -305,7 +340,7 @@ def run(env, perf_dir):
     """Run performance tests based on ENV file(s)."""
     main_execute(env, perf_dir)
 
-cli = click.CommandCollection(sources=[run_group, diagnose_group, graph_group, version_group])
+cli = click.CommandCollection(sources=[run_group, diagnose_group, graph_group, version_group, test_group])
 
 if __name__ == '__main__':
     cli()
