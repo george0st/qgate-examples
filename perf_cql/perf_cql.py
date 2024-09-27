@@ -247,6 +247,27 @@ def graph(scope, perf_dir, input_files):
                                              suppress_error=True):
             print(" ", output)
 
+
+# @click.group()
+# def test_group():
+#     pass
+#
+# @test_group.command()
+# @click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
+# def test(perf_dir):
+#
+#     global_param = CQLConfig(dotenv_values(path.join(perf_dir, "config", env))).get_global_params()
+#     if global_param:
+#             config = dotenv_values(path.join(perf_dir, "config", env))
+#             config = CQLConfig(config).get_params(global_param, perf_dir)
+#
+#     setup = RunSetup(duration_second = 0,
+#                      start_delay = 0,
+#                      parameters = parameters)
+#     access = CQLAccess()
+
+
+
 @click.group()
 def version_group():
     pass
