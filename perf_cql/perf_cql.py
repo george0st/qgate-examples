@@ -227,6 +227,31 @@ def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = F
     else:
         print("!!! Missing 'MULTIPLE_ENV' configuration !!!")
 
+def test_cluster(env, perf_dir):
+
+    global_param = CQLConfig(perf_dir).get_global_params(env)
+    if global_param:
+        multi_env = [env.strip() for env in global_param['multiple_env'].split(",")]
+        if len(multi_env) > 1:
+            # we will use connection from first env file
+            single_env = multi_env[0]
+            if not single_env.lower().endswith(".env"):
+                single_env += ".env"
+            params = CQLConfig(perf_dir).get_params(single_env, global_param)
+
+            try:
+                # Cluster connection
+                setup = RunSetup(parameters=params)
+                access = CQLAccess(setup)
+
+                # Queries
+
+            except Exception as ex:
+                pass
+            finally:
+                pass
+
+
 @click.group()
 def graph_group():
     pass
@@ -246,28 +271,16 @@ def graph(scope, perf_dir, input_files):
             print(" ", output)
 
 
-# @click.group()
-# def test_group():
-#     pass
-#
-# @test_group.command()
-# @click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
-# def test(perf_dir):
-#
-# global_param = CQLConfig(perf_dir).get_global_params(env, only_cluster_diagnose, level)
-#     if global_param:
-#         envs = [env.strip() for env in global_param['multiple_env'].split(",")]
-#         for single_env in envs:
-#             if not single_env.lower().endswith(".env"):
-#                 single_env += ".env"
-#             params = CQLConfig(perf_dir).get_params(single_env, global_param)
-#
-#     setup = RunSetup(duration_second = 0,
-#                      start_delay = 0,
-#                      parameters = params)
-#     access = CQLAccess(setup)
+@click.group()
+def test_group():
+    pass
 
-
+@test_group.command()
+@click.option("-e", "--env", help="name of ENV file (default 'cass.env')", default="cass.env")
+@click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
+def test(env, perf_dir):
+    """Test connection to Cluster and access to system tables"""
+    test_cluster(env, perf_dir)
 
 @click.group()
 def version_group():
