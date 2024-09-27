@@ -237,20 +237,27 @@ def test_cluster(env, perf_dir):
             single_env = multi_env[0]
             if not single_env.lower().endswith(".env"):
                 single_env += ".env"
-            params = CQLConfig(perf_dir).get_params(single_env, global_param)
+
+            setup = RunSetup(parameters=CQLConfig(perf_dir).get_params(single_env, global_param))
+            session = None
+            cql = None
 
             try:
                 # Cluster connection
-                setup = RunSetup(parameters=params)
-                access = CQLAccess(setup)
-
-                # Queries
-
+                cql = CQLAccess(setup)
+                cql.open()
+                session = cql.create_session()
+                rows = session.execute("SELECT cluster_name, cql_version, data_center, rack, release_version FROM system.local;")
+                for row in rows:
+                    print(row)
+                print("!!! Ok !!!")
             except Exception as ex:
-                pass
+                print(Exception, str(ex))
             finally:
-                pass
-
+                if session:
+                    session.shutdown()
+                if cql:
+                    cql.close()
 
 @click.group()
 def graph_group():
