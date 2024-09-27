@@ -254,17 +254,18 @@ def graph(scope, perf_dir, input_files):
 # @click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
 # def test(perf_dir):
 #
-# global_param = CQLConfig(dotenv_values(path.join(perf_dir, "config", multi_env))).get_global_params(perf_dir,
-#                                                                                                     only_cluster_diagnose,
-#                                                                                                     level)
+# global_param = CQLConfig(perf_dir).get_global_params(env, only_cluster_diagnose, level)
 #     if global_param:
-#             config = dotenv_values(path.join(perf_dir, "config", env))
-#             params = CQLConfig(config).get_params(global_param)
+#         envs = [env.strip() for env in global_param['multiple_env'].split(",")]
+#         for single_env in envs:
+#             if not single_env.lower().endswith(".env"):
+#                 single_env += ".env"
+#             params = CQLConfig(perf_dir).get_params(single_env, global_param)
 #
 #     setup = RunSetup(duration_second = 0,
 #                      start_delay = 0,
-#                      parameters = parameters)
-#     access = CQLAccess()
+#                      parameters = params)
+#     access = CQLAccess(setup)
 
 
 
