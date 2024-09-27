@@ -340,7 +340,7 @@ def run(env, perf_dir):
     """Run performance tests based on ENV file(s)."""
     main_execute(env, perf_dir)
 
-cli = click.CommandCollection(sources=[run_group, diagnose_group, graph_group, version_group])
+cli = click.CommandCollection(sources=[run_group, diagnose_group, graph_group, version_group, test_group])
 
 if __name__ == '__main__':
     cli()
