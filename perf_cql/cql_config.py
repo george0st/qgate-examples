@@ -98,8 +98,8 @@ class CQLConfig:
 
     def get_global_params(self, env_file, only_cluster_diagnose = False, level = "short") -> dict:
 
+        global_param = {}
         self._config = dotenv_values(path.join(self._perf_dir, "config", env_file))
-        global_param={}
 
         # shared params for all providers
         global_param['multiple_env'] = self._config.get('MULTIPLE_ENV', None)
@@ -142,8 +142,8 @@ class CQLConfig:
 
     def get_params(self, env_file, global_param) -> dict:
 
+        param = {}
         self._config = dotenv_values(path.join(self._perf_dir, "config", env_file))
-        param={}
 
         param['adapter'] = self._get_adapter(global_param)
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
