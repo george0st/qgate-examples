@@ -203,29 +203,28 @@ def perf_test(unique_id, global_param, parameters: dict):
                     global_param['generate_graph'],
                     path.join(global_param['perf_dir'], "..", "output"))
 
-def main_execute(env="cass.env", perf_dir = ".", only_cluster_diagnose = False, level = "short"):
+def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = False, level = "short"):
 
-    global_param = CQLConfig(dotenv_values(path.join(perf_dir, "config", env))).get_global_params()
+    global_param = CQLConfig(dotenv_values(path.join(perf_dir, "config", multi_env))).get_global_params(perf_dir, only_cluster_diagnose, level)
     if global_param:
+        env_count = 0
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
         envs = [env.strip() for env in global_param['multiple_env'].split(",")]
-        global_param['perf_dir'] = perf_dir
-        env_count = 0
         for env in envs:
             if not env.lower().endswith(".env"):
                 env += ".env"
             env_count += 1
             print(Fore.LIGHTGREEN_EX + f"Environment switch {env_count}/{len(envs)}: '{env}' ..." + Style.RESET_ALL)
-            if env_count > 1:
-                time.sleep(global_param['multiple_env_delay'])
-            if only_cluster_diagnose:
-                global_param['cluster_diagnose'] = level
-                global_param['cluster_diagnose_only'] = True
+
+            # delay before other processing
+            if not only_cluster_diagnose:
+                if env_count > 1 :
+                    time.sleep(global_param['multiple_env_delay'])
 
             config = dotenv_values(path.join(perf_dir, "config", env))
             perf_test(unique_id,
                       global_param,
-                      CQLConfig(config).get_params(global_param, perf_dir))
+                      CQLConfig(config).get_params(global_param))
     else:
         print("!!! Missing 'MULTIPLE_ENV' configuration !!!")
 
@@ -256,10 +255,12 @@ def graph(scope, perf_dir, input_files):
 # @click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
 # def test(perf_dir):
 #
-#     global_param = CQLConfig(dotenv_values(path.join(perf_dir, "config", env))).get_global_params()
+# global_param = CQLConfig(dotenv_values(path.join(perf_dir, "config", multi_env))).get_global_params(perf_dir,
+#                                                                                                     only_cluster_diagnose,
+#                                                                                                     level)
 #     if global_param:
 #             config = dotenv_values(path.join(perf_dir, "config", env))
-#             config = CQLConfig(config).get_params(global_param, perf_dir)
+#             params = CQLConfig(config).get_params(global_param)
 #
 #     setup = RunSetup(duration_second = 0,
 #                      start_delay = 0,
