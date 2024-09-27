@@ -277,7 +277,6 @@ def graph(scope, perf_dir, input_files):
                                              suppress_error=True):
             print(" ", output)
 
-
 @click.group()
 def test_group():
     pass
@@ -286,7 +285,7 @@ def test_group():
 @click.option("-e", "--env", help="name of ENV file (default 'cass.env')", default="cass.env")
 @click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
 def test(env, perf_dir):
-    """Test connection to Cluster and access to system tables"""
+    """Test connection to Cluster and access to a few system tables"""
     test_cluster(env, perf_dir)
 
 @click.group()
