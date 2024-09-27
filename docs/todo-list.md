@@ -8,3 +8,4 @@
 4. Extend tests RW, all with blob also
 5. Add unit tests for validation if precisions in response time
    - focus on qgate-graph
+6. Add parametr for test with report of exception to stdout
