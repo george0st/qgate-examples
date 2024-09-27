@@ -48,3 +48,7 @@
    - **Info**: the connection is using CL QUORUM
    - **Solution**: Use different account than 'cassandra', this account has setting to CL QUORUM.
      see full clarification https://docs.datastax.com/en/archived/datastax_enterprise/4.8/datastax_enterprise/sec/secConfiguringInternalAuthentication.html
+     see citation 
+     - Logins for the cassandra user are performed with QUORUM consistency. 
+     - Do not use the default cassandra user in production, because QUORUM consistency has significant performance degradation for multiple data centers. 
+     - Logins for all other users are performed with LOCAL_ONE consistency.
