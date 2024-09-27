@@ -205,7 +205,7 @@ def perf_test(unique_id, global_param, parameters: dict):
 
 def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = False, level = "short"):
 
-    global_param = CQLConfig(dotenv_values(path.join(perf_dir, "config", multi_env))).get_global_params(perf_dir, only_cluster_diagnose, level)
+    global_param = CQLConfig(perf_dir).get_global_params(multi_env, only_cluster_diagnose, level)
     if global_param:
         env_count = 0
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
@@ -221,10 +221,9 @@ def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = F
                 if env_count > 1 :
                     time.sleep(global_param['multiple_env_delay'])
 
-            config = dotenv_values(path.join(perf_dir, "config", env))
             perf_test(unique_id,
                       global_param,
-                      CQLConfig(config).get_params(global_param))
+                      CQLConfig(perf_dir).get_params(env, global_param))
     else:
         print("!!! Missing 'MULTIPLE_ENV' configuration !!!")
 

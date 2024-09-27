@@ -3,6 +3,7 @@ from ast import literal_eval
 from enum import Enum, Flag
 from os import path
 from colorama import Fore, Style
+from dotenv import dotenv_values
 import cql_helper
 
 
@@ -58,9 +59,10 @@ class CQLConfigSetting:
 
 class CQLConfig:
 
-    def __init__(self, env: str = None, config: dict = {}):
+    def __init__(self, perf_dir = "."):
         """Processing/Parsing of dictionary parameters from config/ENV files"""
-        self._config = config
+        self._perf_dir = perf_dir
+        self._config = {}
 
     def _inherit_param_eval(self, param_name, global_param, global_param_name, param_name_default = None):
         """Get adapter from single or from global ENV"""
@@ -94,8 +96,9 @@ class CQLConfig:
             return CQLAdapter[CQLConfigSetting.ADAPTER.lower()]
         return CQLAdapter[adapter.lower()]
 
-    def get_global_params(self, perf_dir = ".", only_cluster_diagnose = False, level = "short") -> dict:
+    def get_global_params(self, env_file, only_cluster_diagnose = False, level = "short") -> dict:
 
+        self._config = dotenv_values(path.join(self._perf_dir, "config", env_file))
         global_param={}
 
         # shared params for all providers
@@ -103,7 +106,7 @@ class CQLConfig:
         if global_param['multiple_env']:
             # multiple configurations
 
-            global_param['perf_dir'] = perf_dir
+            global_param['perf_dir'] = self._perf_dir
             global_param['adapter'] = self._config.get("ADAPTER", None)
             global_param['executors'] = literal_eval(self._config.get("EXECUTORS", CQLConfigSetting.EXECUTORS))
             global_param['detail_output'] = cql_helper.str2bool(self._config.get('DETAIL_OUTPUT', CQLConfigSetting.DETAIL_OUTPUT))
@@ -137,8 +140,11 @@ class CQLConfig:
         else:
             return None
 
-    def get_params(self, global_param) -> dict:
+    def get_params(self, env_file, global_param) -> dict:
+
+        self._config = dotenv_values(path.join(self._perf_dir, "config", env_file))
         param={}
+
         param['adapter'] = self._get_adapter(global_param)
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
         if param['test_type'] == "r":
