@@ -1,13 +1,10 @@
 import datetime, time
 from os import path
-
-import cassandra.cluster
 from cassandra.query import BatchStatement, BoundStatement
 from qgate_perf.parallel_executor import ParallelExecutor
 from qgate_perf.parallel_probe import ParallelProbe
 from qgate_perf.executor_helper import GraphScope
 from qgate_perf.run_setup import RunSetup
-from dotenv import dotenv_values
 from cql_config import CQLConfig, CQLAdapter
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
