@@ -5,7 +5,6 @@ from qgate_perf.parallel_executor import ParallelExecutor
 from qgate_perf.parallel_probe import ParallelProbe
 from qgate_perf.executor_helper import GraphScope
 from qgate_perf.run_setup import RunSetup
-from dotenv import dotenv_values
 from cql_config import CQLConfig, CQLAdapter
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
@@ -231,26 +230,33 @@ def test_cluster(env, perf_dir):
 
     global_param = CQLConfig(perf_dir).get_global_params(env)
     if global_param:
+        env_count = 0
         multi_env = [env.strip() for env in global_param['multiple_env'].split(",")]
-        if len(multi_env) > 1:
-            # we will use connection from first env file
-            single_env = multi_env[0]
+        for single_env in multi_env:
             if not single_env.lower().endswith(".env"):
                 single_env += ".env"
-            params = CQLConfig(perf_dir).get_params(single_env, global_param)
+            env_count += 1
+            print(Fore.LIGHTGREEN_EX + f"Environment switch {env_count}/{len(multi_env)}: '{single_env}' ..." + Style.RESET_ALL)
+
+            setup = RunSetup(parameters=CQLConfig(perf_dir).get_params(single_env, global_param))
+            session = None
+            cql = None
 
             try:
                 # Cluster connection
-                setup = RunSetup(parameters=params)
-                access = CQLAccess(setup)
-
-                # Queries
-
+                cql = CQLAccess(setup)
+                cql.open()
+                session = cql.create_session()
+                rows = session.execute("SELECT cluster_name, cql_version, data_center, rack, release_version FROM system.local;")
+                for row in rows:
+                    print("  ", row)
             except Exception as ex:
-                pass
+                print(Fore.LIGHTRED_EX, "Exception: ", str(ex), Style.RESET_ALL)
             finally:
-                pass
-
+                if session:
+                    session.shutdown()
+                if cql:
+                    cql.close()
 
 @click.group()
 def graph_group():
@@ -270,7 +276,6 @@ def graph(scope, perf_dir, input_files):
                                              suppress_error=True):
             print(" ", output)
 
-
 @click.group()
 def test_group():
     pass
@@ -279,7 +284,7 @@ def test_group():
 @click.option("-e", "--env", help="name of ENV file (default 'cass.env')", default="cass.env")
 @click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
 def test(env, perf_dir):
-    """Test connection to Cluster and access to system tables"""
+    """Test connection to Cluster and access to a few system tables"""
     test_cluster(env, perf_dir)
 
 @click.group()
