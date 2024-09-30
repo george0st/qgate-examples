@@ -29,14 +29,19 @@ The remove unused data for better performance. The usage
  - nodetool garbagecollect prftest 
  - nodetool garbagecollect prftest t01
 
-### 2. State of environment
+### 2. Get state of environment
 
-#### 2.1 Compaction
+#### 2.1 Status
+
+The information about cluster state, the usage:
+ - nodetool status
+
+#### 2.2 Compaction
 
 The information about compaction, the usage:
  - nodetool compactionstats
 
-#### 2.2 Tablestats
+#### 2.3 Tablestats
 
 The information about tables, the usage:
  - nodetool tablestats `<keyspace>.<table>`
