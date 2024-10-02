@@ -10,8 +10,8 @@
  - **ReadTimeout**: Error from server: code=1200 [Coordinator node timed out waiting for replica nodes' responses]
    - **Info**: Long execution time on server side is needed, typically complex CQL which expected more execution time or network issue between nodes
    - **Solution**: 
-     - Change CQL or tune schema (tune where conditions, add indexes, etc.)
-     - or focus on network quality
+     - Change CQL or tune schema (tune where conditions, add indexes, etc.) 
+     or focus on network quality
 
 
  - **OperationTimedOut**: errors={<Host: 10.117.19.5:9042 datacenter2>: ConnectionShutdown('Connection to 10.117.19.5:9042 was closed')}, last_host=10.117.19.6:9042
