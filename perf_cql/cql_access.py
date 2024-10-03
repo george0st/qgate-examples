@@ -49,7 +49,7 @@ class CQLAccess:
                                     control_connection_timeout = Setting.TIMEOUT,
                                     #idle_heartbeat_interval = Setting.TIMEOUT,
                                     connect_timeout = Setting.TIMEOUT,
-                                    protocol_version = ProtocolVersion.V4)
+                                    protocol_version = ProtocolVersion.V5)
         else:
             # connection with 'ip' and 'port'
             self._cluster = Cluster(contact_points = self._run_setup['ip'],
@@ -59,7 +59,7 @@ class CQLAccess:
                                     control_connection_timeout = Setting.TIMEOUT,
                                     #idle_heartbeat_interval = Setting.TIMEOUT,
                                     connect_timeout = Setting.TIMEOUT,
-                                    protocol_version = ProtocolVersion.V4)
+                                    protocol_version = ProtocolVersion.V5)
                                     # issue with 'CRC mismatch on header ...', not use protocol V5
                                     # protocol_version = ProtocolVersion.V5)
 
