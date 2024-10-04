@@ -6,5 +6,4 @@
    - it will be little tricky based on system tables
    - see stackoverflow discussion
 4. Extend tests RW, all with blob also
-5. Footer, human time, add round for total time
-6. detail output, add zero alignment
+6. add zero alignment

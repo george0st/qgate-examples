@@ -45,7 +45,7 @@ def prf_read(run_setup: RunSetup) -> ParallelProbe:
         select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0 IN ({items[:-1]}) and fn1 IN ({items[:-1]});")
         bound = BoundStatement(select_statement, consistency_level=run_setup['consistency_level'])
 
-        while True:
+        while 1:
 
             # generate synthetic data
             #  NOTE: It will generate only values for two columns (as primary keys), not for all columns
@@ -102,7 +102,7 @@ def prf_write(run_setup: RunSetup) -> ParallelProbe:
                                            #keyspace=run_setup['keyspace']) it generate issue for protocol version 4
         batch = BatchStatement(consistency_level=run_setup['consistency_level'])
 
-        while True:
+        while 1:
             batch.clear()
 
             # generate synthetic data
