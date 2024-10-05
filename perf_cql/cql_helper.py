@@ -7,13 +7,13 @@ def get_rng_generator(complex_init = True) -> random._generator.Generator:
     """Create generator of random values with initiation"""
 
     # now and now_ms (as detail about milliseconds)
-    now = time.time()
+    now = time.perf_counter()
     now_ms = (now - int(now)) * 1000000000
 
     # calc based on CPU speed
     ns_start = time.perf_counter_ns()
     if complex_init:
-        time.sleep(0.01)
+        time.sleep(0.001)
         ns_stop = time.perf_counter_ns()
 
         # create generator with more random seed (now, now_ms, cpu speed)
