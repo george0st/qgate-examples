@@ -1,4 +1,4 @@
 
 # helper for update python components
-python3.11 -m pip install qgate-perf==0.4.28
+python3.11 -m pip install qgate-perf==0.4.29
 python3.11 -m pip install cassandra-driver==3.29.2
