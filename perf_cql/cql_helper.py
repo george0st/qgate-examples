@@ -1,4 +1,4 @@
-import time
+from time import perf_counter, perf_counter_ns, sleep
 from numpy import random
 import string
 
@@ -7,14 +7,14 @@ def get_rng_generator(complex_init = True) -> random._generator.Generator:
     """Create generator of random values with initiation"""
 
     # now and now_ms (as detail about milliseconds)
-    now = time.perf_counter()
+    now = perf_counter()
     now_ms = (now - int(now)) * 1000000000
 
     # calc based on CPU speed
-    ns_start = time.perf_counter_ns()
+    ns_start = perf_counter_ns()
     if complex_init:
-        time.sleep(0.001)
-        ns_stop = time.perf_counter_ns()
+        sleep(0.001)
+        ns_stop = perf_counter_ns()
 
         # create generator with more random seed (now, now_ms, cpu speed)
         return random.default_rng([int(now), int(now_ms), ns_stop - ns_start, ns_stop])
