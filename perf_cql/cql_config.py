@@ -124,6 +124,9 @@ class CQLConfig:
             global_param['bulk_list_w'] = literal_eval(self._config.get("BULK_LIST_W", CQLConfigSetting.BULK_LIST_W))
             global_param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', CQLConfigSetting.MULTIPLE_ENV_DELAY))
 
+            if self._config.get("PERCENTILE", None):
+                global_param['percentile'] = float(self._config['PERCENTILE'])
+
             # global connection & login
             if self._config.get("IP", None):
                 global_param["ip"] = self._config["IP"]
@@ -152,6 +155,11 @@ class CQLConfig:
         else:
             param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_w', CQLConfigSetting.BULK_LIST_W)
         param['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
+
+        # percentile setting
+        percentile = self._inherit_param("PERCENTILE", global_param, "percentile")
+        if percentile:
+            param['percentile'] = float(percentile)
 
         # connection setting (relation to global_param)
         param["ip"] = self._inherit_param("IP", global_param, 'ip', CQLConfigSetting.IP).split(",")
