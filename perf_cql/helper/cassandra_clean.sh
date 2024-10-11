@@ -1,3 +1,4 @@
+#!/bin/sh
 # useful command for cassandra clean
 
 nodetool compact
