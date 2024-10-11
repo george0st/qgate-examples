@@ -65,7 +65,7 @@ be applied to each single ENV file):
    - Note:
      - '_Off_' it is without generation of graphs
      - '_Perf_' generates graph about performances (operations/second and response times)
-     - '_Perf_RAW_' the same as '_Perf_' but without miltiplication by rows in bundle
+     - '_Perf_RAW_' the same as '_Perf_' but without multiplication by rows in bundle
      - '_Exe_' generates graph about change of executors in time (it is useful 
        visualization for tuning of value for parameter '_EXECUTOR_START_DELAY_')
      - '_All_' generates performance and executor graphs
