@@ -1,6 +1,6 @@
  # TODO list
  
-1. Implementation of 99 percentile, 95 percentile
+1. Update documentation, add percentile and heap size
 2. Generate summary table with values
 3. Extend tests RW, all with blob also
 4. Add CLI for check size of all or specific keyspaces
