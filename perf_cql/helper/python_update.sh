@@ -1,3 +1,4 @@
+#!/bin/sh
 
 # helper for update python components
 python3.11 -m pip install qgate-perf==0.4.33
