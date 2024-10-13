@@ -162,6 +162,7 @@ class CQLConfig:
 
         # connection setting (relation to global_param)
         param["ip"] = self._inherit_param("IP", global_param, 'ip', CQLConfigSetting.IP).split(",")
+        param["ip"] = [ip.strip() for ip in param["ip"]]    # cleaning IP addresses
         param["port"] = self._inherit_param("PORT", global_param, 'port', CQLConfigSetting.PORT)
 
         # login setting (relation to global_param)

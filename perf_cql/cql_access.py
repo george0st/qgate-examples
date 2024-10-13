@@ -3,6 +3,7 @@ from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster, Session
 from cassandra import ProtocolVersion
 from cassandra.policies import DCAwareRoundRobinPolicy, RoundRobinPolicy
+from cassandra.policies import RetryPolicy
 from cql_config import CQLAdapter
 
 
@@ -46,8 +47,8 @@ class CQLAccess:
             self._cluster = Cluster(cloud = cloud_config,
                                     auth_provider = auth_provider,
                                     load_balancing_policy = load_balancing_policy,
+                                    default_retry_policy = RetryPolicy(),
                                     control_connection_timeout = Setting.TIMEOUT,
-                                    #idle_heartbeat_interval = Setting.TIMEOUT,
                                     connect_timeout = Setting.TIMEOUT,
                                     protocol_version = ProtocolVersion.V4)
         else:
@@ -56,8 +57,8 @@ class CQLAccess:
                                     port = self._run_setup['port'],
                                     auth_provider = auth_provider,
                                     load_balancing_policy = load_balancing_policy,
+                                    default_retry_policy = RetryPolicy(),
                                     control_connection_timeout = Setting.TIMEOUT,
-                                    #idle_heartbeat_interval = Setting.TIMEOUT,
                                     connect_timeout = Setting.TIMEOUT,
                                     protocol_version = ProtocolVersion.V4)
                                     # issue with 'CRC mismatch on header ...', not use protocol V5
