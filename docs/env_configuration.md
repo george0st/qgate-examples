@@ -14,6 +14,12 @@ default ASC ordering).
  - **EXECUTOR_DURATION** (opt)
    - The test duration for run EACH PERFORMANCE TEST (value in seconds, 
      default is _5_)
+ - **PERCENTILE** (opt)
+   - The usage of percentile in outputs and graphs (default value is without percentile).
+   - The value is float number **>0 and <1**
+   - NOTE:
+     - Expected value e.g. _0.99_, _0.95_, _0.70_, etc. (recommendation is 0.99 or 0.95)
+     - The usage of percentile is without impact to quality of measurement
  - **BULK_LIST_R** (opt) and
  - **BULK_LIST_W** (opt)
    - The size of data bulk/bundle for READ and WRITE in format

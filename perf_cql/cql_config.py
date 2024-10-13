@@ -157,9 +157,8 @@ class CQLConfig:
         param['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
 
         # percentile setting
-        percentile = self._inherit_param("PERCENTILE", global_param, "percentile")
-        if percentile:
-            param['percentile'] = float(percentile)
+        if global_param.get("percentile", None):
+            param['percentile'] = float(global_param["percentile"])
 
         # connection setting (relation to global_param)
         param["ip"] = self._inherit_param("IP", global_param, 'ip', CQLConfigSetting.IP).split(",")

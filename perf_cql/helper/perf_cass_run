@@ -25,3 +25,9 @@ nohup python3.11 perf_cql/perf_cql.py run -e _cass-quick.env -d perf_cql
 # Run all without terminal
 ###########################
 nohup ./perf_cql/helper/perf_cass_run_all.sh
+
+# only volatility
+nohup ./perf_cql/helper/perf_cass_run_1.sh
+
+# only peek
+nohup ./perf_cql/helper/perf_cass_run_2.sh
