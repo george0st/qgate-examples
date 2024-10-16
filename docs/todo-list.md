@@ -6,8 +6,7 @@
 5. Identify Cassandra, Scylla, AstraDB based on CQL
    - it will be little tricky based on system tables
    - see stackoverflow discussion
-6. Tune unit tests for scope in qgate-perf
-   - split tests
-   - add test for all raw
+6. generate graph (only non-exists)
+   - with param rewrite_existing
 
 
