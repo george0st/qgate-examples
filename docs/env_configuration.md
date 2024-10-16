@@ -67,11 +67,16 @@ be applied to each single ENV file):
      (but it is without usage for performance graph)
  - **GENERATE_GRAPH** (opt)
    - The setting for graph generator can be '_Off_', '_Perf_' (as default),
-     '_Perf_RAW_', '_Perf_txt_', 'Perf_txt_RAW', '_Exe_' or '_All_'
+     '_Perf_RAW_', '_Perf_txt_', '_Perf_txt_RAW_', '_Perf_csv_',
+     '_Perf_csv_raw_', '_Exe_' or '_All_'
    - Note:
      - '_Off_' it is without generation of graphs
      - '_Perf_' generates graph about performances (operations/second and response times)
-     - '_Perf_RAW_' the same as '_Perf_' but without multiplication by rows in bundle
+     - '_Perf_RAW_' the same as '_Perf_' but without multiplication by rows from bundle
+     - '_Perf_txt_' the output is in readable TXT (text) form
+     - '_Perf_txt_RAW_' the same as '_Perf_txt_' but without multiplication by rows from bundle
+     - '_Perf_csv_' the output is in CSV form
+     - '_Perf_csv_RAW_' the same as '_Perf_csv_' but without multiplication by rows from bundle
      - '_Exe_' generates graph about change of executors in time (it is useful 
        visualization for tuning of value for parameter '_EXECUTOR_START_DELAY_')
      - '_All_' generates performance and executor graphs
