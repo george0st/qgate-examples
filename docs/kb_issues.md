@@ -52,3 +52,10 @@
      - Logins for the cassandra user are performed with QUORUM consistency. 
      - Do not use the default cassandra user in production, because QUORUM consistency has significant performance degradation for multiple data centers. 
      - Logins for all other users are performed with LOCAL_ONE consistency.
+
+
+ - **NoHostAvailable**: ('Unable to connect to any servers', {'10.129.53.159:9042': ConnectionRefusedError(10061, "Tried connecting to [('10.129.53.159', 9042)]. Last error: No connection could be made because the target machine actively refused it")})
+   - **Info**: The node '10.129.53.159:9042' is not available and you did not define other nodes for connection
+   - **Solution**: Add to the connection:
+     - more nodes 
+     - define retry policy for optimal error handling

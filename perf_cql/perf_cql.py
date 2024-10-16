@@ -146,15 +146,10 @@ def cluster_diagnose(run_setup, level):
 
 def generate_graphs(generator: ParallelExecutor, generate_graph_scope, output_dir):
     """Generate graph based on setting"""
-
-    scope = GraphScope[generate_graph_scope.lower()]
-    if GraphScope.perf in scope:
-        print("Generate graph: performance...")
-        generator.create_graph_perf(output_dir, suppress_error = True)
-
-    if GraphScope.exe in scope:
-        print("Generate graph: execution...")
-        generator.create_graph_exec(output_dir, suppress_error = True)
+    print(f"Generate graph(s): '{generate_graph_scope}'...")
+    generator.create_graph(output_dir,
+                           scope = GraphScope[generate_graph_scope.lower()],
+                           suppress_error = True)
 
 def perf_test(unique_id, global_param, parameters: dict):
 
