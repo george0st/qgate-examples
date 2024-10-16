@@ -67,7 +67,7 @@ be applied to each single ENV file):
      (but it is without usage for performance graph)
  - **GENERATE_GRAPH** (opt)
    - The setting for graph generator can be '_Off_', '_Perf_' (as default),
-     '_Perf_RAW_', '_Exe_' or '_All_'
+     '_Perf_RAW_', '_Perf_txt_', 'Perf_txt_RAW', '_Exe_' or '_All_'
    - Note:
      - '_Off_' it is without generation of graphs
      - '_Perf_' generates graph about performances (operations/second and response times)
