@@ -15,6 +15,9 @@ python3.11 perf_cql/perf_cql.py run -e _cass-peek2.env -d perf_cql
 python3.11 perf_cql/perf_cql.py run -e _cass-local-one.env -d perf_cql
 
 python3.11 perf_cql/perf_cql.py run -e _azure-cass-v4.env -d perf_cql
+python3.11 perf_cql/perf_cql.py run -e _azure-cass-v4-one.env -d perf_cql
+python3.11 perf_cql/perf_cql.py run -e _azure-cass-v5.env -d perf_cql
+python3.11 perf_cql/perf_cql.py run -e _azure-cass-v5-one.env -d perf_cql
 
 # Run without terminal
 ###########################
