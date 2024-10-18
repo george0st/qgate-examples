@@ -15,8 +15,75 @@ import click
 
 
 def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
-    # TODO: Add readwrite operations
-    pass
+    generator = get_rng_generator()
+    columns, items = "", ""
+    cql = None
+    session = None
+
+    if run_setup.is_init:
+        # create schema for write data
+        try:
+            cql = CQLAccess(run_setup)
+            cql.open()
+            cql.create_model()
+        finally:
+            if cql:
+                cql.close()
+        return None
+
+    try:
+        cql = CQLAccess(run_setup)
+        cql.open()
+        session = cql.create_session()
+
+        # INIT - contains executor synchronization, if needed
+        probe = ParallelProbe(run_setup)
+
+        # prepare insert statement for batch
+        for i in range(0, run_setup.bulk_col):
+            columns += f"fn{i},"
+            items += "?,"
+
+        # insert one value
+        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]});")
+        insert_bound = BoundStatement(insert_statement, consistency_level = run_setup['consistency_level'])
+
+        # select one value
+        select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0 = ? and fn1 = ?;")
+        select_bound = BoundStatement(select_statement, consistency_level = run_setup['consistency_level'])
+
+        while 1:
+            insert_bound.clear()
+            select_bound.clear()
+
+            # START - probe, only for this specific code part
+            probe.start()
+
+            for cycle in range(run_setup.bulk_row):
+
+                # generate synthetic data
+                synthetic_insert_data = generator.integers(Setting.MAX_GNR_VALUE, size = run_setup.bulk_col)
+                synthetic_select_data = generator.integers(Setting.MAX_GNR_VALUE, size = 2)
+
+                # prepare data
+                insert_bound.bind(synthetic_insert_data)
+                select_bound.bind(synthetic_select_data)
+
+                # execute
+                session.execute(insert_bound)
+                session.execute(select_bound)
+
+            # STOP - probe
+            if probe.stop():
+                break
+    finally:
+        if session:
+            session.shutdown()
+        if cql:
+            cql.close()
+
+    return probe
+
 
 def prf_read(run_setup: RunSetup) -> ParallelProbe:
     generator = get_rng_generator()
@@ -146,6 +213,7 @@ def cluster_diagnose(run_setup, level):
 
 def generate_graphs(generator: ParallelExecutor, generate_graph_scope, output_dir):
     """Generate graph based on setting"""
+
     graph_scope = GraphScope[generate_graph_scope.lower()]
     if GraphScope.off not in graph_scope:
         print(f"Generate graph(s): '{generate_graph_scope}'...")
