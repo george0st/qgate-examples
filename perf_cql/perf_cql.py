@@ -56,25 +56,29 @@ def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
             insert_bound.clear()
             select_bound.clear()
 
-            # START - probe, only for this specific code part
-            probe.start()
+            # partly INIT
+            probe.partly_init()
 
             for cycle in range(run_setup.bulk_row):
 
-                # generate synthetic data
+                # generate synthetic data & prepare data
                 synthetic_insert_data = generator.integers(Setting.MAX_GNR_VALUE, size = run_setup.bulk_col)
                 synthetic_select_data = generator.integers(Setting.MAX_GNR_VALUE, size = 2)
-
-                # prepare data
                 insert_bound.bind(synthetic_insert_data)
                 select_bound.bind(synthetic_select_data)
+
+                # partly START
+                probe.partly_start()
 
                 # execute
                 session.execute(insert_bound)
                 session.execute(select_bound)
 
-            # STOP - probe
-            if probe.stop():
+                # partly STOP
+                probe.partly_stop()
+
+            # partly FINISH
+            if probe.partly_finish():
                 break
     finally:
         if session:
@@ -239,13 +243,12 @@ def perf_test(unique_id, global_param, parameters: dict):
                                      detail_output=global_param['detail_output'],
                                      output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-R{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
                                      init_each_bulk=True)
-    # TODO: Add read & write
-    # elif parameters['test_type']=='rw' or parameters['test_type']=='wr':    # READ & WRITE perf test
-    #     generator = ParallelExecutor(prf_cql_readwrite(),
-    #                                  label=f"{lbl}-read{lbl_suffix}",
-    #                                  detail_output=True,
-    #                                  output_file=f"../output/prf_{lbl.lower()}-write{lbl_suffix.lower()}-{datetime.date.today()}.txt",
-    #                                  init_each_bulk=True)
+    elif parameters['test_type']=='rw' or parameters['test_type']=='wr':    # READ & WRITE perf test
+        generator = ParallelExecutor(prf_readwrite(),
+                                     label=f"{lbl}{unique_id}-RW{lbl_suffix}",
+                                     detail_output=global_param['detail_output'],
+                                     output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-RW{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
+                                     init_each_bulk=True)
 
     # define setup
     setup = RunSetup(duration_second = global_param['executor_duration'],
