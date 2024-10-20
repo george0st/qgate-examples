@@ -151,6 +151,7 @@ class CQLConfig:
         self._config = dotenv_values(path.join(self._perf_dir, "config", env_file))
 
         param['adapter'] = self._get_adapter(global_param)
+
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
         if param['test_type'] == "r":
             param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_r', CQLConfigSetting.BULK_LIST_R)
