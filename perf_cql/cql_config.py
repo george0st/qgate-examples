@@ -36,6 +36,7 @@ class CQLConfigSetting:
     BULK_LIST = "[[200, 10]]"
     BULK_LIST_W = "[[200, 10]]"
     BULK_LIST_R = "[[1, 10]]"
+    BULK_LIST_RW = "[[100, 10]]"
     EXECUTORS = "[[1, 1, '1x threads'], [2, 1, '1x threads']]"
 
     # The other tuning
@@ -122,6 +123,7 @@ class CQLConfig:
             global_param['keyspace'] = self._config.get("KEYSPACE", CQLConfigSetting.KEYSPACE)
             global_param['bulk_list_r'] = literal_eval(self._config.get("BULK_LIST_R", CQLConfigSetting.BULK_LIST_R))
             global_param['bulk_list_w'] = literal_eval(self._config.get("BULK_LIST_W", CQLConfigSetting.BULK_LIST_W))
+            global_param['bulk_list_rw'] = literal_eval(self._config.get("BULK_LIST_RW", CQLConfigSetting.BULK_LIST_RW))
             global_param['multiple_env_delay'] = int(self._config.get('MULTIPLE_ENV_DELAY', CQLConfigSetting.MULTIPLE_ENV_DELAY))
 
             if self._config.get("PERCENTILE", None):
@@ -149,11 +151,15 @@ class CQLConfig:
         self._config = dotenv_values(path.join(self._perf_dir, "config", env_file))
 
         param['adapter'] = self._get_adapter(global_param)
+
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
         if param['test_type'] == "r":
             param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_r', CQLConfigSetting.BULK_LIST_R)
-        else:
+        elif param['test_type'] == "w":
             param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_w', CQLConfigSetting.BULK_LIST_W)
+        elif param['test_type'] == "rw" or param['test_type'] == "wr":
+            param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_rw', CQLConfigSetting.BULK_LIST_RW)
+
         param['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
 
         # percentile setting

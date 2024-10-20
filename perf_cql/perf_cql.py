@@ -53,9 +53,6 @@ def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
         select_bound = BoundStatement(select_statement, consistency_level = run_setup['consistency_level'])
 
         while 1:
-            insert_bound.clear()
-            select_bound.clear()
-
             # partly INIT
             probe.partly_init()
 
@@ -244,7 +241,7 @@ def perf_test(unique_id, global_param, parameters: dict):
                                      output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-R{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
                                      init_each_bulk=True)
     elif parameters['test_type']=='rw' or parameters['test_type']=='wr':    # READ & WRITE perf test
-        generator = ParallelExecutor(prf_readwrite(),
+        generator = ParallelExecutor(prf_readwrite,
                                      label=f"{lbl}{unique_id}-RW{lbl_suffix}",
                                      detail_output=global_param['detail_output'],
                                      output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-RW{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
