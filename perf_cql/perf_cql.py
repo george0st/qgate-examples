@@ -60,7 +60,7 @@ def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
             synthetic_insert_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, run_setup.bulk_col))
             synthetic_select_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, 2))
 
-            # one cycle
+            # one cycle (with amount of call based on bulk_row)
             for index in range(run_setup.bulk_row):
 
                 # prepare data
