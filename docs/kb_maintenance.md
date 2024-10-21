@@ -8,6 +8,7 @@
 
 The compact data for better efficiency (and remove tombstone). The usage: 
  - nodetool compact `<keyspace>` `<table>`
+ - nodetool compact
  - nodetool compact prftest
  - nodetool compact prftest t01
 
@@ -19,6 +20,7 @@ NOTE:
 
 The cleanup of obsolete, not used data (valid data will be without touch/impact). The usage:
  - nodetool cleanup `<keyspace>` `<table>`
+ - nodetool cleanup 
  - nodetool cleanup prftest 
  - nodetool cleanup prftest t01
 
@@ -26,6 +28,7 @@ The cleanup of obsolete, not used data (valid data will be without touch/impact)
 
 The remove unused data for better performance. The usage 
  - nodetool garbagecollect `<keyspace>` `<table>`
+ - nodetool garbagecollect 
  - nodetool garbagecollect prftest 
  - nodetool garbagecollect prftest t01
 
