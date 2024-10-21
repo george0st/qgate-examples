@@ -3,9 +3,9 @@ from os import path
 from cassandra.query import BatchStatement, BoundStatement
 from qgate_perf.parallel_executor import ParallelExecutor
 from qgate_perf.parallel_probe import ParallelProbe
-from qgate_perf.executor_helper import GraphScope
+from qgate_perf.helper import GraphScope
 from qgate_perf.run_setup import RunSetup
-from cql_config import CQLConfig, CQLAdapter
+from cql_config import CQLConfig
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
 from cql_helper import get_rng_generator
@@ -45,24 +45,31 @@ def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
             items += "?,"
 
         # insert one value
-        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]});")
-        insert_bound = BoundStatement(insert_statement, consistency_level = run_setup['consistency_level'])
+        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} "
+                                           f"({columns[:-1]}) VALUES ({items[:-1]});")
+        insert_bound = BoundStatement(insert_statement,
+                                      consistency_level = run_setup['consistency_level'])
 
         # select one value
-        select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0 = ? and fn1 = ?;")
-        select_bound = BoundStatement(select_statement, consistency_level = run_setup['consistency_level'])
+        select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} "
+                                           f"WHERE fn0 = ? and fn1 = ?;")
+        select_bound = BoundStatement(select_statement,
+                                      consistency_level = run_setup['consistency_level'])
 
         while 1:
             # partly INIT
             probe.partly_init()
 
-            for cycle in range(run_setup.bulk_row):
+            # generate synthetic data for one cycle
+            synthetic_insert_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, run_setup.bulk_col))
+            synthetic_select_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, 2))
 
-                # generate synthetic data & prepare data
-                synthetic_insert_data = generator.integers(Setting.MAX_GNR_VALUE, size = run_setup.bulk_col)
-                synthetic_select_data = generator.integers(Setting.MAX_GNR_VALUE, size = 2)
-                insert_bound.bind(synthetic_insert_data)
-                select_bound.bind(synthetic_select_data)
+            # one cycle (with amount of call based on bulk_row)
+            for index in range(run_setup.bulk_row):
+
+                # prepare data
+                insert_bound.bind(synthetic_insert_data[index])
+                select_bound.bind(synthetic_select_data[index])
 
                 # partly START
                 probe.partly_start()
@@ -74,7 +81,7 @@ def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
                 # partly STOP
                 probe.partly_stop()
 
-            # partly FINISH
+            # partly FINISH - check time for performance test END
             if probe.partly_finish():
                 break
     finally:
@@ -84,7 +91,6 @@ def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
             cql.close()
 
     return probe
-
 
 def prf_read(run_setup: RunSetup) -> ParallelProbe:
     generator = get_rng_generator()
@@ -110,7 +116,8 @@ def prf_read(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_row):
             items+="?,"
 
-        select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} WHERE fn0 IN ({items[:-1]}) and fn1 IN ({items[:-1]});")
+        select_statement = session.prepare(f"SELECT {columns[:-1]} FROM {run_setup['keyspace']}.{Setting.TABLE_NAME} "
+                                           f"WHERE fn0 IN ({items[:-1]}) and fn1 IN ({items[:-1]});")
         bound = BoundStatement(select_statement, consistency_level=run_setup['consistency_level'])
 
         while 1:
@@ -166,8 +173,8 @@ def prf_write(run_setup: RunSetup) -> ParallelProbe:
         for i in range(0, run_setup.bulk_col):
             columns+=f"fn{i},"
             items+="?,"
-        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) VALUES ({items[:-1]});")
-                                           #keyspace=run_setup['keyspace']) it generate issue for protocol version 4
+        insert_statement = session.prepare(f"INSERT INTO {run_setup['keyspace']}.{Setting.TABLE_NAME} ({columns[:-1]}) "
+                                           f"VALUES ({items[:-1]});")
         batch = BatchStatement(consistency_level=run_setup['consistency_level'])
 
         while 1:
