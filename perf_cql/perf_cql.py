@@ -3,9 +3,9 @@ from os import path
 from cassandra.query import BatchStatement, BoundStatement
 from qgate_perf.parallel_executor import ParallelExecutor
 from qgate_perf.parallel_probe import ParallelProbe
-from qgate_perf.executor_helper import GraphScope
+from qgate_perf.helper import GraphScope
 from qgate_perf.run_setup import RunSetup
-from cql_config import CQLConfig, CQLAdapter
+from cql_config import CQLConfig
 from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
 from cql_helper import get_rng_generator
@@ -56,13 +56,16 @@ def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
             # partly INIT
             probe.partly_init()
 
-            for cycle in range(run_setup.bulk_row):
+            # generate synthetic data for one cycle
+            synthetic_insert_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, run_setup.bulk_col))
+            synthetic_select_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, 2))
 
-                # generate synthetic data & prepare data
-                synthetic_insert_data = generator.integers(Setting.MAX_GNR_VALUE, size = run_setup.bulk_col)
-                synthetic_select_data = generator.integers(Setting.MAX_GNR_VALUE, size = 2)
-                insert_bound.bind(synthetic_insert_data)
-                select_bound.bind(synthetic_select_data)
+            # one cycle
+            for index in range(run_setup.bulk_row):
+
+                # prepare data
+                insert_bound.bind(synthetic_insert_data[index])
+                select_bound.bind(synthetic_select_data[index])
 
                 # partly START
                 probe.partly_start()
@@ -74,7 +77,7 @@ def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
                 # partly STOP
                 probe.partly_stop()
 
-            # partly FINISH
+            # partly FINISH - check time for performance test end
             if probe.partly_finish():
                 break
     finally:
