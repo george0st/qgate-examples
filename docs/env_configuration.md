@@ -30,7 +30,7 @@ default ASC ordering).
    - NOTE: _[[200, 10]]_ means, that table will have 10 columns and will do
      - 200 insert/upsert operations in batch, during the test type Write
      - 1 select operation with 200 where conditions, during the test type Read 
-       (it is better to use bulk e.g. [1, 10] for read operations)
+       (it is better to use bulk e.g. [1, 10] or [10,10] for read operations)
      - 200 atomic insert and select operations during the test type ReadWrite
  - **EXECUTORS** (opt)
    - The set of executors in format '_[[processes, threads, label], ...]_' 
