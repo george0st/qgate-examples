@@ -36,7 +36,7 @@ class CQLConfigSetting:
     BULK_LIST = "[[200, 10]]"
     BULK_LIST_W = "[[200, 10]]"
     BULK_LIST_R = "[[1, 10]]"
-    BULK_LIST_RW = "[[100, 10]]"
+    BULK_LIST_RW = "[[5, 10]]"
     EXECUTORS = "[[1, 1, '1x threads'], [2, 1, '1x threads']]"
 
     # The other tuning

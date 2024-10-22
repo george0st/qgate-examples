@@ -22,13 +22,16 @@ default ASC ordering).
      - The usage of percentile is without impact to quality of measurement
  - **BULK_LIST_R** (opt) and
  - **BULK_LIST_W** (opt)
-   - The size of data bulk/bundle for READ and WRITE in format
-     '_[[rows, columns], ...]_' (default for READ '_[[200, 10]]_',
-     for WRITE '_[[1,10]]_')
+ - **BULK_LIST_RW** (opt)
+   - The size of data bulk/bundle for READ, WRITE and READWRITE are in format:
+     - '_[[rows, columns], ...]_' 
+     - defaults are '_[[200, 10]]_' for READ, '_[[1,10]]_' for WRITE and
+       '_[[5,10]]_' for READWRITE
    - NOTE: _[[200, 10]]_ means, that table will have 10 columns and will do
-     - 200 insert/upsert operation during the test type Write
-     - 200 select operation during the test type Read 
+     - 200 insert/upsert operations in batch, during the test type Write
+     - 1 select operation with 200 where conditions, during the test type Read 
        (it is better to use bulk e.g. [1, 10] for read operations)
+     - 200 atomic insert and select operations during the test type ReadWrite
  - **EXECUTORS** (opt)
    - The set of executors in format '_[[processes, threads, label], ...]_' 
      (default is '_"[[1, 1, '1x threads'], [2, 1, '1x threads']]"_')
@@ -140,7 +143,7 @@ The configuration for connection to the specific CQL solution such as
 ScyllaDB, Cassandra, AstraDB, CosmosDB.
 
  - **TEST_TYPE** (opt)
-   - The type of operation can be '_R_' read, '_W_' write (as default) 
+   - The type of operation can be '_R_' read, '_W_' write (as default) and '_RW_'
  - **BULK_LIST** (opt, inherit)
    - The size of data bulk in format '_[[rows, columns], ...]_' 
      (default is '_[[200, 10]]_')
