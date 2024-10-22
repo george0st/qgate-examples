@@ -192,9 +192,11 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
    - The name of local data center for correct balancing 
      (default is '_datacenter1_')
  - **COMPACTION** (opt)
-   - The type of compaction (without default as optional), expected values
-     '_UnifiedCompactionStrategy_', '_SizeTieredCompactionStrategy_',
-     '_LeveledCompactionStrategy_', '_TimeWindowCompactionStrategy_'
+   - The type of compaction (without default as optional), expected values:
+     - '_UnifiedCompactionStrategy_' (new in cassandra V5)
+     - '_SizeTieredCompactionStrategy_'
+     - '_LeveledCompactionStrategy_'
+     - '_TimeWindowCompactionStrategy_'
    - NOTE: 
      - detailed description see [Apache Compaction](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/index.html),
        [DataStax Compaction](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/operations/opsConfigureCompaction.html)
@@ -203,11 +205,11 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
    - The parameters for the compaction (without default as optional), value must be 
      in **quotation marks** 
    - Sample:
-     - The parameters for COMPACTION '_SizeTieredCompactionStrategy_'
-       - _"'max_threshold': 32, 'min_threshold': 4"_ for
-         COMPACTION '_SizeTieredCompactionStrategy_'
-     - The parameters for COMPACTION '_UnifiedCompactionStrategy_'
+     - The parameters for COMPACTION '_SizeTieredCompactionStrategy_':
+       - _"'max_threshold': 32, 'min_threshold': 4"_
+     - The parameters for COMPACTION '_UnifiedCompactionStrategy_':
        - _"'scaling_parameters': 'L4, L10'"_ or _"'scaling_parameters': 'T8, T4, N, L4'"_
+       - _"'max_sstables_to_compact':'64', 'min_sstable_size':'100MiB', 'scaling_parameters':'T4', 'sstable_growth':'0.3333333333333333', 'target_sstable_size':'1GiB'"_
    - NOTE: 
      - detailed description see params
        [UCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/ucs.html#ucs_options), 
