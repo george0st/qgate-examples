@@ -33,10 +33,10 @@ class CQLAccess:
                                                  password = self._run_setup["password"])
 
         # load balancing policy
-        if int(self._run_setup['replication_factor']) == 1:
-            load_balancing_policy = RoundRobinPolicy()
-        else:
+        if int(self._run_setup['replication_factor']) > 1 and self._run_setup["local_dc"]:
             load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"])
+        else:
+            load_balancing_policy = RoundRobinPolicy()
 
         if self._run_setup["secure_connect_bundle"]:
             # connection with 'secure_connect_bundle' to the cloud

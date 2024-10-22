@@ -227,7 +227,8 @@ def generate_graphs(generator: ParallelExecutor, generate_graph_scope, output_di
         print(f"Generate graph(s): '{generate_graph_scope}'...")
         generator.create_graph(output_dir,
                                scope = graph_scope,
-                               suppress_error = True)
+                               suppress_error = True,
+                               only_new=True)           # generate only new files (not regenerate all)
 
 def perf_test(unique_id, global_param, parameters: dict):
 
@@ -343,9 +344,10 @@ def graph(scope, perf_dir, input_files):
     for file in glob(path.join(perf_dir, "..", "output", input_files)):
         print(file)
         for output in ParallelExecutor.create_graph_static(file,
-                                             path.join(perf_dir, "..", "output"),
-                                             GraphScope[scope.lower()],
-                                             suppress_error=True):
+                                                           path.join(perf_dir, "..", "output"),
+                                                           GraphScope[scope.lower()],
+                                                           suppress_error=True,
+                                                           only_new=False):
             print(" ", output)
 
 @click.group()

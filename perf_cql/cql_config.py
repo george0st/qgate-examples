@@ -196,7 +196,8 @@ class CQLConfig:
                                                                                       CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
 
         # network balancing, local data center for correct setting of balancing (RoundRobinPolicy or DCAwareRoundRobinPolicy)
-        param['local_dc'] = self._config.get("LB_LOCAL_DC", CQLConfigSetting.LB_LOCAL_DC)
+        if self._config.get("LB_LOCAL_DC", None):
+            param['local_dc'] = self._config.get("LB_LOCAL_DC")
 
         # label
         param['label'] = self._config.get("LABEL", CQLConfigSetting.LABEL)

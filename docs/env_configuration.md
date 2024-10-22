@@ -193,7 +193,10 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
    - NOTE: detailed description see [DataStax Consistency](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
  - **LB_LOCAL_DC** (opt)
    - The name of local data center for correct balancing 
-     (default is '_datacenter1_')
+     (expected value is e.g. '_datacenter1_')
+   - NOTE: 
+     - in case of (REPLICATION_FACTOR>1 and LB_LOCAL_DC!=None) => will be used **DCAwareRoundRobinPolicy with LB_LOCAL_DC** 
+       else **RoundRobinPolicy**
  - **COMPACTION** (opt)
    - The type of compaction (without default as optional), expected values:
      - '_UnifiedCompactionStrategy_' (new in cassandra V5)
