@@ -22,13 +22,16 @@ default ASC ordering).
      - The usage of percentile is without impact to quality of measurement
  - **BULK_LIST_R** (opt) and
  - **BULK_LIST_W** (opt)
-   - The size of data bulk/bundle for READ and WRITE in format
-     '_[[rows, columns], ...]_' (default for READ '_[[200, 10]]_',
-     for WRITE '_[[1,10]]_')
+ - **BULK_LIST_RW** (opt)
+   - The size of data bulk/bundle for READ, WRITE and READWRITE are in format:
+     - '_[[rows, columns], ...]_' 
+     - defaults are '_[[200, 10]]_' for READ, '_[[1,10]]_' for WRITE and
+       '_[[5,10]]_' for READWRITE
    - NOTE: _[[200, 10]]_ means, that table will have 10 columns and will do
-     - 200 insert/upsert operation during the test type Write
-     - 200 select operation during the test type Read 
-       (it is better to use bulk e.g. [1, 10] for read operations)
+     - 200 insert/upsert operations in batch, during the test type Write
+     - 1 select operation with 200 where conditions, during the test type Read 
+       (it is better to use bulk e.g. [1, 10] or [10,10] for read operations)
+     - 200 atomic insert and select operations during the test type ReadWrite
  - **EXECUTORS** (opt)
    - The set of executors in format '_[[processes, threads, label], ...]_' 
      (default is '_"[[1, 1, '1x threads'], [2, 1, '1x threads']]"_')
@@ -140,7 +143,7 @@ The configuration for connection to the specific CQL solution such as
 ScyllaDB, Cassandra, AstraDB, CosmosDB.
 
  - **TEST_TYPE** (opt)
-   - The type of operation can be '_R_' read, '_W_' write (as default) 
+   - The type of operation can be '_R_' read, '_W_' write (as default) and '_RW_'
  - **BULK_LIST** (opt, inherit)
    - The size of data bulk in format '_[[rows, columns], ...]_' 
      (default is '_[[200, 10]]_')
@@ -192,9 +195,11 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
    - The name of local data center for correct balancing 
      (default is '_datacenter1_')
  - **COMPACTION** (opt)
-   - The type of compaction (without default as optional), expected values
-     '_UnifiedCompactionStrategy_', '_SizeTieredCompactionStrategy_',
-     '_LeveledCompactionStrategy_', '_TimeWindowCompactionStrategy_'
+   - The type of compaction (without default as optional), expected values:
+     - '_UnifiedCompactionStrategy_' (new in cassandra V5)
+     - '_SizeTieredCompactionStrategy_'
+     - '_LeveledCompactionStrategy_'
+     - '_TimeWindowCompactionStrategy_'
    - NOTE: 
      - detailed description see [Apache Compaction](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/index.html),
        [DataStax Compaction](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/operations/opsConfigureCompaction.html)
@@ -203,11 +208,11 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
    - The parameters for the compaction (without default as optional), value must be 
      in **quotation marks** 
    - Sample:
-     - The parameters for COMPACTION '_SizeTieredCompactionStrategy_'
-       - _"'max_threshold': 32, 'min_threshold': 4"_ for
-         COMPACTION '_SizeTieredCompactionStrategy_'
-     - The parameters for COMPACTION '_UnifiedCompactionStrategy_'
+     - The parameters for COMPACTION '_SizeTieredCompactionStrategy_':
+       - _"'max_threshold': 32, 'min_threshold': 4"_
+     - The parameters for COMPACTION '_UnifiedCompactionStrategy_':
        - _"'scaling_parameters': 'L4, L10'"_ or _"'scaling_parameters': 'T8, T4, N, L4'"_
+       - _"'max_sstables_to_compact':'64', 'min_sstable_size':'100MiB', 'scaling_parameters':'T4', 'sstable_growth':'0.3333333333333333', 'target_sstable_size':'1GiB'"_
    - NOTE: 
      - detailed description see params
        [UCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/ucs.html#ucs_options), 

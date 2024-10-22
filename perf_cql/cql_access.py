@@ -81,9 +81,10 @@ class CQLAccess:
                     session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']};")
 
                     # Create key space
-                    session.execute(f"CREATE KEYSPACE IF NOT EXISTS {self._run_setup['keyspace']}" +
-                                    " WITH replication = {" +
-                                    f"'class':'{self._run_setup['replication_class']}', 'replication_factor' : {self._run_setup['replication_factor']}" +
+                    session.execute(f"CREATE KEYSPACE IF NOT EXISTS {self._run_setup['keyspace']} " +
+                                    "WITH replication = {" +
+                                    f"'class':'{self._run_setup['replication_class']}', " +
+                                    f"'replication_factor' : {self._run_setup['replication_factor']}" +
                                     "};")
 
             # use LTW atomic command with IF

@@ -48,5 +48,6 @@ The information about compaction, the usage:
 
 The information about tables, the usage:
  - nodetool tablestats `<keyspace>.<table>`
+ - nodetool tablestats
  - nodetool tablestats prftest
  - nodetool tablestats prftest.t01
