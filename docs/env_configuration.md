@@ -61,12 +61,21 @@ be applied to each single ENV file):
    - **SECURE_CONNECT_BUNDLE** (opt)
      - The connection based on SECURE_CONNECT_BUNDLE, it is a useful
        way for AstraDB.
-     - NOTE: It is typically used instead of IP and PORT definition
+     - NOTE: 
+       - It is typically used instead of IP and PORT definition 
+         (it means the username and password is still needed)
+       - SCB is the link to '*.zip' file, downloaded from astra web
    - **USERNAME** (opt)
       - The username for login (default is '_cassandra_')
+      - NOTE:
+        - In case of usage 'SECURE_CONNECT_BUNDLE', the username is 
+          'clientId' from downloaded astra web file '*-token.json'
    - **PASSWORD** (opt)
       - The path to the file with password for login 
         (default is password value '_cassandra_')
+      - NOTE:
+        - In case of usage 'SECURE_CONNECT_BUNDLE', the password is 
+          'secret' from downloaded astra web file '*-token.json'
 
 ### 1.3 The other parameters with smaller importance
 
