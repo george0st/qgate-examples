@@ -11,6 +11,12 @@ default ASC ordering).
 
 ### 1.1 The main parameters for test execution
 
+ - **ADAPTER** (opt)
+   - The name of adapter e.g. 'cassandra', 'scylla', 'astra', etc.
+     (default is _'cassandra'_)
+   - NOTE: 
+     - you can change behavioral based on adapter in your own code
+     - adapter name is used in output files (*.txt, *.png, *.csv, etc.) 
  - **EXECUTOR_DURATION** (opt)
    - The test duration for run EACH PERFORMANCE TEST (value in seconds, 
      default is _5_)

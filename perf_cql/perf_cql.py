@@ -232,7 +232,7 @@ def generate_graphs(generator: ParallelExecutor, generate_graph_scope, output_di
 
 def perf_test(unique_id, global_param, parameters: dict):
 
-    lbl = parameters['adapter'].name
+    lbl = parameters['adapter']#.name
     lbl_suffix = f"{parameters['label']}" if parameters.get('label', None) else ""
 
     generator = None

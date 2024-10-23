@@ -4,7 +4,6 @@ from cassandra.cluster import Cluster, Session
 from cassandra import ProtocolVersion
 from cassandra.policies import DCAwareRoundRobinPolicy, RoundRobinPolicy
 from cassandra.policies import RetryPolicy
-from cql_config import CQLAdapter
 
 
 class Setting:
@@ -75,17 +74,17 @@ class CQLAccess:
         session = None
         try:
             session = self.create_session(Setting.TIMEOUT_CREATE_MODEL)
-            if self._run_setup["adapter"] != CQLAdapter.astradb:
-                if self._run_setup['replication_factor']:
-                    # Drop key space
-                    session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']};")
+#            if self._run_setup["adapter"] != CQLAdapter.astradb:
+            if self._run_setup['replication_factor']:
+                # Drop key space
+                session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']};")
 
-                    # Create key space
-                    session.execute(f"CREATE KEYSPACE IF NOT EXISTS {self._run_setup['keyspace']} " +
-                                    "WITH replication = {" +
-                                    f"'class':'{self._run_setup['replication_class']}', " +
-                                    f"'replication_factor' : {self._run_setup['replication_factor']}" +
-                                    "};")
+                # Create key space
+                session.execute(f"CREATE KEYSPACE IF NOT EXISTS {self._run_setup['keyspace']} " +
+                                "WITH replication = {" +
+                                f"'class':'{self._run_setup['replication_class']}', " +
+                                f"'replication_factor' : {self._run_setup['replication_factor']}" +
+                                "};")
 
             # use LTW atomic command with IF
             session.execute(f"DROP TABLE IF EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME};")

@@ -13,8 +13,6 @@
     KEYSPACE_COMPACTION = UnifiedCompactionStrategy
     KEYSPACE_COMPACTION_PARAMS = "'scaling_parameters': 'L4, L10'"
 
-4. Add description for ADAPTER/USAGE??
-
 5. Use relevant subdirectories for details ENV files
 
 
