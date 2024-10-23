@@ -61,12 +61,21 @@ be applied to each single ENV file):
    - **SECURE_CONNECT_BUNDLE** (opt)
      - The connection based on SECURE_CONNECT_BUNDLE, it is a useful
        way for AstraDB.
-     - NOTE: It is typically used instead of IP and PORT definition
+     - NOTE: 
+       - It is typically used instead of IP and PORT definition 
+         (it means the username and password is still needed)
+       - SCB is the link to '*.zip' file, downloaded from astra web
    - **USERNAME** (opt)
       - The username for login (default is '_cassandra_')
+      - NOTE:
+        - In case of usage 'SECURE_CONNECT_BUNDLE', the username is 
+          'clientId' from downloaded astra web file '*-token.json'
    - **PASSWORD** (opt)
       - The path to the file with password for login 
         (default is password value '_cassandra_')
+      - NOTE:
+        - In case of usage 'SECURE_CONNECT_BUNDLE', the password is 
+          'secret' from downloaded astra web file '*-token.json'
 
 ### 1.3 The other parameters with smaller importance
 
@@ -109,7 +118,7 @@ be applied to each single ENV file):
    - The delay before switch to different config file (value in seconds,
      default is _0_)
 
-### 1.1 Examples
+### 1.4 Examples
 
 The example with full setting:
 ```
@@ -150,6 +159,8 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
 
  - **TEST_TYPE** (opt)
    - The type of operation can be '_R_' read, '_W_' write (as default) and '_RW_'
+ - **LABEL** (opt)
+   - The label used in output file name (default is '_local_')
  - **BULK_LIST** (opt, inherit)
    - The size of data bulk in format '_[[rows, columns], ...]_' 
      (default is '_[[200, 10]]_')
@@ -162,8 +173,9 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
        '_TEST_TYPE = R_' or '_BULK_LIST_W_' for '_TEST_TYPE = W_' 
  - **KEYSPACE** (opt, inherit)
    - The name of keyspace for test (default is '_prftest_')
- - **LABEL** (opt)
-   - The label used in output file name (default is '_local_')
+
+### 2.1 The access parameters
+
  - **IP** (opt, inherit)
    - The list of IP addresses separated by a comma, 
      e.g. '_10.129.53.159, 10.129.53.153, ..._' (default is '_localhost_')
@@ -178,19 +190,6 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
  - **PASSWORD** (opt, inherit)
     - The path to the file with password for login 
       (default is password value '_cassandra_')
- - **REPLICATION_CLASS** (opt)
-   - The replication class can be '_SimpleStrategy_' or 
-     '_NetworkTopologyStrategy_' (as default)
-   - NOTE: 
-     - detailed description see [DataStax Replication](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeReplication.html)
-     - relevant setting for Write TEST_TYPE
- - **REPLICATION_FACTOR** (opt)
-   - The amount of replicas (default is _3_)
-   - NOTE:
-     - relevant setting for Write TEST_TYPE
-     - replication factor is applied for each data center under the cluster
-       (e.g. if replication factor is 3 in 2 data centers, it means, that we
-       have totally 6 copies of data in cluster)
  - **CONSISTENCY_LEVEL** (opt)
    - The consistency level for application (valid for Read/Write operations) can be:
      - Only local data center: '_LOCAL_ONE_', '_LOCAL_QUORUM_' (as default), '_LOCAL_SERIAL_' 
@@ -201,8 +200,33 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
    - The name of local data center for correct balancing 
      (expected value is e.g. '_datacenter1_')
    - NOTE: 
-     - in case of (REPLICATION_FACTOR>1 and LB_LOCAL_DC!=None) => will be used **DCAwareRoundRobinPolicy with LB_LOCAL_DC** 
-       else **RoundRobinPolicy**
+     - in case of (REPLICATION_FACTOR > 1 and LB_LOCAL_DC ! =None) => will be
+       used **DCAwareRoundRobinPolicy with LB_LOCAL_DC** else
+       **RoundRobinPolicy**
+
+### 2.2 The keyspace parameters
+ - **KEYSPACE_REBUILD** (opt)
+   - The switch for rebuild keyspace based on 'KEYSPACE_REPLICATION_CLASS' 
+     and 'KEYSPACE_REPLICATION_FACTOR' (True is default)
+   - NOTE:
+     - It is useful switch in case, that you cannot modify keyspace 
+       base on missing privileges (in this case use value False)
+ - **KEYSPACE_REPLICATION_CLASS** (opt)
+   - The replication class can be '_SimpleStrategy_' or 
+     '_NetworkTopologyStrategy_' (as default)
+   - NOTE: 
+     - detailed description see [DataStax Replication](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeReplication.html)
+     - relevant setting for Write TEST_TYPE
+ - **KEYSPACE_REPLICATION_FACTOR** (opt)
+   - The amount of replicas (default is _3_)
+   - NOTE:
+     - relevant setting for Write TEST_TYPE
+     - replication factor is applied for each data center under the cluster
+       (e.g. if replication factor is 3 in 2 data centers, it means, that we
+       have totally 6 copies of data in cluster)
+
+### 2.3 The table parameters
+
  - **COMPACTION** (opt)
    - The type of compaction (without default as optional), expected values:
      - '_UnifiedCompactionStrategy_' (new in cassandra V5)
@@ -228,43 +252,36 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
        [STCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/stcs.html#stcs_options),
        [LCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/lcs.html#lcs_options),
        [TWCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/twcs.html#twcs_options)
-     - relevant setting for Write TEST_TYPE
+     - relevant setting for Write and ReadWrite TEST_TYPE
 
-### 2.1 Examples
+### 2.4 Examples
 
 The example of configuration (focus on setting in single ENV file):
 ```
 TEST_TYPE = W
-BULK_LIST = [[100, 20]]
-
-LABEL = local-1-low
-IP = localhost
-PORT = 9042
-USERNAME = cassandra
-PASSWORD = ../secrets/cassandra.txt
-REPLICATION_CLASS = SimpleStrategy
-REPLICATION_FACTOR = 1
-CONSISTENCY_LEVEL = ONE
-LB_LOCAL_DC = datacenter1
-COMPACTION = UnifiedCompactionStrategy
-```
-The shorter example (with usage global setting for connection):
-
-```
-TEST_TYPE = W
-
 LABEL = 1-low
-REPLICATION_CLASS = NetworkTopologyStrategy
-REPLICATION_FACTOR = 2
+
+# 2.1 ACCESSS
+#################
 CONSISTENCY_LEVEL = LOCAL_ONE
 LB_LOCAL_DC = datacenter1
+
+# 2.2 KEYSPACE
+#################
+KEYSPACE_REBUILD = True
+KEYSPACE_REPLICATION_CLASS = NetworkTopologyStrategy
+KEYSPACE_REPLICATION_FACTOR = 2
+
+# 2.3 TABLE
+#################
 COMPACTION = UnifiedCompactionStrategy
+COMPACTION_PARAMS = "'scaling_parameters': 'L4, L10'"
 ```
 
 ## NOTEs
 
  - The **network routing** will be used based on setting of 
-   replication factor 
-   - _RoundRobinPolicy_ (for REPLICATION_FACTOR = 1)
-   - _DCAwareRoundRobinPolicy_ (for CASSANDRA_REPLICATION_FACTOR > 1) 
-     with local data center based on value LB_LOCAL_DC
+   replication factor and load balacing  
+   - _DCAwareRoundRobinPolicy_ (for REPLICATION_FACTOR > 1 and LB_LOCAL_DC != None)  
+     with usage of local data center (from LB_LOCAL_DC)
+   - else _RoundRobinPolicy_
