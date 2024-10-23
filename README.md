@@ -8,7 +8,7 @@ The project about usage of QGate suite.
     CQL (Cassandra Query Language)
   - The description of configuration, see [ENV configuration](/docs/env_configuration.md)
     - The samples of configurations
-      - [Multi ENV configuration](perf_cql/config/cass.env)
+      - [Multi ENV configuration](perf_cql/config/_cass.env)
       - [Single ENV configuration](perf_cql/config/cass/cass-W1-low.env)
   - Expected outputs
     - Performance graphs
