@@ -32,7 +32,7 @@ class CQLAccess:
                                                  password = self._run_setup["password"])
 
         # load balancing policy
-        if int(self._run_setup['replication_factor']) > 1 and self._run_setup["local_dc"]:
+        if int(self._run_setup['keyspace_replication_factor']) > 1 and self._run_setup["local_dc"]:
             load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"])
         else:
             load_balancing_policy = RoundRobinPolicy()
@@ -74,17 +74,17 @@ class CQLAccess:
         session = None
         try:
             session = self.create_session(Setting.TIMEOUT_CREATE_MODEL)
-#            if self._run_setup["adapter"] != CQLAdapter.astradb:
-            if self._run_setup['replication_factor']:
-                # Drop key space
-                session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']};")
+            if self._run_setup["keyspace_rebuild"]:
+                if self._run_setup['keyspace_replication_factor']:
+                    # Drop key space
+                    session.execute(f"DROP KEYSPACE IF EXISTS {self._run_setup['keyspace']};")
 
-                # Create key space
-                session.execute(f"CREATE KEYSPACE IF NOT EXISTS {self._run_setup['keyspace']} " +
-                                "WITH replication = {" +
-                                f"'class':'{self._run_setup['replication_class']}', " +
-                                f"'replication_factor' : {self._run_setup['replication_factor']}" +
-                                "};")
+                    # Create key space
+                    session.execute(f"CREATE KEYSPACE IF NOT EXISTS {self._run_setup['keyspace']} " +
+                                    "WITH replication = {" +
+                                    f"'class':'{self._run_setup['keyspace_replication_class']}', " +
+                                    f"'replication_factor' : {self._run_setup['keyspace_replication_factor']}" +
+                                    "};")
 
             # use LTW atomic command with IF
             session.execute(f"DROP TABLE IF EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME};")
