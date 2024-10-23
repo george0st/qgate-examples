@@ -11,6 +11,12 @@ default ASC ordering).
 
 ### 1.1 The main parameters for test execution
 
+ - **ADAPTER** (opt)
+   - The name of adapter e.g. 'cassandra', 'scylla', 'astra', etc.
+     (default is _'cassandra'_)
+   - NOTE: 
+     - you can change behavioral based on adapter in your own code
+     - adapter name is used in output files (*.txt, *.png, *.csv, etc.) 
  - **EXECUTOR_DURATION** (opt)
    - The test duration for run EACH PERFORMANCE TEST (value in seconds, 
      default is _5_)
@@ -193,7 +199,10 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
    - NOTE: detailed description see [DataStax Consistency](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
  - **LB_LOCAL_DC** (opt)
    - The name of local data center for correct balancing 
-     (default is '_datacenter1_')
+     (expected value is e.g. '_datacenter1_')
+   - NOTE: 
+     - in case of (REPLICATION_FACTOR>1 and LB_LOCAL_DC!=None) => will be used **DCAwareRoundRobinPolicy with LB_LOCAL_DC** 
+       else **RoundRobinPolicy**
  - **COMPACTION** (opt)
    - The type of compaction (without default as optional), expected values:
      - '_UnifiedCompactionStrategy_' (new in cassandra V5)

@@ -7,12 +7,6 @@ from dotenv import dotenv_values
 import cql_helper
 
 
-class CQLAdapter(Flag):
-    scylladb = 1
-    cassandra = 2
-    astradb = 4
-    cosmosdb = 8
-
 class ConsistencyHelper:
     name_to_value = {
     'ANY': ConsistencyLevel.ANY,
@@ -80,22 +74,15 @@ class CQLConfig:
     def _inherit_param(self, param_name, global_param, global_param_name, param_name_default = None):
         """Get adapter from single or from global ENV"""
 
-        if self._config.get(param_name, None):
-            return self._config[param_name]
-        else:
-            # inheritance of param from global_param
-            if global_param:
-                if global_param.get(global_param_name, None):
-                    return global_param[global_param_name]
-            return param_name_default
+        if param_name:
+            if self._config.get(param_name, None):
+                return self._config[param_name]
 
-    def _get_adapter(self, global_param) -> str:
-        """Get adapter type or setup default adapter (in case of unsupported adapter)"""
-        adapter = self._inherit_param("ADAPTER", global_param, 'adapter')
-        if not adapter in CQLAdapter.__members__:
-            print(Fore.LIGHTRED_EX, f"!!! Unsupported ADAPTER '{adapter}', we switched to the default adapter 'Cassandra' (please, repair your ENV file) !!!", Style.RESET_ALL)
-            return CQLAdapter[CQLConfigSetting.ADAPTER.lower()]
-        return CQLAdapter[adapter.lower()]
+        # inheritance of param from global_param
+        if global_param:
+            if global_param.get(global_param_name, None):
+                return global_param[global_param_name]
+        return param_name_default
 
     def get_global_params(self, env_file, only_cluster_diagnose = False, level = "short") -> dict:
 
@@ -150,8 +137,7 @@ class CQLConfig:
         param = {}
         self._config = dotenv_values(path.join(self._perf_dir, "config", env_file))
 
-        param['adapter'] = self._get_adapter(global_param)
-
+        param['adapter'] = self._inherit_param(None, global_param, 'adapter', CQLConfigSetting.ADAPTER).lower()
         param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
         if param['test_type'] == "r":
             param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_r', CQLConfigSetting.BULK_LIST_R)
@@ -196,7 +182,8 @@ class CQLConfig:
                                                                                       CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
 
         # network balancing, local data center for correct setting of balancing (RoundRobinPolicy or DCAwareRoundRobinPolicy)
-        param['local_dc'] = self._config.get("LB_LOCAL_DC", CQLConfigSetting.LB_LOCAL_DC)
+        if self._config.get("LB_LOCAL_DC", None):
+            param['local_dc'] = self._config.get("LB_LOCAL_DC")
 
         # label
         param['label'] = self._config.get("LABEL", CQLConfigSetting.LABEL)
