@@ -52,6 +52,8 @@ class CQLConfigSetting:
     IP = "localhost"
     LABEL = "local"
 
+    KEYSPACE_REBUILD = "True"
+
 class CQLConfig:
 
     def __init__(self, perf_dir = "."):
@@ -167,11 +169,12 @@ class CQLConfig:
         password_path = self._inherit_param("PASSWORD", global_param, 'password')
         param['password'] = cql_helper.read_file(path.join(global_param['perf_dir'], password_path)) if password_path else CQLConfigSetting.PASSWORD
 
-        # replication setting
-        param['replication_class'] = self._config.get("REPLICATION_CLASS", CQLConfigSetting.REPLICATION_CLASS)
-        param['replication_factor'] = self._config.get("REPLICATION_FACTOR", CQLConfigSetting.REPLICATION_FACTOR)
+        # keyspace rebuild & # replication setting
+        param['keyspace_rebuild'] = cql_helper.str2bool(self._config.get("KEYSPACE_REBUILD", CQLConfigSetting.KEYSPACE_REBUILD))
+        param['keyspace_replication_class'] = self._config.get("KEYSPACE_REPLICATION_CLASS", CQLConfigSetting.REPLICATION_CLASS)
+        param['keyspace_replication_factor'] = self._config.get("KEYSPACE_REPLICATION_FACTOR", CQLConfigSetting.REPLICATION_FACTOR)
 
-        # compaction
+        # table compaction & compaction params
         if self._config.get("COMPACTION", None):
             param['compaction'] = self._config["COMPACTION"]
         if self._config.get("COMPACTION_PARAMS", None):
