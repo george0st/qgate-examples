@@ -200,7 +200,7 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
    - The name of local data center for correct balancing 
      (expected value is e.g. '_datacenter1_')
    - NOTE: 
-     - in case of (REPLICATION_FACTOR>1 and LB_LOCAL_DC!=None) => will be
+     - in case of (REPLICATION_FACTOR > 1 and LB_LOCAL_DC ! =None) => will be
        used **DCAwareRoundRobinPolicy with LB_LOCAL_DC** else
        **RoundRobinPolicy**
 
@@ -259,36 +259,29 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
 The example of configuration (focus on setting in single ENV file):
 ```
 TEST_TYPE = W
-BULK_LIST = [[100, 20]]
-
-LABEL = local-1-low
-IP = localhost
-PORT = 9042
-USERNAME = cassandra
-PASSWORD = ../secrets/cassandra.txt
-REPLICATION_CLASS = SimpleStrategy
-REPLICATION_FACTOR = 1
-CONSISTENCY_LEVEL = ONE
-LB_LOCAL_DC = datacenter1
-COMPACTION = UnifiedCompactionStrategy
-```
-The shorter example (with usage global setting for connection):
-
-```
-TEST_TYPE = W
-
 LABEL = 1-low
-REPLICATION_CLASS = NetworkTopologyStrategy
-REPLICATION_FACTOR = 2
+
+# 2.1 ACCESSS
+#################
 CONSISTENCY_LEVEL = LOCAL_ONE
 LB_LOCAL_DC = datacenter1
+
+# 2.2 KEYSPACE
+#################
+KEYSPACE_REBUILD = True
+KEYSPACE_REPLICATION_CLASS = NetworkTopologyStrategy
+KEYSPACE_REPLICATION_FACTOR = 2
+
+# 2.3 TABLE
+#################
 COMPACTION = UnifiedCompactionStrategy
+COMPACTION_PARAMS = "'scaling_parameters': 'L4, L10'"
 ```
 
 ## NOTEs
 
  - The **network routing** will be used based on setting of 
-   replication factor 
-   - _RoundRobinPolicy_ (for REPLICATION_FACTOR = 1)
-   - _DCAwareRoundRobinPolicy_ (for CASSANDRA_REPLICATION_FACTOR > 1) 
-     with local data center based on value LB_LOCAL_DC
+   replication factor and load balacing  
+   - _DCAwareRoundRobinPolicy_ (for REPLICATION_FACTOR > 1 and LB_LOCAL_DC != None)  
+     with usage of local data center (from LB_LOCAL_DC)
+   - else _RoundRobinPolicy_
