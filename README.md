@@ -9,7 +9,7 @@ The project about usage of QGate suite.
   - The description of configuration, see [ENV configuration](/docs/env_configuration.md)
     - The samples of configurations
       - [Multi ENV configuration](perf_cql/config/cass.env)
-      - [Single ENV configuration](perf_cql/config/cass-W1-low.env)
+      - [Single ENV configuration](perf_cql/config/cass/cass-W1-low.env)
   - Expected outputs
     - Performance graphs
       ![Read min](docs/outputs/PRF-Cassandra-092409-R1-min-2024-09-04_07-36-33-bulk-1x10.png)
