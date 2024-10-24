@@ -55,6 +55,7 @@ class CQLConfigSetting:
     KEYSPACE_REBUILD = "True"
 
 class CQLConfig:
+    """The configuration of CQL, based on ENV files."""
 
     def __init__(self, perf_dir = "."):
         """Processing/Parsing of dictionary parameters from config/ENV files"""
