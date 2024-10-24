@@ -28,7 +28,6 @@ class CQLHealth:
         elif level==CQLDiagnosePrint.extra:
             self.print_status_short(status)
             self.print_status_full(status)
-        print(self.get_size())
         return status
 
     #region DIAGNOSE private functions
