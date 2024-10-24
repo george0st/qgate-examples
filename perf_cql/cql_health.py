@@ -6,12 +6,15 @@ from cql_helper import generate_id, get_rng_generator, bool2str
 
 
 class CQLDiagnosePrint(Enum):
+    """The type of diagnose print"""
+
     off = 1
     short = 2
     full = 3
     extra = 4
 
 class CQLHealth:
+    """The view to the CQL health check"""
 
     def __init__(self, cluster: Cluster):
         self._cluster = cluster

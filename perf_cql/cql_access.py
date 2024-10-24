@@ -7,12 +7,15 @@ from cassandra.policies import RetryPolicy
 
 
 class Setting:
+    """Setting for CQLAccess"""
+
     TABLE_NAME = "t01"
     MAX_GNR_VALUE = 99999
     TIMEOUT = 30
     TIMEOUT_CREATE_MODEL = 180
 
 class CQLAccess:
+    """The access via CQL"""
 
     def __init__(self, run_setup: RunSetup):
         self._run_setup = run_setup
