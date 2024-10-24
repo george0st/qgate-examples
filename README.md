@@ -2,7 +2,8 @@
 
 The project about usage of QGate suite.
 
-## Performance tests 
+## Performance tests
+
 - [Cassandra & ScyllaDB & AstraDB & CosmosDB](perf_cql/perf_cql.py)
   - The performance tests for Cassandra, ScyllaDB, AstraDB and CosmosDB via
     CQL (Cassandra Query Language)
