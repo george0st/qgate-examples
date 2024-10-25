@@ -1,8 +1,6 @@
 from cassandra import ConsistencyLevel
 from ast import literal_eval
-from enum import Enum, Flag
 from os import path
-from colorama import Fore, Style
 from dotenv import dotenv_values
 import cql_helper
 
