@@ -53,29 +53,36 @@ default ASC ordering).
 It is possible to specify these settings as global (and it will
 be applied to each single ENV file):
 
-   - **IP** (opt)
-     - The list of IP addresses separated by a comma, 
+  - **IP** (opt)
+    - The list of IP addresses separated by a comma, 
        e.g. '_10.129.53.159, 10.129.53.153, ..._' (default is '_localhost_')
-   - **PORT** (opt)
-     - The port value (default is _9042_)
-   - **SECURE_CONNECT_BUNDLE** (opt)
-     - The connection based on SECURE_CONNECT_BUNDLE, it is a useful
-       way for AstraDB.
-     - NOTE: 
-       - It is typically used instead of IP and PORT definition 
-         (it means the username and password is still needed)
-       - SCB is the link to '*.zip' file, downloaded from astra web
-   - **USERNAME** (opt)
-      - The username for login (default is '_cassandra_')
-      - NOTE:
-        - In case of usage 'SECURE_CONNECT_BUNDLE', the username is 
-          'clientId' from downloaded astra web file '*-token.json'
-   - **PASSWORD** (opt)
-      - The path to the file with password for login 
-        (default is password value '_cassandra_')
-      - NOTE:
-        - In case of usage 'SECURE_CONNECT_BUNDLE', the password is 
-          'secret' from downloaded astra web file '*-token.json'
+  - **PORT** (opt)
+    - The port value (default is _9042_)
+  - **SECURE_CONNECT_BUNDLE** (opt)
+    - The connection based on SECURE_CONNECT_BUNDLE, it is a useful
+    way for AstraDB.
+    - NOTE: 
+      - It is typically used instead of IP and PORT definition 
+      (it means the username and password is still needed)
+      - SCB is the link to '*.zip' file, downloaded from astra web
+  - **USERNAME** (opt)
+    - The username for login (default is '_cassandra_')
+    - NOTE:
+      - In case of usage 'SECURE_CONNECT_BUNDLE', the username is 
+       'clientId' from downloaded astra web file '*-token.json'
+  - **PASSWORD** (opt)
+    - The path to the file with password for login 
+      (default is password value '_cassandra_')
+    - NOTE:
+      - In case of usage 'SECURE_CONNECT_BUNDLE', the password is 
+       'secret' from downloaded astra web file '*-token.json'
+  - **LB_LOCAL_DC** (opt)
+    - The name of local data center for correct balancing 
+      (expected value is e.g. '_datacenter1_' or '_dc1_')
+    - NOTE:
+      - in case of (REPLICATION_FACTOR > 1 and LB_LOCAL_DC ! =None) => will be
+        used **DCAwareRoundRobinPolicy with LB_LOCAL_DC** else
+        **RoundRobinPolicy**
 
 ### 1.3 The other parameters with smaller importance
 
@@ -196,9 +203,9 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
      - All data centers: '_EACH_QUORUM_', '_QUORUM_', '_SERIAL_', '_ALL_'
      - Some data center:  '_ONE_', '_TWO_', '_THREE_', '_ANY_'
    - NOTE: detailed description see [DataStax Consistency](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
- - **LB_LOCAL_DC** (opt)
+ - **LB_LOCAL_DC** (opt, inherit)
    - The name of local data center for correct balancing 
-     (expected value is e.g. '_datacenter1_')
+     (expected value is e.g. '_datacenter1_' or '_dc1_')
    - NOTE: 
      - in case of (REPLICATION_FACTOR > 1 and LB_LOCAL_DC ! =None) => will be
        used **DCAwareRoundRobinPolicy with LB_LOCAL_DC** else
