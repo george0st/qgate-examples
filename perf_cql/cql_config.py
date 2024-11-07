@@ -129,6 +129,10 @@ class CQLConfig:
             if self._config.get("PASSWORD", None):
                 global_param['password'] = self._config["PASSWORD"]
 
+            # network global setting
+            if self._config.get("LB_LOCAL_DC", None):
+                global_param['local_dc'] = self._config["LB_LOCAL_DC"]
+
             return global_param
         else:
             return None
@@ -184,8 +188,9 @@ class CQLConfig:
                                                                                       CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
 
         # network balancing, local data center for correct setting of balancing (RoundRobinPolicy or DCAwareRoundRobinPolicy)
-        if self._config.get("LB_LOCAL_DC", None):
-            param['local_dc'] = self._config.get("LB_LOCAL_DC")
+        local_dc = self._inherit_param("LB_LOCAL_DC", global_param, 'local_dc')
+        if local_dc:
+            param['local_dc'] = local_dc
 
         # label
         param['label'] = self._config.get("LABEL", CQLConfigSetting.LABEL)
