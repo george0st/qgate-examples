@@ -43,7 +43,6 @@ class CQLConfigSetting:
     REPLICATION_CLASS = "NetworkTopologyStrategy"
     REPLICATION_FACTOR = "3"
     CONSISTENCY_LEVEL = "LOCAL_QUORUM"
-    LB_LOCAL_DC = "datacenter1"
     USERNAME = "cassandra"
     PASSWORD = "cassandra"
     PORT = "9042"
