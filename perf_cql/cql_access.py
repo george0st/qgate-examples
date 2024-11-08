@@ -11,7 +11,7 @@ class Setting:
 
     TABLE_NAME = "t01"
     TIMEOUT = 40
-    TIMEOUT_CREATE_MODEL = 600
+    TIMEOUT_CREATE_MODEL = 900
 
 class CQLAccess:
     """The access via CQL"""
