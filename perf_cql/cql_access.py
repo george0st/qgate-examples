@@ -10,7 +10,6 @@ class Setting:
     """Setting for CQLAccess"""
 
     TABLE_NAME = "t01"
-    MAX_GNR_VALUE = 99999
     TIMEOUT = 30
     TIMEOUT_CREATE_MODEL = 180
 
