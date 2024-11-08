@@ -15,6 +15,7 @@ import click
 
 
 def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
+    numeric_scope = run_setup['numeric_scope']
     generator = get_rng_generator()
     columns, items = "", ""
     cql = None
@@ -61,8 +62,8 @@ def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
             probe.partly_init()
 
             # generate synthetic data for one cycle
-            synthetic_insert_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, run_setup.bulk_col))
-            synthetic_select_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, 2))
+            synthetic_insert_data = generator.integers(numeric_scope, size=(run_setup.bulk_row, run_setup.bulk_col))
+            synthetic_select_data = generator.integers(numeric_scope, size=(run_setup.bulk_row, 2))
 
             # one cycle (with amount of call based on bulk_row)
             for index in range(run_setup.bulk_row):
@@ -93,6 +94,7 @@ def prf_readwrite(run_setup: RunSetup) -> ParallelProbe:
     return probe
 
 def prf_read(run_setup: RunSetup) -> ParallelProbe:
+    numeric_scope = run_setup['numeric_scope']
     generator = get_rng_generator()
     columns, items="", ""
     cql = None
@@ -124,7 +126,7 @@ def prf_read(run_setup: RunSetup) -> ParallelProbe:
 
             # generate synthetic data
             #  NOTE: It will generate only values for two columns (as primary keys), not for all columns
-            synthetic_data = generator.integers(Setting.MAX_GNR_VALUE, size=run_setup.bulk_row*2)
+            synthetic_data = generator.integers(numeric_scope, size=run_setup.bulk_row*2)
 
             # prepare data
             bound.bind(synthetic_data)
@@ -145,6 +147,7 @@ def prf_read(run_setup: RunSetup) -> ParallelProbe:
     return probe
 
 def prf_write(run_setup: RunSetup) -> ParallelProbe:
+    numeric_scope = run_setup['numeric_scope']
     generator = get_rng_generator()
     columns, items = "", ""
     cql = None
@@ -181,7 +184,7 @@ def prf_write(run_setup: RunSetup) -> ParallelProbe:
             batch.clear()
 
             # generate synthetic data
-            synthetic_data = generator.integers(Setting.MAX_GNR_VALUE, size=(run_setup.bulk_row, run_setup.bulk_col))
+            synthetic_data = generator.integers(numeric_scope, size=(run_setup.bulk_row, run_setup.bulk_col))
 
             # prepare data
             for row in synthetic_data:

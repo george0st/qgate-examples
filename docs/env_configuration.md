@@ -124,6 +124,10 @@ be applied to each single ENV file):
  - **MULTIPLE_ENV_DELAY** (opt)
    - The delay before switch to different config file (value in seconds,
      default is _0_)
+ - **NUMERIC_SCOPE** (opt)
+   - The maximal value for generation of random items (from 0 to this value)
+     in all performance tests (for READ, WRITE, READWRITE). The default is
+     value _99999_.
 
 ### 1.4 Examples
 
@@ -260,7 +264,11 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
        [LCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/lcs.html#lcs_options),
        [TWCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/twcs.html#twcs_options)
      - relevant setting for Write and ReadWrite TEST_TYPE
-
+ - **NUMERIC_SCOPE** (opt, inherit)
+   - The maximal value for generation of random items (from 0 to this value)
+     in all performance tests (for READ, WRITE, READWRITE). The default is
+     value _99999_.
+   
 ### 2.4 Examples
 
 The example of configuration (focus on setting in single ENV file):

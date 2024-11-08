@@ -48,6 +48,7 @@ class CQLConfigSetting:
     PORT = "9042"
     IP = "localhost"
     LABEL = "local"
+    NUMERIC_SCOPE = "99999"
 
     KEYSPACE_REBUILD = "True"
 
@@ -132,6 +133,10 @@ class CQLConfig:
             if self._config.get("LB_LOCAL_DC", None):
                 global_param['local_dc'] = self._config["LB_LOCAL_DC"]
 
+            # numeric scope
+            if self._config.get("NUMERIC_SCOPE", None):
+                global_param['numeric_scope'] = self._config["NUMERIC_SCOPE"]
+
             return global_param
         else:
             return None
@@ -193,5 +198,8 @@ class CQLConfig:
 
         # label
         param['label'] = self._config.get("LABEL", CQLConfigSetting.LABEL)
+
+        # numeric scope
+        param['numeric_scope'] = int(self._inherit_param("NUMERIC_SCOPE", global_param, 'numeric_scope', CQLConfigSetting.NUMERIC_SCOPE))
 
         return param
