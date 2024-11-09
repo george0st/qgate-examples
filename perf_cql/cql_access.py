@@ -4,6 +4,8 @@ from cassandra.cluster import Cluster, Session
 from cassandra import ProtocolVersion
 from cassandra.policies import DCAwareRoundRobinPolicy, RoundRobinPolicy
 from cassandra.policies import RetryPolicy
+from colorama import Fore, Style
+from time import perf_counter
 
 
 class Setting:
@@ -74,6 +76,9 @@ class CQLAccess:
     def create_model(self):
         """Create new NoSQL model (create keyspace and table)"""
         session = None
+        print("  Create new model...")
+        create_start = perf_counter()
+
         try:
             session = self.create_session(Setting.TIMEOUT_CREATE_MODEL)
             if self._run_setup["keyspace_rebuild"]:
@@ -110,7 +115,9 @@ class CQLAccess:
 
             # create table
             session.execute(create_tbl)
-
+            print(f"    Model created (duration {round(perf_counter()-create_start,1)} seconds)!")
+        except Exception as ex:
+            print(Fore.LIGHTRED_EX + f"    {type(ex).__name__}: {str(ex)}" + Style.RESET_ALL)
         finally:
             if session:
                 session.shutdown()
