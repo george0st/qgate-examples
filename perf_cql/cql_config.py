@@ -141,65 +141,74 @@ class CQLConfig:
         else:
             return None
 
-    def get_params(self, env_file, global_param) -> dict:
+    def get_params(self, env_file, global_param: dict) -> (dict, dict):
 
-        param = {}
+        executor_params = {}
+        manage_params = {}
+
         self._config = dotenv_values(path.join(self._perf_dir, "config", env_file))
 
-        param['adapter'] = self._inherit_param(None, global_param, 'adapter', CQLConfigSetting.ADAPTER).lower()
-        param['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
-        if param['test_type'] == "r":
-            param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_r', CQLConfigSetting.BULK_LIST_R)
-        elif param['test_type'] == "w":
-            param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_w', CQLConfigSetting.BULK_LIST_W)
-        elif param['test_type'] == "rw" or param['test_type'] == "wr":
-            param['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param,'bulk_list_rw', CQLConfigSetting.BULK_LIST_RW)
+        # 1. create 'manage_params' as copy of 'global_params' and modification
+        manage_params = global_param.copy()
 
-        param['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
+        manage_params['executor_duration'] = int(self._inherit_param("EXECUTOR_DURATION", global_param, 'executor_duration'))
+
+        manage_params['adapter'] = self._inherit_param(None, global_param, 'adapter', CQLConfigSetting.ADAPTER).lower()
+        manage_params['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
+        if manage_params['test_type'] == "r":
+            manage_params['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, 'bulk_list_r', CQLConfigSetting.BULK_LIST_R)
+        elif manage_params['test_type'] == "w":
+            manage_params['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, 'bulk_list_w', CQLConfigSetting.BULK_LIST_W)
+        elif manage_params['test_type'] == "rw" or executor_params['test_type'] == "wr":
+            manage_params['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, 'bulk_list_rw', CQLConfigSetting.BULK_LIST_RW)
+
+        # label
+        manage_params['label'] = self._config.get("LABEL", CQLConfigSetting.LABEL)
+
+        # 2. update 'executor_params'
+
+        executor_params['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
 
         # percentile setting
         if global_param.get("percentile", None):
-            param['percentile'] = float(global_param["percentile"])
+            executor_params['percentile'] = float(global_param["percentile"])
 
         # connection setting (relation to global_param)
-        param["ip"] = self._inherit_param("IP", global_param, 'ip', CQLConfigSetting.IP).split(",")
-        param["ip"] = [ip.strip() for ip in param["ip"]]    # cleaning IP addresses
-        param["port"] = self._inherit_param("PORT", global_param, 'port', CQLConfigSetting.PORT)
+        executor_params["ip"] = self._inherit_param("IP", global_param, 'ip', CQLConfigSetting.IP).split(",")
+        executor_params["ip"] = [ip.strip() for ip in executor_params["ip"]]    # cleaning IP addresses
+        executor_params["port"] = self._inherit_param("PORT", global_param, 'port', CQLConfigSetting.PORT)
 
         # login setting (relation to global_param)
         secure_connect_bundle = self._inherit_param("SECURE_CONNECT_BUNDLE", global_param,'secure_connect_bundle')
         if secure_connect_bundle:
-            param['secure_connect_bundle'] = secure_connect_bundle
+            executor_params['secure_connect_bundle'] = secure_connect_bundle
         username = self._inherit_param("USERNAME", global_param, 'username', CQLConfigSetting.USERNAME)
         if username:
-            param['username'] = username
+            executor_params['username'] = username
         password_path = self._inherit_param("PASSWORD", global_param, 'password')
-        param['password'] = cql_helper.read_file(path.join(global_param['perf_dir'], password_path)) if password_path else CQLConfigSetting.PASSWORD
+        executor_params['password'] = cql_helper.read_file(path.join(global_param['perf_dir'], password_path)) if password_path else CQLConfigSetting.PASSWORD
 
         # keyspace rebuild & # replication setting
-        param['keyspace_rebuild'] = cql_helper.str2bool(self._config.get("KEYSPACE_REBUILD", CQLConfigSetting.KEYSPACE_REBUILD))
-        param['keyspace_replication_class'] = self._config.get("KEYSPACE_REPLICATION_CLASS", CQLConfigSetting.REPLICATION_CLASS)
-        param['keyspace_replication_factor'] = self._config.get("KEYSPACE_REPLICATION_FACTOR", CQLConfigSetting.REPLICATION_FACTOR)
+        executor_params['keyspace_rebuild'] = cql_helper.str2bool(self._config.get("KEYSPACE_REBUILD", CQLConfigSetting.KEYSPACE_REBUILD))
+        executor_params['keyspace_replication_class'] = self._config.get("KEYSPACE_REPLICATION_CLASS", CQLConfigSetting.REPLICATION_CLASS)
+        executor_params['keyspace_replication_factor'] = self._config.get("KEYSPACE_REPLICATION_FACTOR", CQLConfigSetting.REPLICATION_FACTOR)
 
         # table compaction & compaction params
         if self._config.get("COMPACTION", None):
-            param['compaction'] = self._config["COMPACTION"]
+            executor_params['compaction'] = self._config["COMPACTION"]
         if self._config.get("COMPACTION_PARAMS", None):
-            param['compaction_params'] = self._config["COMPACTION_PARAMS"]
+            executor_params['compaction_params'] = self._config["COMPACTION_PARAMS"]
 
         # consistency level
-        param['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get("CONSISTENCY_LEVEL",
-                                                                                      CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
+        executor_params['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get("CONSISTENCY_LEVEL",
+                                                                                                CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
 
         # network balancing, local data center for correct setting of balancing (RoundRobinPolicy or DCAwareRoundRobinPolicy)
         local_dc = self._inherit_param("LB_LOCAL_DC", global_param, 'local_dc')
         if local_dc:
-            param['local_dc'] = local_dc
-
-        # label
-        param['label'] = self._config.get("LABEL", CQLConfigSetting.LABEL)
+            executor_params['local_dc'] = local_dc
 
         # numeric scope
-        param['numeric_scope'] = int(self._inherit_param("NUMERIC_SCOPE", global_param, 'numeric_scope', CQLConfigSetting.NUMERIC_SCOPE))
+        executor_params['numeric_scope'] = int(self._inherit_param("NUMERIC_SCOPE", global_param, 'numeric_scope', CQLConfigSetting.NUMERIC_SCOPE))
 
-        return param
+        return executor_params, manage_params

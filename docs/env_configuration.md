@@ -172,6 +172,9 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
    - The type of operation can be '_R_' read, '_W_' write (as default) and '_RW_'
  - **LABEL** (opt)
    - The label used in output file name (default is '_local_')
+ - **EXECUTOR_DURATION** (opt, inherid)
+   - The test duration for run EACH PERFORMANCE TEST (value in seconds, 
+     default is _5_)
  - **BULK_LIST** (opt, inherit)
    - The size of data bulk in format '_[[rows, columns], ...]_' 
      (default is '_[[200, 10]]_')
