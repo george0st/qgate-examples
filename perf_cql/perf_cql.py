@@ -233,7 +233,7 @@ def generate_graphs(generator: ParallelExecutor, generate_graph_scope, output_di
                                suppress_error = True,
                                only_new=True)           # generate only new files (not regenerate all)
 
-def perf_test(unique_id, global_param, parameters: dict):
+def perf_test(unique_id, main_param, parameters: dict):
 
     lbl = parameters['adapter']#.name
     lbl_suffix = f"{parameters['label']}" if parameters.get('label', None) else ""
@@ -242,41 +242,41 @@ def perf_test(unique_id, global_param, parameters: dict):
     if parameters['test_type']=='w':    # WRITE perf test
         generator = ParallelExecutor(prf_write,
                                      label=f"{lbl}{unique_id}-W{lbl_suffix}",
-                                     detail_output=global_param['detail_output'],
-                                     output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-W{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
+                                     detail_output=main_param['detail_output'],
+                                     output_file=path.join(main_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-W{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
                                      init_each_bulk=True)
     elif parameters['test_type']=='r':  # READ perf test
         generator = ParallelExecutor(prf_read,
                                      label=f"{lbl}{unique_id}-R{lbl_suffix}",
-                                     detail_output=global_param['detail_output'],
-                                     output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-R{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
+                                     detail_output=main_param['detail_output'],
+                                     output_file=path.join(main_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-R{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
                                      init_each_bulk=True)
     elif parameters['test_type']=='rw' or parameters['test_type']=='wr':    # READ & WRITE perf test
         generator = ParallelExecutor(prf_readwrite,
                                      label=f"{lbl}{unique_id}-RW{lbl_suffix}",
-                                     detail_output=global_param['detail_output'],
-                                     output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-RW{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
+                                     detail_output=main_param['detail_output'],
+                                     output_file=path.join(main_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-RW{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
                                      init_each_bulk=True)
 
     # define setup
-    setup = RunSetup(duration_second = global_param['executor_duration'],
-                     start_delay = global_param['executor_start_delay'],
+    setup = RunSetup(duration_second = main_param['executor_duration'],
+                     start_delay = main_param['executor_start_delay'],
                      parameters = parameters)
 
     # run diagnose
-    cluster_diagnose(setup, global_param['cluster_diagnose'])
-    if global_param['cluster_diagnose_only']:
+    cluster_diagnose(setup, main_param['cluster_diagnose'])
+    if main_param['cluster_diagnose_only']:
         return
 
     # performance execution
     generator.run_bulk_executor(parameters['bulk_list'],
-                                global_param['executors'],
+                                main_param['executors'],
                                 run_setup = setup)
 
     # generate graphs
     generate_graphs(generator,
-                    global_param['generate_graph'],
-                    path.join(global_param['perf_dir'], "..", "output"))
+                    main_param['generate_graph'],
+                    path.join(main_param['perf_dir'], "..", "output"))
 
 def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = False, level = "short"):
 
@@ -296,6 +296,9 @@ def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = F
                 if env_count > 1 :
                     time.sleep(global_param['multiple_env_delay'])
 
+            # TODO: copy 'global_param' to 'main_param'
+
+            # TODO: use 'main_param' for execution
             perf_test(unique_id,
                       global_param,
                       CQLConfig(perf_dir).get_params(env, global_param))
