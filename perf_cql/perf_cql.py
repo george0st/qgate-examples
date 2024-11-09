@@ -233,58 +233,60 @@ def generate_graphs(generator: ParallelExecutor, generate_graph_scope, output_di
                                suppress_error = True,
                                only_new=True)           # generate only new files (not regenerate all)
 
-def perf_test(unique_id, global_param, parameters: dict):
+def perf_test(unique_id, manage_params: dict, executor_params: dict):
 
-    lbl = parameters['adapter']#.name
-    lbl_suffix = f"{parameters['label']}" if parameters.get('label', None) else ""
+    #lbl = executor_param['adapter']
+    lbl = manage_params['adapter']
+    #lbl_suffix = f"{executor_param['label']}" if executor_param.get('label', None) else ""
+    lbl_suffix = f"{manage_params['label']}" if manage_params.get('label', None) else ""
 
     generator = None
-    if parameters['test_type']=='w':    # WRITE perf test
+    if manage_params['test_type']=='w':    # WRITE perf test
         generator = ParallelExecutor(prf_write,
-                                     label=f"{lbl}{unique_id}-W{lbl_suffix}",
-                                     detail_output=global_param['detail_output'],
-                                     output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-W{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
-                                     init_each_bulk=True)
-    elif parameters['test_type']=='r':  # READ perf test
+                                     label = f"{lbl}{unique_id}-W{lbl_suffix}",
+                                     detail_output = manage_params['detail_output'],
+                                     output_file = path.join(manage_params['perf_dir'], "..", "output", f"prf_{lbl.lower()}-W{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
+                                     init_each_bulk = True)
+    elif manage_params['test_type']=='r':  # READ perf test
         generator = ParallelExecutor(prf_read,
-                                     label=f"{lbl}{unique_id}-R{lbl_suffix}",
-                                     detail_output=global_param['detail_output'],
-                                     output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-R{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
-                                     init_each_bulk=True)
-    elif parameters['test_type']=='rw' or parameters['test_type']=='wr':    # READ & WRITE perf test
+                                     label = f"{lbl}{unique_id}-R{lbl_suffix}",
+                                     detail_output = manage_params['detail_output'],
+                                     output_file = path.join(manage_params['perf_dir'], "..", "output", f"prf_{lbl.lower()}-R{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
+                                     init_each_bulk = True)
+    elif manage_params['test_type']=='rw' or manage_params['test_type']=='wr':    # READ & WRITE perf test
         generator = ParallelExecutor(prf_readwrite,
-                                     label=f"{lbl}{unique_id}-RW{lbl_suffix}",
-                                     detail_output=global_param['detail_output'],
-                                     output_file=path.join(global_param['perf_dir'], "..", "output", f"prf_{lbl.lower()}-RW{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
-                                     init_each_bulk=True)
+                                     label = f"{lbl}{unique_id}-RW{lbl_suffix}",
+                                     detail_output = manage_params['detail_output'],
+                                     output_file = path.join(manage_params['perf_dir'], "..", "output", f"prf_{lbl.lower()}-RW{lbl_suffix.lower()}-{datetime.date.today()}.txt"),
+                                     init_each_bulk = True)
 
     # define setup
-    setup = RunSetup(duration_second = global_param['executor_duration'],
-                     start_delay = global_param['executor_start_delay'],
-                     parameters = parameters)
+    setup = RunSetup(duration_second = manage_params['executor_duration'],
+                     start_delay = manage_params['executor_start_delay'],
+                     parameters = executor_params)
 
     # run diagnose
-    cluster_diagnose(setup, global_param['cluster_diagnose'])
-    if global_param['cluster_diagnose_only']:
+    cluster_diagnose(setup, manage_params['cluster_diagnose'])
+    if manage_params['cluster_diagnose_only']:
         return
 
     # performance execution
-    generator.run_bulk_executor(parameters['bulk_list'],
-                                global_param['executors'],
+    generator.run_bulk_executor(manage_params['bulk_list'],
+                                manage_params['executors'],
                                 run_setup = setup)
 
     # generate graphs
     generate_graphs(generator,
-                    global_param['generate_graph'],
-                    path.join(global_param['perf_dir'], "..", "output"))
+                    manage_params['generate_graph'],
+                    path.join(manage_params['perf_dir'], "..", "output"))
 
 def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = False, level = "short"):
 
-    global_param = CQLConfig(perf_dir).get_global_params(multi_env, only_cluster_diagnose, level)
-    if global_param:
+    global_params = CQLConfig(perf_dir).get_global_params(multi_env, only_cluster_diagnose, level)
+    if global_params:
         env_count = 0
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
-        envs = [env.strip() for env in global_param['multiple_env'].split(",")]
+        envs = [env.strip() for env in global_params['multiple_env'].split(",")]
         for env in envs:
             if not env.lower().endswith(".env"):
                 env += ".env"
@@ -294,27 +296,32 @@ def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = F
             # delay before other processing
             if not only_cluster_diagnose:
                 if env_count > 1 :
-                    time.sleep(global_param['multiple_env_delay'])
+                    time.sleep(global_params['multiple_env_delay'])
 
+            # create manage and executor params
+            executor_params, manage_params = CQLConfig(perf_dir).get_params(env, global_params)
+
+            # TODO: use 'main_param' for execution and get_params can update 'main_param' also
             perf_test(unique_id,
-                      global_param,
-                      CQLConfig(perf_dir).get_params(env, global_param))
+                      manage_params,
+                      executor_params)
     else:
         print("!!! Missing 'MULTIPLE_ENV' configuration !!!")
 
 def test_cluster(env, perf_dir):
 
-    global_param = CQLConfig(perf_dir).get_global_params(env)
-    if global_param:
+    global_params = CQLConfig(perf_dir).get_global_params(env)
+    if global_params:
         env_count = 0
-        multi_env = [env.strip() for env in global_param['multiple_env'].split(",")]
+        multi_env = [env.strip() for env in global_params['multiple_env'].split(",")]
         for single_env in multi_env:
             if not single_env.lower().endswith(".env"):
                 single_env += ".env"
             env_count += 1
             print(Fore.LIGHTGREEN_EX + f"Environment switch {env_count}/{len(multi_env)}: '{single_env}' ..." + Style.RESET_ALL)
 
-            setup = RunSetup(parameters=CQLConfig(perf_dir).get_params(single_env, global_param))
+            executor_params, manage_params = CQLConfig(perf_dir).get_params(single_env, global_params)
+            setup = RunSetup(parameters = executor_params)
             session = None
             cql = None
 
