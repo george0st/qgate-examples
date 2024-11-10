@@ -69,7 +69,7 @@ class CQLConfig:
         else:
             # inheritance of param from global_param
             if global_param:
-                if global_param.get(global_param_name, None):
+                if global_param.get(global_param_name, None) is not None:
                     return global_param[global_param_name]
             return param_name_default
 
@@ -82,7 +82,7 @@ class CQLConfig:
 
         # inheritance of param from global_param
         if global_param:
-            if global_param.get(global_param_name, None):
+            if global_param.get(global_param_name, None) is not None:
                 return global_param[global_param_name]
         return param_name_default
 
