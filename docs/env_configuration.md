@@ -80,7 +80,7 @@ be applied to each single ENV file):
     - The name of local data center for correct balancing 
       (expected value is e.g. '_datacenter1_' or '_dc1_')
     - NOTE:
-      - in case of (REPLICATION_FACTOR > 1 and LB_LOCAL_DC ! =None) => will be
+      - in case of LB_LOCAL_DC ! =None => will be
         used **DCAwareRoundRobinPolicy with LB_LOCAL_DC** else
         **RoundRobinPolicy**
 
@@ -219,8 +219,8 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
  - **LB_LOCAL_DC** (opt, inherited)
    - The name of local data center for correct balancing 
      (expected value is e.g. '_datacenter1_' or '_dc1_')
-   - NOTE: 
-     - in case of (REPLICATION_FACTOR > 1 and LB_LOCAL_DC ! =None) => will be
+   - NOTE:
+     - in case of LB_LOCAL_DC ! =None => will be
        used **DCAwareRoundRobinPolicy with LB_LOCAL_DC** else
        **RoundRobinPolicy**
 
@@ -304,8 +304,7 @@ COMPACTION_PARAMS = "'scaling_parameters': 'L4, L10'"
 
 ## NOTEs
 
- - The **network routing** will be used based on setting of 
-   replication factor and load balancing  
-   - _DCAwareRoundRobinPolicy_ (for REPLICATION_FACTOR > 1 and LB_LOCAL_DC != None)  
+ - The **network routing** will be used based on setting of load balancing  
+   - _DCAwareRoundRobinPolicy_ (for LB_LOCAL_DC != None)  
      with usage of local data center (from LB_LOCAL_DC)
-   - else _RoundRobinPolicy_
+   - else _RoundRobinPolicy_ cross whole cluster (all data centers)

@@ -313,9 +313,9 @@ def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = F
             count_states += output.count_states
             count_false_states += output.count_false_states
 
-        print(Fore.LIGHTGREEN_EX + f"=> FINISH tests, "
-                                   f"State: {'OK' if state else 'Err'} (Count: {count_states}"
-                                   f"{', ERR count: '+str(count_false_states) if count_false_states > 0 else ''}) <=" + Style.RESET_ALL)
+        print(Fore.LIGHTGREEN_EX + f"FINISH TESTS, "
+                                   f"State: {'OK' if state else 'Err'} (Tests: {count_states}"
+                                   f"{', ERR tests: '+str(count_false_states) if count_false_states > 0 else ''})" + Style.RESET_ALL)
     else:
         print(Fore.LIGHTRED_EX + "!!! Missing 'MULTIPLE_ENV' configuration !!!" + Style.RESET_ALL)
 
