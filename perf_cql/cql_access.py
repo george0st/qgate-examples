@@ -75,6 +75,9 @@ class CQLAccess:
 
     def create_model(self):
         """Create new NoSQL model (create keyspace and table)"""
+        if not self._run_setup["model_rebuild"]:
+            return
+
         session = None
         print("  Create new model...")
         create_start = perf_counter()
