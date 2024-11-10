@@ -1,4 +1,4 @@
-# Knowledge base for CQL solutions
+# Knowledge base for maintenance
 
 ## Maintenance tasks
 
