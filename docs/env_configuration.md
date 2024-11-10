@@ -128,6 +128,13 @@ be applied to each single ENV file):
    - The maximal value for generation of random items (from 0 to this value)
      in all performance tests (for READ, WRITE, READWRITE). The default is
      value _99999_.
+ - **MODEL_REBUILD** (opt)
+   - Is it possible rebuild the model? (True is default)
+   - NOTE:
+     - In case of False, it will be without creation of new keyspace or table
+       (the test will use existing keyspace and table without modification)
+     - It is useful param in case, that you have to primary push data to the 
+       model and then to do performance tests
 
 ### 1.4 Examples
 
@@ -191,7 +198,7 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
      - if the value is not defined, the value will be used from multi ENV
        (as global setting), from setting '_BULK_LIST_R_' for
        '_TEST_TYPE = R_' or '_BULK_LIST_W_' for '_TEST_TYPE = W_' 
- - **MODEL_REBUILD** (opt)
+ - **MODEL_REBUILD** (opt, inherited)
    - Is it possible rebuild the model? (True is default)
    - NOTE:
      - In case of False, it will be without creation of new keyspace or table

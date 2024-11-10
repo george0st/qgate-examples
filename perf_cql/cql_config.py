@@ -109,6 +109,7 @@ class CQLConfig:
             else:
                 global_param['cluster_diagnose'] = self._config.get("CLUSTER_DIAGNOSE", CQLConfigSetting.CLUSTER_DIAGNOSE)
                 global_param['cluster_diagnose_only'] = False
+            global_param['model_rebuild'] = self._config.get("MODEL_REBUILD", CQLConfigSetting.MODEL_REBUILD)
             global_param['keyspace'] = self._config.get("KEYSPACE", CQLConfigSetting.KEYSPACE)
             global_param['bulk_list_r'] = literal_eval(self._config.get("BULK_LIST_R", CQLConfigSetting.BULK_LIST_R))
             global_param['bulk_list_w'] = literal_eval(self._config.get("BULK_LIST_W", CQLConfigSetting.BULK_LIST_W))
@@ -159,7 +160,7 @@ class CQLConfig:
         manage_params = global_param.copy()
 
         manage_params['executor_duration'] = int(self._inherit_param("EXECUTOR_DURATION", global_param, 'executor_duration'))
-
+        manage_params['executors'] = self._inherit_param_eval("EXECUTORS", global_param, 'executors', CQLConfigSetting.EXECUTORS)
         manage_params['adapter'] = self._inherit_param(None, global_param, 'adapter', CQLConfigSetting.ADAPTER).lower()
         manage_params['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
         if manage_params['test_type'] == "r":
@@ -168,7 +169,7 @@ class CQLConfig:
             manage_params['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, 'bulk_list_w', CQLConfigSetting.BULK_LIST_W)
         elif manage_params['test_type'] == "rw" or manage_params['test_type'] == "wr":
             manage_params['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, 'bulk_list_rw', CQLConfigSetting.BULK_LIST_RW)
-
+        manage_params['generate_graph'] = self._inherit_param('GENERATE_GRAPH', global_param, 'generate_graph', CQLConfigSetting.GENERATE_GRAPH)
         # label
         manage_params['label'] = self._config.get("LABEL", CQLConfigSetting.LABEL)
         return manage_params
@@ -178,7 +179,8 @@ class CQLConfig:
 
         executor_params = {}
 
-        executor_params['model_rebuild'] = cql_helper.str2bool(self._config.get("MODEL_REBUILD", CQLConfigSetting.MODEL_REBUILD))
+        executor_params['model_rebuild'] = cql_helper.str2bool(self._inherit_param("MODEL_REBUILD", global_param, "model_rebuild", CQLConfigSetting.MODEL_REBUILD))
+            #self._config.get("MODEL_REBUILD", CQLConfigSetting.MODEL_REBUILD))
 
         executor_params['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
 
