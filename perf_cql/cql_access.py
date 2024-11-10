@@ -36,7 +36,8 @@ class CQLAccess:
                                                  password = self._run_setup["password"])
 
         # load balancing policy
-        if int(self._run_setup['keyspace_replication_factor']) > 1 and self._run_setup["local_dc"]:
+#        if int(self._run_setup['keyspace_replication_factor']) > 1 and self._run_setup["local_dc"]:
+        if self._run_setup["local_dc"]:
             load_balancing_policy = DCAwareRoundRobinPolicy(local_dc = self._run_setup["local_dc"])
         else:
             load_balancing_policy = RoundRobinPolicy()

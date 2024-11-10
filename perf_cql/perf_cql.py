@@ -10,6 +10,7 @@ from cql_access import CQLAccess, Setting
 from colorama import Fore, Style
 from cql_helper import get_rng_generator
 from cql_health import CQLHealth, CQLDiagnosePrint
+from qgate_perf.output_result import PerfResult, PerfResults
 from glob import glob
 import click
 
@@ -233,7 +234,7 @@ def generate_graphs(generator: ParallelExecutor, generate_graph_scope, output_di
                                suppress_error = True,
                                only_new=True)           # generate only new files (not regenerate all)
 
-def perf_test(unique_id, manage_params: dict, executor_params: dict):
+def perf_test(unique_id, manage_params: dict, executor_params: dict) -> PerfResults:
 
     #lbl = executor_param['adapter']
     lbl = manage_params['adapter']
@@ -271,18 +272,24 @@ def perf_test(unique_id, manage_params: dict, executor_params: dict):
         return
 
     # performance execution
-    generator.run_bulk_executor(manage_params['bulk_list'],
-                                manage_params['executors'],
-                                run_setup = setup)
+    output = generator.run_bulk_executor(manage_params['bulk_list'],
+                                          manage_params['executors'],
+                                          run_setup = setup)
 
     # generate graphs
     generate_graphs(generator,
                     manage_params['generate_graph'],
                     path.join(manage_params['perf_dir'], "..", "output"))
 
+    return output
+
 def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = False, level = "short"):
 
     global_params = CQLConfig(perf_dir).get_global_params(multi_env, only_cluster_diagnose, level)
+    state=True
+    count_states=0
+    count_false_states=0
+
     if global_params:
         env_count = 0
         unique_id = "-" + datetime.datetime.now().strftime("%H%M%S")
@@ -300,10 +307,14 @@ def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = F
 
             # create manage and executor params
             executor_params, manage_params = CQLConfig(perf_dir).get_params(env, global_params)
-            perf_test(unique_id,
-                      manage_params,
-                      executor_params)
-        print(Fore.LIGHTGREEN_EX + f"=> FINISH tests ({len(envs)}x env {'files' if len(envs)>1 else 'file'}) <=" + Style.RESET_ALL)
+            output = perf_test(unique_id, manage_params, executor_params)
+            if not output.state:
+                state = False
+            count_states += output.count_states
+            count_false_states += output.count_false_states
+        print(Fore.LIGHTGREEN_EX + f"=> FINISH tests ("
+                                   f"ENV files: {len(envs)}, "
+                                   f"Total state: {'OK' if state else 'Err'} [Count: {count_states}, ERR count: {count_false_states}]) <=" + Style.RESET_ALL)
     else:
         print(Fore.LIGHTRED_EX + "!!! Missing 'MULTIPLE_ENV' configuration !!!" + Style.RESET_ALL)
 
