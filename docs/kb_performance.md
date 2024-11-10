@@ -6,11 +6,13 @@
 
 #### 1.1.1 Balance to all nodes
   - Please, comment the parameter '_LB_LOCAL_DC_', than RoundRobinPolicy will be
-    used (instead of '_DCAwareRoundRobinPolicy_'), it means routing will be
+    used (instead of '_DCAwareRoundRobinPolicy_'). It means routing will be
     to the all nodes in cluster (not only nodes in local data center)
   - NOTE: 
     - It is valid recommendation in case, that all data centers have the same
-      network availabilities
+      network availabilities. If you have DC with different network availability
+      that you have to consider this setting (tradeoff between different 
+      response time vs higher parallelism)
 
 #### 1.1.2 Increase replication factor for keyspace
   - It will increase parallel/concurrent access to the data 
@@ -25,13 +27,15 @@
      parameters based on preference for tuning of READ/WRITE operationS 
    - The detail setting has relation of density, timing of compaction, etc.
    - NOTE:
-     - The setting will be visible in case, that node/cluster has enough data (it
-       is not visible in case of small data amount) 
+     - The setting will be visible in case, that node/cluster will have enough data
+       (it is not visible in case of small data amount) 
   
 ### 1.2 With HW increase
 
 #### 1.2.1 Increase amount of nodes
   - NOTE:
-    - if you use the parameter '_LB_LOCAL_DC_', the main is scaling for local 
-      data center
+    - It is possible to use not symetric data centers e.g. 4x node in PDC and
+      2x node in DRC
+    - if you use the parameter '_LB_LOCAL_DC_' (focus on local data center),
+      the scaling of local data center will be enough.
 
