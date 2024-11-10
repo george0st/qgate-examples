@@ -5,3 +5,5 @@
 4. Add 'table name' as param
   - ability to use more tables for testing t01, t02, etc.
 5. update doc, 'executors', 'GENERATE_GRAPH' in level single ENV
+6. change error propagation for missing ENV file
+  - not exception but RED message and switch processing for this ENV file

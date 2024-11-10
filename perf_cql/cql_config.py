@@ -69,7 +69,7 @@ class CQLConfig:
         else:
             # inheritance of param from global_param
             if global_param:
-                if global_param.get(global_param_name, None):
+                if global_param.get(global_param_name, None) is not None:
                     return global_param[global_param_name]
             return param_name_default
 
@@ -82,14 +82,19 @@ class CQLConfig:
 
         # inheritance of param from global_param
         if global_param:
-            if global_param.get(global_param_name, None):
+            if global_param.get(global_param_name, None) is not None:
                 return global_param[global_param_name]
         return param_name_default
 
     def get_global_params(self, env_file, only_cluster_diagnose = False, level = "short") -> dict:
 
         global_param = {}
-        self._config = dotenv_values(path.join(self._perf_dir, "config", env_file))
+
+        env_file_path = path.join(self._perf_dir, "config", env_file)
+        if not path.exists(env_file_path):
+            raise Exception(f"Invalid path to ENV file '{env_file_path}'.")
+
+        self._config = dotenv_values(env_file_path)
 
         # shared params for all providers
         global_param['multiple_env'] = self._config.get('MULTIPLE_ENV', None)
@@ -148,7 +153,11 @@ class CQLConfig:
         executor_params = {}
         manage_params = {}
 
-        self._config = dotenv_values(path.join(self._perf_dir, "config", env_file))
+        # load ENV file
+        env_file_path=path.join(self._perf_dir, "config", env_file)
+        if not path.exists(env_file_path):
+            raise Exception(f"Invalid path to ENV file '{env_file_path}'.")
+        self._config = dotenv_values(env_file_path)
 
         manage_params = self._create_manage_param(global_param)
         executor_params = self._create_executor_param(global_param)
