@@ -300,13 +300,12 @@ def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = F
 
             # create manage and executor params
             executor_params, manage_params = CQLConfig(perf_dir).get_params(env, global_params)
-
-            # TODO: use 'main_param' for execution and get_params can update 'main_param' also
             perf_test(unique_id,
                       manage_params,
                       executor_params)
+        print(Fore.LIGHTGREEN_EX + f"=> FINISH tests ({len(envs)}x env {'files' if len(envs)>1 else 'file'}) <=" + Style.RESET_ALL)
     else:
-        print("!!! Missing 'MULTIPLE_ENV' configuration !!!")
+        print(Fore.LIGHTRED_EX + "!!! Missing 'MULTIPLE_ENV' configuration !!!" + Style.RESET_ALL)
 
 def test_cluster(env, perf_dir):
 

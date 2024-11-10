@@ -21,12 +21,12 @@ default ASC ordering).
    - The test duration for run EACH PERFORMANCE TEST (value in seconds, 
      default is _5_)
  - **PERCENTILE** (opt)
-   - The usage of percentile in outputs and graphs (default value is without percentile).
+   - The percentile is used in outputs and graphs (default value is without percentile).
    - The value is float number **>0 and <1**
    - NOTE:
      - Expected value e.g. _0.99_, _0.95_, _0.70_, etc. (recommendation is 0.99 or 0.95)
      - The usage of percentile is without impact to quality of measurement
- - **BULK_LIST_R** (opt) and
+ - **BULK_LIST_R** (opt) 
  - **BULK_LIST_W** (opt)
  - **BULK_LIST_RW** (opt)
    - The size of data bulk/bundle for READ, WRITE and READWRITE are in format:
@@ -172,10 +172,16 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
    - The type of operation can be '_R_' read, '_W_' write (as default) and '_RW_'
  - **LABEL** (opt)
    - The label used in output file name (default is '_local_')
- - **EXECUTOR_DURATION** (opt, inherid)
+ - **EXECUTOR_DURATION** (opt, inherited)
    - The test duration for run EACH PERFORMANCE TEST (value in seconds, 
      default is _5_)
- - **BULK_LIST** (opt, inherit)
+ - **PERCENTILE** (opt, inherited)
+   - The percentile is used in outputs and graphs (default value is without percentile).
+   - The value is float number **>0 and <1**
+   - NOTE:
+     - Expected value e.g. _0.99_, _0.95_, _0.70_, etc. (recommendation is 0.99 or 0.95)
+     - The usage of percentile is without impact to quality of measurement
+ - **BULK_LIST** (opt, inherited)
    - The size of data bulk in format '_[[rows, columns], ...]_' 
      (default is '_[[200, 10]]_')
    - NOTE: _[[200, 10]]_ means, that table will have 10 columns and will do
@@ -185,23 +191,23 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
      - if the value is not defined, the value will be used from multi ENV
        (as global setting), from setting '_BULK_LIST_R_' for
        '_TEST_TYPE = R_' or '_BULK_LIST_W_' for '_TEST_TYPE = W_' 
- - **KEYSPACE** (opt, inherit)
+ - **KEYSPACE** (opt, inherited)
    - The name of keyspace for test (default is '_prftest_')
 
 ### 2.1 The access parameters
 
- - **IP** (opt, inherit)
+ - **IP** (opt, inherited)
    - The list of IP addresses separated by a comma, 
      e.g. '_10.129.53.159, 10.129.53.153, ..._' (default is '_localhost_')
- - **PORT** (opt, inherit)
+ - **PORT** (opt, inherited)
    - The port value (default is _9042_)
- - **SECURE_CONNECT_BUNDLE** (opt, inherit)
+ - **SECURE_CONNECT_BUNDLE** (opt, inherited)
    - The connection based on SECURE_CONNECT_BUNDLE, it is a useful
      way for AstraDB.
    - NOTE: It is typically used instead of IP and PORT definition
- - **USERNAME** (opt, inherit)
+ - **USERNAME** (opt, inherited)
     - The username for login (default is '_cassandra_')
- - **PASSWORD** (opt, inherit)
+ - **PASSWORD** (opt, inherited)
     - The path to the file with password for login 
       (default is password value '_cassandra_')
  - **CONSISTENCY_LEVEL** (opt)
@@ -210,7 +216,7 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
      - All data centers: '_EACH_QUORUM_', '_QUORUM_', '_SERIAL_', '_ALL_'
      - Some data center:  '_ONE_', '_TWO_', '_THREE_', '_ANY_'
    - NOTE: detailed description see [DataStax Consistency](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
- - **LB_LOCAL_DC** (opt, inherit)
+ - **LB_LOCAL_DC** (opt, inherited)
    - The name of local data center for correct balancing 
      (expected value is e.g. '_datacenter1_' or '_dc1_')
    - NOTE: 
@@ -267,7 +273,7 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
        [LCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/lcs.html#lcs_options),
        [TWCS](https://cassandra.apache.org/doc/5.0/cassandra/managing/operating/compaction/twcs.html#twcs_options)
      - relevant setting for Write and ReadWrite TEST_TYPE
- - **NUMERIC_SCOPE** (opt, inherit)
+ - **NUMERIC_SCOPE** (opt, inherited)
    - The maximal value for generation of random items (from 0 to this value)
      in all performance tests (for READ, WRITE, READWRITE). The default is
      value _99999_.
@@ -299,7 +305,7 @@ COMPACTION_PARAMS = "'scaling_parameters': 'L4, L10'"
 ## NOTEs
 
  - The **network routing** will be used based on setting of 
-   replication factor and load balacing  
+   replication factor and load balancing  
    - _DCAwareRoundRobinPolicy_ (for REPLICATION_FACTOR > 1 and LB_LOCAL_DC != None)  
      with usage of local data center (from LB_LOCAL_DC)
    - else _RoundRobinPolicy_
