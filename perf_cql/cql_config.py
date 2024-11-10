@@ -38,6 +38,7 @@ class CQLConfigSetting:
     CLUSTER_DIAGNOSE = "Short"
     MULTIPLE_ENV_DELAY = "0"
 
+    TABLE = "t01"
     KEYSPACE = "prftest"
     TEST_TYPE = "W"
     REPLICATION_CLASS = "NetworkTopologyStrategy"
@@ -115,6 +116,7 @@ class CQLConfig:
                 global_param['cluster_diagnose'] = self._config.get("CLUSTER_DIAGNOSE", CQLConfigSetting.CLUSTER_DIAGNOSE)
                 global_param['cluster_diagnose_only'] = False
             global_param['model_rebuild'] = self._config.get("MODEL_REBUILD", CQLConfigSetting.MODEL_REBUILD)
+            global_param['table'] = self._config.get("TABLE", CQLConfigSetting.TABLE)
             global_param['keyspace'] = self._config.get("KEYSPACE", CQLConfigSetting.KEYSPACE)
             global_param['bulk_list_r'] = literal_eval(self._config.get("BULK_LIST_R", CQLConfigSetting.BULK_LIST_R))
             global_param['bulk_list_w'] = literal_eval(self._config.get("BULK_LIST_W", CQLConfigSetting.BULK_LIST_W))
@@ -189,8 +191,8 @@ class CQLConfig:
         executor_params = {}
 
         executor_params['model_rebuild'] = cql_helper.str2bool(self._inherit_param("MODEL_REBUILD", global_param, "model_rebuild", CQLConfigSetting.MODEL_REBUILD))
-            #self._config.get("MODEL_REBUILD", CQLConfigSetting.MODEL_REBUILD))
 
+        executor_params['table'] = self._inherit_param("TABLE", global_param, "table", CQLConfigSetting.TABLE)
         executor_params['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
 
         # percentile setting
