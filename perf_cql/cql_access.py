@@ -11,7 +11,6 @@ from time import perf_counter
 class Setting:
     """Setting for CQLAccess"""
 
-    TABLE_NAME = "t01"
     TIMEOUT = 40
     TIMEOUT_CREATE_MODEL = 900
 
@@ -79,7 +78,7 @@ class CQLAccess:
             return
 
         session = None
-        print("  Create new model...")
+        print(f"  Create new model [{self._run_setup['keyspace']}].[{self._run_setup['table']}]...")
         create_start = perf_counter()
 
         try:
@@ -97,7 +96,7 @@ class CQLAccess:
                                     "};")
 
             # use LTW atomic command with IF
-            session.execute(f"DROP TABLE IF EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME};")
+            session.execute(f"DROP TABLE IF EXISTS {self._run_setup['keyspace']}.{self._run_setup['table']};")
 
             # prepare insert statement for batch
             columns = ""
@@ -105,7 +104,7 @@ class CQLAccess:
                 columns += f"fn{i} int,"
 
             # complex primary key (partition key 'fn0' and cluster key 'fn1')
-            create_tbl = (f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{Setting.TABLE_NAME} "
+            create_tbl = (f"CREATE TABLE IF NOT EXISTS {self._run_setup['keyspace']}.{self._run_setup['table']} "
                           f"({columns[:-1]}, PRIMARY KEY (fn0, fn1))")
 
             # add compaction setting
