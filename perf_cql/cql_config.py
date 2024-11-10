@@ -50,6 +50,7 @@ class CQLConfigSetting:
     LABEL = "local"
     NUMERIC_SCOPE = "99999"
 
+    MODEL_REBUILD = "True"
     KEYSPACE_REBUILD = "True"
 
 class CQLConfig:
@@ -142,13 +143,19 @@ class CQLConfig:
             return None
 
     def get_params(self, env_file, global_param: dict) -> (dict, dict):
-
+        """"""
         executor_params = {}
         manage_params = {}
 
         self._config = dotenv_values(path.join(self._perf_dir, "config", env_file))
 
-        # 1. create 'manage_params' as copy of 'global_params' and modification
+        manage_params = self._create_manage_param(global_param)
+        executor_params = self._create_executor_param(global_param)
+        return executor_params, manage_params
+
+    def _create_manage_param(self, global_param: dict) -> dict:
+        """Create params for management/setting of executors"""
+        manage_params = {}
         manage_params = global_param.copy()
 
         manage_params['executor_duration'] = int(self._inherit_param("EXECUTOR_DURATION", global_param, 'executor_duration'))
@@ -159,13 +166,19 @@ class CQLConfig:
             manage_params['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, 'bulk_list_r', CQLConfigSetting.BULK_LIST_R)
         elif manage_params['test_type'] == "w":
             manage_params['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, 'bulk_list_w', CQLConfigSetting.BULK_LIST_W)
-        elif manage_params['test_type'] == "rw" or executor_params['test_type'] == "wr":
+        elif manage_params['test_type'] == "rw" or manage_params['test_type'] == "wr":
             manage_params['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, 'bulk_list_rw', CQLConfigSetting.BULK_LIST_RW)
 
         # label
         manage_params['label'] = self._config.get("LABEL", CQLConfigSetting.LABEL)
+        return manage_params
 
-        # 2. update 'executor_params'
+    def _create_executor_param(self, global_param: dict) -> dict:
+        """Create params for usage in executors (in processes and threads)"""
+
+        executor_params = {}
+
+        executor_params['model_rebuild'] = cql_helper.str2bool(self._config.get("MODEL_REBUILD", CQLConfigSetting.MODEL_REBUILD))
 
         executor_params['keyspace'] = self._inherit_param("KEYSPACE", global_param, "keyspace", CQLConfigSetting.KEYSPACE)
 
@@ -173,8 +186,6 @@ class CQLConfig:
         percentile = self._inherit_param("PERCENTILE", global_param, "percentile")
         if percentile:
             executor_params['percentile'] = float(percentile)
-        # if global_param.get("percentile", None):
-        #     executor_params['percentile'] = float(global_param["percentile"])
 
         # connection setting (relation to global_param)
         executor_params["ip"] = self._inherit_param("IP", global_param, 'ip', CQLConfigSetting.IP).split(",")
@@ -213,5 +224,4 @@ class CQLConfig:
 
         # numeric scope
         executor_params['numeric_scope'] = int(self._inherit_param("NUMERIC_SCOPE", global_param, 'numeric_scope', CQLConfigSetting.NUMERIC_SCOPE))
-
-        return executor_params, manage_params
+        return executor_params
