@@ -7,3 +7,8 @@ python3.11 perf_cql/perf_cql.py run -e _cass2.env -d perf_cql
 # PERFORMANCE peek, run _cass-peek.env (1 minute execution time, focus on performance peek)
 python3.11 perf_cql/perf_cql.py run -e _cass-peek.env -d perf_cql
 python3.11 perf_cql/perf_cql.py run -e _cass-peek2.env -d perf_cql
+
+
+nohup python3.11 perf_cql/perf_cql.py run -e _cassV4.env -d perf_cql
+nohup python3.11 perf_cql/perf_cql.py run -e _cassV5.env -d perf_cql
+
