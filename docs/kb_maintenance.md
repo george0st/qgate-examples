@@ -6,9 +6,9 @@
 
 #### 1.1 Total cleanup
 
- - nodetool compact
- - nodetool cleanup
- - nodetool garbagecollect
+ - ./nodetool compact
+ - ./nodetool cleanup
+ - ./nodetool garbagecollect
 
 #### 1.2 Compaction
 
