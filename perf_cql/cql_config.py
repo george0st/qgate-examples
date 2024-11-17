@@ -137,6 +137,8 @@ class CQLConfig:
                 global_param['username'] = self._config["USERNAME"]
             if self._config.get("PASSWORD", None):
                 global_param['password'] = self._config["PASSWORD"]
+            if self._config.get("CONSISTENCY_LEVEL", None):
+                global_param['consistency_level'] = self._config["CONSISTENCY_LEVEL"]
 
             # network global setting
             if self._config.get("LB_LOCAL_DC", None):
@@ -227,8 +229,12 @@ class CQLConfig:
             executor_params['compaction_params'] = self._config["COMPACTION_PARAMS"]
 
         # consistency level
-        executor_params['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get("CONSISTENCY_LEVEL",
-                                                                                                CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
+        executor_params['consistency_level'] = ConsistencyHelper.name_to_value[self._inherit_param("CONSISTENCY_LEVEL",
+                                                                                                   global_param,
+                                                                                                   'consistency_level',
+                                                                                                   CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
+        # executor_params['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get("CONSISTENCY_LEVEL",
+        #                                                                                         CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
 
         # network balancing, local data center for correct setting of balancing (RoundRobinPolicy or DCAwareRoundRobinPolicy)
         local_dc = self._inherit_param("LB_LOCAL_DC", global_param, 'local_dc')

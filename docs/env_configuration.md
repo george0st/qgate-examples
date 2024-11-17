@@ -76,6 +76,12 @@ be applied to each single ENV file):
     - NOTE:
       - In case of usage 'SECURE_CONNECT_BUNDLE', the password is 
        'secret' from downloaded astra web file '*-token.json'
+ - **CONSISTENCY_LEVEL** (opt)
+   - The consistency level for application (valid for Read/Write operations) can be:
+     - Only local data center: '_LOCAL_ONE_', '_LOCAL_QUORUM_' (as default), '_LOCAL_SERIAL_' 
+     - All data centers: '_EACH_QUORUM_', '_QUORUM_', '_SERIAL_', '_ALL_'
+     - Some data center:  '_ONE_', '_TWO_', '_THREE_', '_ANY_'
+   - NOTE: detailed description see [DataStax Consistency](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html)
   - **LB_LOCAL_DC** (opt)
     - The name of local data center for correct balancing 
       (expected value is e.g. '_datacenter1_' or '_dc1_')
@@ -222,7 +228,7 @@ ScyllaDB, Cassandra, AstraDB, CosmosDB.
  - **PASSWORD** (opt, inherited)
     - The path to the file with password for login 
       (default is password value '_cassandra_')
- - **CONSISTENCY_LEVEL** (opt)
+ - **CONSISTENCY_LEVEL** (opt, inherited)
    - The consistency level for application (valid for Read/Write operations) can be:
      - Only local data center: '_LOCAL_ONE_', '_LOCAL_QUORUM_' (as default), '_LOCAL_SERIAL_' 
      - All data centers: '_EACH_QUORUM_', '_QUORUM_', '_SERIAL_', '_ALL_'
