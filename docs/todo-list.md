@@ -10,3 +10,6 @@
 
 6. change error propagation for missing ENV file
   - not exception but RED message and switch processing for this ENV file
+  - see exception in get_global_params
+
+7. Add consistency level to global ENV
