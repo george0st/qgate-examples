@@ -283,7 +283,7 @@ def perf_test(unique_id, manage_params: dict, executor_params: dict) -> PerfResu
 
     return output
 
-def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = False, level = "short"):
+def main_execute(multi_env="cass.env", perf_dir = ".", force_param = "", only_cluster_diagnose = False, level = "short"):
 
     global_params = CQLConfig(perf_dir).get_global_params(multi_env, only_cluster_diagnose, level)
     state=True
@@ -306,7 +306,7 @@ def main_execute(multi_env="cass.env", perf_dir = ".", only_cluster_diagnose = F
                     time.sleep(global_params['multiple_env_delay'])
 
             # create manage and executor params
-            executor_params, manage_params = CQLConfig(perf_dir).get_params(env, global_params)
+            executor_params, manage_params = CQLConfig(perf_dir, force_param).get_params(env, global_params)
             output = perf_test(unique_id, manage_params, executor_params)
             if not output.state:
                 state = False
@@ -427,7 +427,7 @@ def diagnose_group():
 @click.option("-l", "--level", help="level of diagnose, acceptable values 'short', 'full', 'extra' (default 'short')", default="short")
 def diagnose(env, perf_dir, level):
     """Diagnostic for cluster based on ENV file(s)."""
-    main_execute(env, perf_dir, True, level)
+    main_execute(env, perf_dir, "",True, level)
 
 @click.group()
 def run_group():
@@ -436,9 +436,10 @@ def run_group():
 @run_group.command()
 @click.option("-e", "--env", help="name of ENV file (default 'cass.env')", default="cass.env")
 @click.option("-d", "--perf_dir", help="directory with perf_cql (default '.')", default=".")
-def run(env, perf_dir):
+@click.option("-fp", "--force_param", help="force/rewrite parameters in ENV file", default="")
+def run(env, perf_dir, force_param):
     """Run performance tests based on ENV file(s)."""
-    main_execute(env, perf_dir)
+    main_execute(env, perf_dir, force_param)
 
 cli = click.CommandCollection(sources=[run_group, diagnose_group, graph_group, version_group, test_group])
 

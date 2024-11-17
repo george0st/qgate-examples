@@ -57,13 +57,18 @@ class CQLConfigSetting:
 class CQLConfig:
     """The configuration of CQL, based on ENV files."""
 
-    def __init__(self, perf_dir = "."):
+    def __init__(self, perf_dir = ".", force_param: str = None):
         """Processing/Parsing of dictionary parameters from config/ENV files"""
         self._perf_dir = perf_dir
+        self._force_params= self._get_force_params(force_param)
         self._config = {}
 
     def _inherit_param_eval(self, param_name, global_param, global_param_name, param_name_default = None):
-        """Get adapter from single or from global ENV"""
+        """Get item from single or from global ENV"""
+
+        if self._force_params:
+            if self._force_params.get(param_name, None):
+                return literal_eval(self._force_params[param_name])
 
         if self._config.get(param_name, None):
             return literal_eval(self._config[param_name])
@@ -75,11 +80,15 @@ class CQLConfig:
             return param_name_default
 
     def _inherit_param(self, param_name, global_param, global_param_name, param_name_default = None):
-        """Get adapter from single or from global ENV"""
+        """Get item from single or from global ENV"""
 
-        if param_name:
-            if self._config.get(param_name, None):
-                return self._config[param_name]
+        if self._force_params:
+            if self._force_params.get(param_name, None):
+                return self._force_params[param_name]
+
+#        if param_name:
+        if self._config.get(param_name, None):
+            return self._config[param_name]
 
         # inheritance of param from global_param
         if global_param:
@@ -152,6 +161,21 @@ class CQLConfig:
         else:
             return None
 
+    def _get_force_params(self, force_param: str) -> dict:
+        if force_param:
+            if len(force_param) > 0:
+                force_params = {}
+                parse_params = force_param.split(";");
+                for parse_item in parse_params:
+                    force_items = parse_item.split("=",2)
+                    if len(force_items) == 2:
+                        key=force_items[0].strip(" ;\r\n")
+                        item=force_items[1].strip(" ;\r\n")
+                        if len(key) > 0:
+                            force_params[key]=item
+                return force_params
+        return None
+
     def get_params(self, env_file, global_param: dict) -> (dict, dict):
         """"""
         executor_params = {}
@@ -165,6 +189,7 @@ class CQLConfig:
 
         manage_params = self._create_manage_param(global_param)
         executor_params = self._create_executor_param(global_param)
+
         return executor_params, manage_params
 
     def _create_manage_param(self, global_param: dict) -> dict:
@@ -174,7 +199,7 @@ class CQLConfig:
 
         manage_params['executor_duration'] = int(self._inherit_param("EXECUTOR_DURATION", global_param, 'executor_duration'))
         manage_params['executors'] = self._inherit_param_eval("EXECUTORS", global_param, 'executors', CQLConfigSetting.EXECUTORS)
-        manage_params['adapter'] = self._inherit_param(None, global_param, 'adapter', CQLConfigSetting.ADAPTER).lower()
+        manage_params['adapter'] = self._inherit_param("ADAPTER", global_param, 'adapter', CQLConfigSetting.ADAPTER).lower()
         manage_params['test_type'] = self._config.get("TEST_TYPE", CQLConfigSetting.TEST_TYPE).lower()
         if manage_params['test_type'] == "r":
             manage_params['bulk_list'] = self._inherit_param_eval("BULK_LIST", global_param, 'bulk_list_r', CQLConfigSetting.BULK_LIST_R)
@@ -233,8 +258,6 @@ class CQLConfig:
                                                                                                    global_param,
                                                                                                    'consistency_level',
                                                                                                    CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
-        # executor_params['consistency_level'] = ConsistencyHelper.name_to_value[self._config.get("CONSISTENCY_LEVEL",
-        #                                                                                         CQLConfigSetting.CONSISTENCY_LEVEL).upper()]
 
         # network balancing, local data center for correct setting of balancing (RoundRobinPolicy or DCAwareRoundRobinPolicy)
         local_dc = self._inherit_param("LB_LOCAL_DC", global_param, 'local_dc')
