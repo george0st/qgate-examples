@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="run _cassV5" type="PythonConfigurationType" factoryName="Python" folderName="cassandra V4 vs V5">
+  <configuration default="false" name="run _cassV5_write" type="PythonConfigurationType" factoryName="Python" folderName="cassandra V4 vs V5">
     <module name="qgate-examples" />
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
@@ -14,7 +14,7 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/perf_cql/perf_cql.py" />
-    <option name="PARAMETERS" value="run -e _cassV5.env" />
+    <option name="PARAMETERS" value="run -e _cassV5_write.env" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />
