@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Loaded data for test
-#  - ~90 mil items in each table
+#  - ~56 mil items in each table
 ####################################
 
 # test Cassandra V4
